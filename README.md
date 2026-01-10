@@ -1,164 +1,91 @@
-# 信毅會 Faith Learning Society 網站
+# 信毅會 Faith Learning Society
 
-## 信而有毅，學而無礙
-### Redefining learning possibilities for diverse needs
+<p align="center">
+  <img src="images/faithwill-logo.png" alt="信毅會 Logo" width="300">
+</p>
 
----
-
-## 📁 專案結構
-
-```
-faithwill-website/
-├── index.html          # 首頁
-├── about.html          # 關於我們
-├── resources.html      # 免費資源與工具
-├── css/
-│   └── style.css       # 主要樣式表
-├── js/
-│   └── main.js         # JavaScript 互動功能
-├── images/             # 圖片資源（待新增）
-└── README.md           # 專案說明文件
-```
-
-## 🚀 快速開始
-
-### 方法一：直接開啟
-直接在瀏覽器中開啟 `index.html` 即可瀏覽網站。
-
-### 方法二：使用本地伺服器（推薦）
-
-使用 Python：
-```bash
-# Python 3
-python -m http.server 8000
-
-# 然後在瀏覽器開啟 http://localhost:8000
-```
-
-使用 Node.js：
-```bash
-# 安裝 serve
-npm install -g serve
-
-# 啟動伺服器
-serve .
-
-# 或使用 npx
-npx serve .
-```
-
-使用 VS Code Live Server 擴充功能：
-1. 安裝 Live Server 擴充功能
-2. 右鍵點擊 `index.html`
-3. 選擇「Open with Live Server」
-
-## 🎨 設計特色
-
-### 品牌色彩
-- **主色調**：#4A90A4（信任藍綠）
-- **信 Faith**：#6B5B95（紫色 - 代表信任）
-- **毅 Will**：#FF6B6B（珊瑚紅 - 代表力量）
-- **會 Learning**：#4ECDC4（青綠色 - 代表成長）
-
-### 響應式設計
-- 桌面版（1024px+）
-- 平板版（768px - 1024px）
-- 手機版（< 768px）
-
-### 無障礙功能
-- 符合 WCAG 2.1 AA 標準
-- 支援螢幕閱讀器
-- 鍵盤導航友善
-- 可調整字體大小
-- 高對比模式支援
-- 減少動態效果模式支援
-
-## 📄 頁面說明
-
-### 首頁 (index.html)
-- Hero 主視覺區
-- 信毅精神三階段（信、毅、會）
-- 免費平台功能介紹
-- 願景區塊
-- 行動呼籲區
-
-### 關於我們 (about.html)
-- 願景與使命
-- 名稱由來解說
-- 免費模式說明
-- 創辦人的話
-- 團隊招募資訊
-- 合作夥伴區塊
-
-### 免費資源與工具 (resources.html)
-- 適用對象說明
-- AI 學習工具介紹
-- 開放教學資源庫
-- AI 學習流程
-- 設計原則
-- 使用指南
-- 社群資訊
-- 常見問題 FAQ
-
-## 🔧 技術規格
-
-### 使用技術
-- HTML5 語意化標籤
-- CSS3（CSS Variables、Flexbox、Grid）
-- Vanilla JavaScript（ES6+）
-- Font Awesome 圖示
-- Google Fonts（Noto Sans TC、Noto Serif TC）
-
-### 瀏覽器支援
-- Chrome 80+
-- Firefox 75+
-- Safari 13+
-- Edge 80+
-
-### 效能優化
-- 延遲載入圖片
-- CSS 動畫使用 GPU 加速
-- 事件節流與防抖
-- Intersection Observer API
-
-## 📝 自訂指南
-
-### 修改品牌色彩
-編輯 `css/style.css` 中的 CSS Variables：
-
-```css
-:root {
-  --primary-color: #4A90A4;
-  --secondary-color: #F5A623;
-  --accent-faith: #6B5B95;
-  --accent-will: #FF6B6B;
-  --accent-learn: #4ECDC4;
-}
-```
-
-### 新增頁面
-1. 複製現有 HTML 檔案作為模板
-2. 修改 `<title>` 和 meta 標籤
-3. 更新導航列中的 active 狀態
-4. 編輯主要內容區域
-
-### 新增圖片
-將圖片放入 `images/` 資料夾，建議：
-- 使用 WebP 格式以獲得更好的壓縮率
-- 提供適當的 alt 文字
-- 考慮提供多種尺寸以支援響應式設計
-
-## 📧 聯絡資訊
-
-- **Email**: contact@faithwill.org
-- **網站**: https://faithwill.org（待上線）
-
-## 📜 授權條款
-
-- 網站程式碼：MIT License
-- 教學資源：Creative Commons CC BY-NC-SA 4.0
+<p align="center">
+  <strong>信而有毅，學而無礙</strong><br>
+  <em>Redefining learning possibilities for diverse needs</em>
+</p>
 
 ---
 
-**信毅會 Faith Learning Society**
-*讓每個孩子都能學會，讓每個家庭都有希望。*
+## 🌟 關於我們
+
+**信毅會 Faith Learning Society** 是一個致力於為學習障礙兒童提供**完全免費** AI 學習資源的非營利平台。
+
+我們相信每個孩子都擁有獨特的學習天賦。透過科技與愛心，我們正在打造一個無障礙的學習環境，讓每個孩子都能在自己的節奏中成長。
+
+---
+
+## 💜 信毅精神：三階段成長承諾
+
+「信毅會」的名稱蘊含著我們對每個孩子的承諾：
+
+| 階段 | 核心理念 |
+|------|----------|
+| **相信 (Faith)** | 相信每個孩子都能學會。神經多樣性不是缺陷，而是不同的學習方式。 |
+| **毅力 (Will)** | 讓孩子在自己的節奏中建立信心與毅力。 |
+| **學會 (Learning)** | 從「學不會」到「學會」，我們用科技見證每一個里程碑。 |
+
+---
+
+## 🎁 永久免費承諾
+
+我們承諾：**零門檻、零費用**
+
+- ✅ 無需註冊費
+- ✅ 無需訂閱費
+- ✅ 無任何隱藏費用
+- ✅ 只要有網路就能使用
+
+---
+
+## 📚 平台功能
+
+### AI 適應性學習工具
+即時調整難度，配合孩子的學習節奏，提供個人化學習體驗。
+
+### 多感官教學素材
+結合視覺、聽覺、互動式內容的教學資源庫，滿足不同學習風格的需求。
+
+### 家長指導手冊
+專業的學習障礙支援策略與教養建議，陪伴家長一起成長。
+
+### 開源教案分享
+教育工作者可自由下載、修改、分享教學材料，共創優質教育資源生態系。
+
+---
+
+## 🎯 我們的願景
+
+- 持續開發更精準的 AI 學習演算法
+- 建立華人地區最完整的開放式教學資源庫
+- 打造互助社群，讓家長與教育者彼此支援
+- 推動社會對學習障礙的正確認識，消除標籤與偏見
+
+---
+
+## 🌐 網站連結
+
+🔗 **官方網站**：[https://nathan927.github.io/faithwill/](https://nathan927.github.io/faithwill/)
+
+---
+
+## 📧 聯絡我們
+
+- 📩 Email: contact@faithwill.org
+- 🤝 成為志願者
+- 💼 合作洽詢
+
+---
+
+<p align="center">
+  <strong>信毅會 Faith Learning Society</strong><br>
+  讓每個孩子都能學會，讓每個家庭都有希望。
+</p>
+
+---
+
+© 2025 信毅會 Faith Learning Society. 保留所有權利。
