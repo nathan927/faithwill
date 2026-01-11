@@ -2063,21 +2063,23 @@ a:hover {
     height: 100%;
   }
 
-  /* Mobile Hero - Full viewport height for single-page view */
+  /* Mobile Hero - Align to top to reduce spacing */
   .hero {
     min-height: 100vh;
     min-height: 100dvh;
-    padding-top: calc(var(--header-height) + 0.5rem);
-    padding-bottom: 0.5rem;
+    padding-top: calc(var(--header-height) + 2rem);
+    padding-bottom: 2rem;
+    align-items: flex-start;
   }
 
   .hero-content {
-    padding: 0.5rem var(--spacing-sm);
+    padding: 0 var(--spacing-sm);
+    width: 100%;
   }
 
-  /* Mobile Hero Title - Larger to fill space */
+  /* Mobile Hero Title - Slightly smaller */
   .hero-title {
-    font-size: clamp(3.25rem, 16vw, 5rem);
+    font-size: clamp(2.5rem, 13vw, 4rem);
     margin-bottom: 0.5rem;
     line-height: 1.1;
   }
