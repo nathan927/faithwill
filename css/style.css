@@ -797,129 +797,204 @@ a:hover {
 
 /* ========================================
    Journey Showcase - Elegant Display
+   With Fallback Support for Older Browsers
    ======================================== */
 .journey-showcase {
   display: flex;
+  display: -webkit-flex;
   align-items: center;
+  -webkit-align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  -webkit-justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
   flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
 }
 
+/* Base styles with solid color fallback */
 .journey-step {
   display: inline-flex;
+  display: -webkit-inline-flex;
   align-items: center;
+  -webkit-align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-xl);
+  border-radius: 2rem;
+  -webkit-border-radius: 2rem;
   font-size: 1.25rem;
   font-weight: 700;
-  font-family: var(--font-display);
+  font-family: 'Noto Serif TC', Georgia, serif;
   position: relative;
   overflow: hidden;
-  transition: all var(--transition-normal);
+  transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
   cursor: default;
-}
-
-.journey-step::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.6s ease;
-}
-
-.journey-step:hover::before {
-  left: 100%;
+  /* Fallback solid background */
+  background-color: #f5f3ff;
+  border: 2px solid #c4b5fd;
+  color: #7c3aed;
 }
 
 .journey-step i {
   font-size: 1rem;
-  animation: pulse-icon 2s ease-in-out infinite;
 }
 
-@keyframes pulse-icon {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-
-  50% {
-    transform: scale(1.15);
-    opacity: 1;
-  }
-}
-
-/* Faith Step - Purple */
+/* Faith Step - Purple (Fallback) */
 .journey-step.faith-step {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.25) 100%);
-  color: var(--primary-purple);
-  border: 2px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+  background-color: #ede9fe;
+  border-color: #a78bfa;
+  color: #8B5CF6;
 }
 
-.journey-step.faith-step:hover {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(139, 92, 246, 0.4) 100%);
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.35);
-}
-
-/* Will Step - Pink */
+/* Will Step - Pink (Fallback) */
 .journey-step.will-step {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0.25) 100%);
-  color: var(--primary-pink);
-  border: 2px solid rgba(236, 72, 153, 0.3);
-  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.2);
+  background-color: #fce7f3;
+  border-color: #f9a8d4;
+  color: #EC4899;
 }
 
-.journey-step.will-step:hover {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(236, 72, 153, 0.4) 100%);
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 8px 30px rgba(236, 72, 153, 0.35);
-}
-
-/* Learn Step - Teal */
+/* Learn Step - Teal (Fallback) */
 .journey-step.learn-step {
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(20, 184, 166, 0.25) 100%);
-  color: var(--primary-teal);
-  border: 2px solid rgba(20, 184, 166, 0.3);
-  box-shadow: 0 4px 20px rgba(20, 184, 166, 0.2);
+  background-color: #ccfbf1;
+  border-color: #5eead4;
+  color: #14B8A6;
 }
 
-.journey-step.learn-step:hover {
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.25) 0%, rgba(20, 184, 166, 0.4) 100%);
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 8px 30px rgba(20, 184, 166, 0.35);
-}
-
-/* Journey Arrow */
+/* Journey Arrow - Fallback */
 .journey-arrow {
   font-size: 1.75rem;
   font-weight: 300;
-  background: var(--gradient-vibrant);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: arrow-pulse 1.5s ease-in-out infinite;
+  color: #8B5CF6;
 }
 
-@keyframes arrow-pulse {
-
-  0%,
-  100% {
-    opacity: 0.6;
-    transform: translateX(0);
+/* Enhanced styles for browsers that support gradients */
+@supports (background: linear-gradient(to right, #000, #fff)) {
+  .journey-step.faith-step {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.25) 100%);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
   }
 
-  50% {
-    opacity: 1;
-    transform: translateX(4px);
+  .journey-step.will-step {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0.25) 100%);
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.2);
+  }
+
+  .journey-step.learn-step {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(20, 184, 166, 0.25) 100%);
+    box-shadow: 0 4px 20px rgba(20, 184, 166, 0.2);
+  }
+
+  .journey-arrow {
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F97316 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Shimmer effect */
+  .journey-step::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .journey-step:hover::before {
+    left: 100%;
+  }
+
+  /* Hover effects */
+  .journey-step:hover {
+    transform: translateY(-4px) scale(1.05);
+    -webkit-transform: translateY(-4px) scale(1.05);
+  }
+
+  .journey-step.faith-step:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(139, 92, 246, 0.4) 100%);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.35);
+  }
+
+  .journey-step.will-step:hover {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(236, 72, 153, 0.4) 100%);
+    box-shadow: 0 8px 30px rgba(236, 72, 153, 0.35);
+  }
+
+  .journey-step.learn-step:hover {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.25) 0%, rgba(20, 184, 166, 0.4) 100%);
+    box-shadow: 0 8px 30px rgba(20, 184, 166, 0.35);
+  }
+
+  /* Icon pulse animation */
+  .journey-step i {
+    animation: pulse-icon 2s ease-in-out infinite;
+    -webkit-animation: pulse-icon 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-icon {
+
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+
+    50% {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+  }
+
+  @-webkit-keyframes pulse-icon {
+
+    0%,
+    100% {
+      -webkit-transform: scale(1);
+      opacity: 0.9;
+    }
+
+    50% {
+      -webkit-transform: scale(1.15);
+      opacity: 1;
+    }
+  }
+
+  /* Arrow animation */
+  .journey-arrow {
+    animation: arrow-pulse 1.5s ease-in-out infinite;
+    -webkit-animation: arrow-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes arrow-pulse {
+
+    0%,
+    100% {
+      opacity: 0.6;
+      transform: translateX(0);
+    }
+
+    50% {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+  }
+
+  @-webkit-keyframes arrow-pulse {
+
+    0%,
+    100% {
+      opacity: 0.6;
+      -webkit-transform: translateX(0);
+    }
+
+    50% {
+      opacity: 1;
+      -webkit-transform: translateX(4px);
+    }
   }
 }
 
