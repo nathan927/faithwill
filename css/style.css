@@ -2080,22 +2080,22 @@ a:hover {
   /* Mobile Hero Title - Slightly smaller */
   .hero-title {
     font-size: clamp(2.5rem, 13vw, 4rem);
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     line-height: 1.1;
   }
 
   /* Mobile Subtitle - Max 2 lines */
   .hero-subtitle {
     font-size: clamp(0.85rem, 3.8vw, 1.1rem);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     line-height: 1.4;
   }
 
-  /* Mobile description - more compact */
+  /* Mobile description - more spacing */
   .hero-description {
     font-size: 0.95rem;
-    margin-bottom: 1.25rem;
-    line-height: 1.6;
+    margin-bottom: 2rem;
+    line-height: 1.7;
   }
 
   /* Mobile Navigation - Slide-in Panel from Right */
