@@ -2082,10 +2082,11 @@ a:hover {
     line-height: 1.1;
   }
 
-  /* Mobile Subtitle - Larger */
+  /* Mobile Subtitle - Max 2 lines */
   .hero-subtitle {
-    font-size: clamp(1rem, 4.5vw, 1.35rem);
+    font-size: clamp(0.85rem, 3.8vw, 1.1rem);
     margin-bottom: 1rem;
+    line-height: 1.4;
   }
 
   /* Mobile description - more compact */
