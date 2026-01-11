@@ -2067,20 +2067,32 @@ a:hover {
   .hero {
     min-height: 100vh;
     min-height: 100dvh;
-    padding-top: calc(var(--header-height) + 1rem);
-    padding-bottom: 1rem;
+    padding-top: calc(var(--header-height) + 0.5rem);
+    padding-bottom: 0.5rem;
   }
 
-  /* Mobile Hero Title - Larger */
+  .hero-content {
+    padding: 0.5rem var(--spacing-sm);
+  }
+
+  /* Mobile Hero Title - Larger to fill space */
   .hero-title {
-    font-size: clamp(2.75rem, 14vw, 4rem);
-    margin-bottom: 0.75rem;
+    font-size: clamp(3.25rem, 16vw, 5rem);
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
   }
 
   /* Mobile Subtitle - Larger */
   .hero-subtitle {
-    font-size: clamp(0.95rem, 4vw, 1.25rem);
+    font-size: clamp(1rem, 4.5vw, 1.35rem);
+    margin-bottom: 1rem;
+  }
+
+  /* Mobile description - more compact */
+  .hero-description {
+    font-size: 0.95rem;
     margin-bottom: 1.25rem;
+    line-height: 1.6;
   }
 
   /* Mobile Navigation - Slide-in Panel from Right */
