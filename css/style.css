@@ -246,6 +246,7 @@ a:hover {
 .logo-img {
   height: 64px;
   width: auto;
+  max-width: 50px;
   border-radius: var(--radius-sm);
   object-fit: contain;
   flex-shrink: 0;
@@ -628,8 +629,10 @@ a:hover {
   margin-bottom: var(--spacing-xl);
   font-weight: 500;
   letter-spacing: 0.05em;
-  white-space: nowrap;
-  padding: 0 var(--spacing-xl);
+  white-space: normal;
+  text-align: center;
+  padding: 0 var(--spacing-lg);
+  word-wrap: break-word;
 }
 
 .hero-subtitle .subtitle-line {
@@ -1831,19 +1834,30 @@ a:hover {
     visibility: visible;
   }
 
-  /* Mobile menu overlay - separate element for click handling */
-  body.menu-open::after {
+  /* Mobile menu overlay - blurs the content behind, making navigation the main focus */
+  body.menu-open::before {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    z-index: 1004;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1001;
     animation: fadeIn 0.25s ease-out;
+  }
+
+  /* Ensure header stays above the blur overlay */
+  body.menu-open .header {
+    z-index: 1010;
+  }
+
+  /* Navigation menu should be above the blur overlay and clearly visible */
+  body.menu-open .nav-menu {
+    z-index: 1020;
+    box-shadow: -8px 0 60px rgba(139, 92, 246, 0.3);
   }
 
   @keyframes fadeIn {
@@ -2158,12 +2172,30 @@ a:hover {
     font-size: 0.75rem;
   }
 
+  .logo-img {
+    height: 48px;
+    max-width: 48px;
+  }
+
   .logo-text .zh {
     font-size: 1.125rem;
   }
 
   .logo-text .en {
     font-size: 0.5625rem;
+  }
+
+  /* Hero subtitle adjustments for mobile */
+  .hero-subtitle {
+    font-size: clamp(0.75rem, 3.5vw, 0.95rem);
+    padding: 0 var(--spacing-md);
+    line-height: 1.5;
+  }
+
+  .hero-subtitle .subtitle-text::before,
+  .hero-subtitle .subtitle-text::after {
+    font-size: 0.6em;
+    margin: 0 0.3rem;
   }
 
   /* Hero adjustments */
