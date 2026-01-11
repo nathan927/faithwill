@@ -1,11 +1,11 @@
-# 信毅會 Faith Learning Society
+﻿# 信毅會 Faith Learning Society
 
 <p align="center">
   <img src="images/faithwill-logo.png" alt="信毅會 Logo" width="300">
 </p>
 
 <p align="center">
-  <strong>信而有毅，學而無礙</strong><br>
+  <strong>信而有毅，學而無障</strong><br>
   <em>Redefining learning possibilities for diverse needs</em>
 </p>
 

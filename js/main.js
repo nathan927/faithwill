@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 信毅會 Faith Learning Society
  * Main JavaScript File - Responsive Optimized
  */
@@ -433,7 +433,7 @@
 
     // Log initialization
     console.log('🌟 信毅會 Faith Learning Society - Website Initialized');
-    console.log('📚 信而有毅，學而無礙');
+    console.log('📚 信而有毅，學而無障');
   }
 
   // Run on DOM ready
