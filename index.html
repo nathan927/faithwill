@@ -4,429 +4,570 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="信毅會 - 完全免費的AI學習障礙教學資源平台。信而有毅，學而無障。為學習障礙兒童提供專屬教學資源。">
-  <meta name="keywords" content="學習障礙,讀寫障礙,ADHD,AI學習,特殊教育,免費教學資源,信毅會">
-  <meta name="author" content="信毅會 Faith Learning Society">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="信毅會 - 信而有毅，學而無障">
-  <meta property="og:description" content="完全免費的AI學習障礙教學資源平台，為學習障礙兒童提供專屬教學資源。">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="zh_TW">
-
-  <title>信毅會 Faith Learning Society - 信而有毅，學而無障</title>
-
-  <!-- Fonts -->
+  <title>Nathan Yuen | AI Solutions Portfolio</title>
+  <meta name="description" content="Nathan Yuen 作品集 - 運用 AI 創造高效能自動化工具，改善人們的工作方式">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --dark-bg: #0a0a1a;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
 
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css">
+    body {
+      font-family: 'Noto Sans TC', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-animation::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(79, 172, 254, 0.1) 0%, transparent 40%);
+      animation: bgFloat 20s ease-in-out infinite;
+    }
+
+    @keyframes bgFloat {
+
+      0%,
+      100% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      33% {
+        transform: translate(2%, 2%) rotate(1deg);
+      }
+
+      66% {
+        transform: translate(-1%, 1%) rotate(-1deg);
+      }
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1.5rem 2rem;
+      background: rgba(10, 10, 26, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(102, 126, 234, 0.15);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: #667eea;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .hero-badge::before {
+      content: '✨';
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.8s ease-out 0.1s both;
+    }
+
+    .hero h1 .gradient-text {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-description {
+      max-width: 700px;
+      font-size: 1.25rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: var(--primary-gradient);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: transparent;
+      color: var(--text-primary);
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Projects Section */
+    .projects {
+      padding: 6rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .project-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(102, 126, 234, 0.4);
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .project-card:hover::before {
+      opacity: 1;
+    }
+
+    .project-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      object-position: top;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .project-content {
+      padding: 1.5rem;
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .project-tag {
+      padding: 0.25rem 0.75rem;
+      background: rgba(102, 126, 234, 0.15);
+      color: #667eea;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .project-tag.ai {
+      background: rgba(240, 147, 251, 0.15);
+      color: #f093fb;
+    }
+
+    .project-tag.tool {
+      background: rgba(79, 172, 254, 0.15);
+      color: #4facfe;
+    }
+
+    .project-tag.health {
+      background: rgba(0, 242, 254, 0.15);
+      color: #00f2fe;
+    }
+
+    .project-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .project-description {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: gap 0.3s ease;
+    }
+
+    .project-link:hover {
+      gap: 0.75rem;
+    }
+
+    .project-link::after {
+      content: '→';
+    }
+
+    /* Vision Section */
+    .vision {
+      padding: 6rem 2rem;
+      background: linear-gradient(180deg, transparent, rgba(102, 126, 234, 0.05));
+    }
+
+    .vision-content {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .vision-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--primary-gradient);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin: 0 auto 2rem;
+    }
+
+    .vision h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .vision p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.9;
+    }
+
+    /* Footer */
+    footer {
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 1px solid var(--border-color);
+    }
+
+    footer p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .hero {
+        padding: 10rem 1.5rem 4rem;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        padding: 0.875rem 1.5rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <!-- Skip Link for Accessibility -->
-  <a href="#main-content" class="skip-link">跳到主要內容</a>
+  <div class="bg-animation"></div>
 
-  <!-- Header -->
-  <header class="header" id="header">
-    <div class="container">
-      <nav class="nav">
-        <a href="index.html" class="logo">
-          <img src="images/faithwill-logo.png" alt="信毅會 Logo" class="logo-img">
-          <div class="logo-text">
-            <span class="zh">信毅會</span>
-            <span class="en">Faith Learning Society</span>
-          </div>
-        </a>
-
-        <ul class="nav-menu" id="nav-menu">
-          <li><a href="index.html" class="nav-link active">首頁</a></li>
-          <li><a href="about.html" class="nav-link">關於我們</a></li>
-          <li><a href="resources.html" class="nav-link">免費資源</a></li>
-          <li><a href="#contact" class="nav-link">聯絡我們</a></li>
-          <li><a href="#" class="nav-link nav-cta">免費開始</a></li>
-        </ul>
-
-        <div class="mobile-menu-toggle" id="mobile-menu-toggle">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+  <header>
+    <div class="header-content">
+      <div class="logo">Nathan Yuen</div>
+      <nav class="nav-links">
+        <a href="#projects">作品集</a>
+        <a href="#vision">願景</a>
+        <a href="mailto:contact@nathanyuen.org">聯絡</a>
       </nav>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main id="main-content">
-    <!-- Hero Section -->
+  <main>
     <section class="hero">
-      <!-- Animated Background -->
-      <div class="hero-bg"></div>
-
-
-
-      <div class="container">
-        <div class="hero-content">
-          <h1 class="hero-title">
-            <span class="title-part">信而有毅</span><span class="title-comma">，</span><span
-              class="title-divider"></span><span class="title-part">學而無障</span>
-          </h1>
-
-          <p class="hero-subtitle">
-            <span class="subtitle-line"></span>
-            <span class="subtitle-text">Redefining learning possibilities for diverse needs</span>
-            <span class="subtitle-line"></span>
-          </p>
-
-          <p class="hero-description">
-            每個孩子都擁有獨特的學習天賦。我們正在打造完全免費的 AI 學習平台，為學習障礙兒童提供專屬教學資源，讓信心與毅力成為他們前進的力量。
-          </p>
-
-          <div class="hero-buttons">
-            <a href="resources.html" class="btn btn-primary btn-large">
-              <i class="fas fa-rocket btn-icon"></i>
-              免費使用 AI 學習工具
-            </a>
-            <a href="resources.html" class="btn btn-secondary btn-large">
-              <i class="fas fa-book-open btn-icon"></i>
-              瀏覽教學資源庫
-            </a>
-          </div>
-        </div>
-      </div>
-
-
-    </section>
-
-    <!-- Logo Showcase Section -->
-    <section class="section logo-showcase">
-      <div class="container">
-        <div class="logo-showcase-content">
-          <img src="images/faithwill-logo.png" alt="信毅會 Logo" class="logo-showcase-img">
-        </div>
+      <span class="hero-badge">AI Solutions Developer</span>
+      <h1>運用 <span class="gradient-text">AI</span> 突破界限<br>重塑工作方式</h1>
+      <p class="hero-description">
+        專注開發 AI 驅動的高效能自動化工具，致力改善人們的工作流程。
+        我的願景是運用 AI 完成目前人類未能達成的任務，創造真正有意義的技術解決方案。
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn-primary">
+          <span>探索作品</span>
+          <span>↓</span>
+        </a>
+        <a href="mailto:contact@nathanyuen.org" class="btn-secondary">
+          <span>聯絡我</span>
+          <span>✉</span>
+        </a>
       </div>
     </section>
 
-    <!-- Three Pillars Section -->
-    <section class="section section-light" id="pillars">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">
-            <i class="fas fa-heart"></i>
-            Our Philosophy
-          </span>
-          <h2 class="section-title">信毅精神：三階段成長信念</h2>
-          <p class="section-description">
-            「信毅會」的名稱蘊含著我們對每個孩子的信念：
-          </p>
-          <div class="journey-showcase">
-            <span class="journey-step faith-step">
-              <i class="fas fa-heart"></i>
-              相信
-            </span>
-            <span class="journey-arrow">→</span>
-            <span class="journey-step will-step">
-              <i class="fas fa-fire"></i>
-              毅力
-            </span>
-            <span class="journey-arrow">→</span>
-            <span class="journey-step learn-step">
-              <i class="fas fa-star"></i>
-              學會
-            </span>
-          </div>
-        </div>
+    <section class="projects" id="projects">
+      <div class="section-header">
+        <h2>作品展示</h2>
+        <p>透過 AI 與創新技術，打造實用且高效的解決方案</p>
+      </div>
 
-        <div class="pillars">
-          <!-- Faith -->
-          <div class="pillar-card faith reveal">
-            <div class="pillar-icon">
-              <i class="fas fa-heart"></i>
+      <div class="projects-grid">
+        <!-- Faith Learning Society -->
+        <article class="project-card">
+          <img src="images/portfolio/faithwill.png" alt="Faith Learning Society" class="project-image">
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag ai">AI</span>
+              <span class="project-tag">教育科技</span>
             </div>
-            <h3 class="pillar-title">相信</h3>
-            <p class="pillar-subtitle">Faith · 相信每個孩子都能學會</p>
-            <p class="pillar-description">
-              我們堅信神經多樣性不是缺陷，而是不同的學習方式。每個孩子都值得被理解與支持。
+            <h3 class="project-title">信毅會 Faith Learning Society</h3>
+            <p class="project-description">
+              AI 驅動的特殊教育資源平台，為有學習障礙的孩子提供專屬教學資源，讓信心與毅力成為他們前進的力量。
             </p>
+            <a href="/faithwill/" class="project-link">瀏覽專案</a>
           </div>
+        </article>
 
-          <!-- Will -->
-          <div class="pillar-card will reveal">
-            <div class="pillar-icon">
-              <i class="fas fa-fire"></i>
+        <!-- Cancer Knowledge Kit -->
+        <article class="project-card">
+          <img src="images/portfolio/cancer-qa.png" alt="Cancer Knowledge Q&A" class="project-image">
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag ai">AI</span>
+              <span class="project-tag health">健康醫療</span>
             </div>
-            <h3 class="pillar-title">毅力</h3>
-            <p class="pillar-subtitle">Will · 培養持續學習的動力</p>
-            <p class="pillar-description">
-              讓孩子在自己的節奏中建立信心與毅力。
+            <h3 class="project-title">癌症知識問與答</h3>
+            <p class="project-description">
+              整合癌症風險評估、知識百科與照顧指南的完整平台，協助用戶深入了解癌症預防、檢查與治療資訊。
             </p>
+            <a href="/cancer-knowledge-kit/" class="project-link">瀏覽專案</a>
           </div>
+        </article>
 
-          <!-- Learning -->
-          <div class="pillar-card learn reveal">
-            <div class="pillar-icon">
-              <i class="fas fa-star"></i>
+        <!-- VBA Bible -->
+        <article class="project-card">
+          <img src="images/portfolio/vba-bible.png" alt="VBA Bible" class="project-image">
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag tool">工具</span>
+              <span class="project-tag">離線版</span>
             </div>
-            <h3 class="pillar-title">學會</h3>
-            <p class="pillar-subtitle">Learning · 見證真實的進步</p>
-            <p class="pillar-description">
-              從「學不會」到「學會」，我們用科技見證每一個里程碑，讓家長安心、孩子開心。
+            <h3 class="project-title">VBA 全能查詢工具</h3>
+            <p class="project-description">
+              收錄超過 2000 條 VBA 指令說明的離線查詢工具，涵蓋 Excel、Word、Outlook、PowerPoint 等全方位應用。
             </p>
+            <a href="/VBA-Bible/VBA離線全能查詢2.5.html" class="project-link">瀏覽專案</a>
           </div>
-        </div>
+        </article>
+
+        <!-- Word Extractor Pro -->
+        <article class="project-card">
+          <img src="images/portfolio/word-extractor.png" alt="Word Extractor Pro" class="project-image">
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag tool">工具</span>
+              <span class="project-tag">自動化</span>
+            </div>
+            <h3 class="project-title">Word Extractor Pro</h3>
+            <p class="project-description">
+              本地端 Word 文檔批量提取工具，支援自訂規則配置，可快速從多個文件中提取關鍵資訊並匯出結果。
+            </p>
+            <a href="/Word Extractor Pro (offline)/Word Extractor Pro (full ver).html" class="project-link">瀏覽專案</a>
+          </div>
+        </article>
       </div>
     </section>
 
-    <!-- Free Platform Section -->
-    <section class="section section-gradient" id="platform">
-      <div class="container">
-        <div class="promise-banner reveal">
-          <h3>🎁 完全免費的 AI 學習平台</h3>
-          <p>我們的承諾：永久免費，無任何隱藏費用</p>
-        </div>
-
-        <div class="section-header">
-          <span class="section-badge">
-            <i class="fas fa-magic"></i>
-            Features
-          </span>
-          <h2 class="section-title">我們的平台提供</h2>
-        </div>
-
-        <div class="features-grid">
-          <div class="feature-card reveal">
-            <div class="feature-icon">
-              <i class="fas fa-brain"></i>
-            </div>
-            <div class="feature-content">
-              <h4>AI 適應性學習工具</h4>
-              <p>即時調整難度，配合孩子的學習節奏，提供個人化學習體驗。智能演算法持續優化學習路徑。</p>
-            </div>
-          </div>
-
-          <div class="feature-card reveal">
-            <div class="feature-icon">
-              <i class="fas fa-photo-video"></i>
-            </div>
-            <div class="feature-content">
-              <h4>多感官教學素材</h4>
-              <p>結合視覺、聽覺、互動式內容的教學資源庫，滿足不同學習風格的需求。</p>
-            </div>
-          </div>
-
-          <div class="feature-card reveal">
-            <div class="feature-icon">
-              <i class="fas fa-book-reader"></i>
-            </div>
-            <div class="feature-content">
-              <h4>家長指導手冊</h4>
-              <p>專業的學習障礙支援策略與教養建議，陪伴家長一起成長，建立正向親子關係。</p>
-            </div>
-          </div>
-
-          <div class="feature-card reveal">
-            <div class="feature-icon">
-              <i class="fas fa-share-alt"></i>
-            </div>
-            <div class="feature-content">
-              <h4>開源教案分享</h4>
-              <p>教育工作者可自由下載、修改、分享教學材料，共創優質教育資源生態系。</p>
-            </div>
-          </div>
-        </div>
-
-        <div style="text-align: center; margin-top: var(--spacing-xl);">
-          <p
-            style="color: var(--primary-teal); font-weight: 600; font-size: 1.125rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-check-circle"></i> 無需註冊費、訂閱費或任何付費項目
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Vision Section -->
-    <section class="section section-light" id="vision">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">
-            <i class="fas fa-eye"></i>
-            Our Vision
-          </span>
-          <h2 class="section-title">我們的願景</h2>
-          <p class="section-description">
-            作為新成立的平台，我們致力於以下目標：
-          </p>
-        </div>
-
-        <div class="vision-list">
-          <div class="vision-item reveal">
-            <div class="icon">
-              <i class="fas fa-microchip"></i>
-            </div>
-            <p>持續開發更精準的 AI 學習演算法，提供真正個人化的學習體驗</p>
-          </div>
-
-          <div class="vision-item reveal">
-            <div class="icon">
-              <i class="fas fa-database"></i>
-            </div>
-            <p>建立華人地區最完整的開放式教學資源庫，造福更多需要的家庭</p>
-          </div>
-
-          <div class="vision-item reveal">
-            <div class="icon">
-              <i class="fas fa-users"></i>
-            </div>
-            <p>打造互助社群，讓家長與教育者彼此支援，分享經驗與資源</p>
-          </div>
-
-          <div class="vision-item reveal">
-            <div class="icon">
-              <i class="fas fa-bullhorn"></i>
-            </div>
-            <p>推動社會對學習障礙的正確認識，消除標籤與偏見</p>
-          </div>
-        </div>
-
-        <div style="text-align: center; margin-top: var(--spacing-xl);" class="reveal">
-          <p
-            style="font-size: 1.125rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; background: white; padding: var(--spacing-lg); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
-            ✨ 我們正處於起步階段，誠摯邀請您成為早期使用者，一起完善平台。
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Success Story Video Section -->
-    <section class="section" id="success-story" style="background: linear-gradient(180deg, #faf8ff 0%, #f0e6ff 100%);">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">
-            <i class="fas fa-star"></i>
-            成功故事
-          </span>
-          <h2 class="section-title">ADHD 創業家專訪</h2>
-          <p class="section-description">
-            學習障礙不是終點，而是另一個起點。看看這位香港 ADHD 創業家如何突破障礙、創造成功！
-          </p>
-        </div>
-
-        <div style="max-width: 800px; margin: 0 auto;">
-          <div
-            style="position: relative; background: #000; border-radius: 1rem; overflow: hidden; box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);">
-            <video controls preload="metadata" style="width: 100%; display: block; border-radius: 1rem;">
-              <source src="video.mp4" type="video/mp4">
-              您的瀏覽器不支援 HTML5 影片播放。
-            </video>
-          </div>
-
-          <div style="text-align: center; margin-top: var(--spacing-lg);">
-            <a href="video-interview.html" class="btn btn-outline"
-              style="display: inline-flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-external-link-alt"></i>
-              觀看完整介紹
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section" id="cta">
-      <div class="container">
-        <h2>立即開始使用</h2>
+    <section class="vision" id="vision">
+      <div class="vision-content">
+        <div class="vision-icon">🚀</div>
+        <h2>我的願景</h2>
         <p>
-          無論您是家長、教育工作者，還是想了解更多的朋友，歡迎免費使用我們的所有資源。
+          我相信 AI 不僅是提升效率的工具，更是突破人類現有能力邊界的關鍵。
+          透過開發智能自動化解決方案，我致力於改變人們的工作方式，讓繁瑣的任務變得簡單高效。
+          <br><br>
+          未來，我將持續探索 AI 的無限可能，挑戰並完成目前人類未能達成的任務，
+          為社會創造真正有價值的技術貢獻。
         </p>
-        <div class="cta-buttons">
-          <a href="resources.html" class="btn btn-primary btn-large">
-            <i class="fas fa-rocket btn-icon"></i>
-            免費使用學習工具
-          </a>
-          <a href="resources.html" class="btn btn-ghost btn-large">
-            <i class="fas fa-download btn-icon"></i>
-            下載教學資源
-          </a>
-          <a href="contact.html" class="btn btn-ghost btn-large">
-            <i class="fas fa-comments btn-icon"></i>
-            聯絡我們
-          </a>
-        </div>
       </div>
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer" id="contact">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="logo">
-            <img src="images/faithwill-logo.png" alt="信毅會 Logo" class="logo-img">
-            <div class="logo-text">
-              <span class="zh">信毅會</span>
-              <span class="en">Faith Learning Society</span>
-            </div>
-          </a>
-          <p>信而有毅，學而無障。<br>為學習障礙兒童打造完全免費的AI學習平台。</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-            <a href="#" aria-label="LINE"><i class="fab fa-line"></i></a>
-          </div>
-        </div>
-
-        <div class="footer-column">
-          <h4>快速連結</h4>
-          <ul class="footer-links">
-            <li><a href="index.html">首頁</a></li>
-            <li><a href="about.html">關於我們</a></li>
-            <li><a href="resources.html">免費資源</a></li>
-            <li><a href="#">AI 學習工具</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-column">
-          <h4>資源中心</h4>
-          <ul class="footer-links">
-            <li><a href="#">教學教案</a></li>
-            <li><a href="#">家長指南</a></li>
-            <li><a href="#">多媒體素材</a></li>
-            <li><a href="#">常見問題</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-column">
-          <h4>聯絡我們</h4>
-          <ul class="footer-links">
-            <li><a href="mailto:contact@faithwill.org"><i class="fas fa-envelope"></i> contact@faithwill.org</a></li>
-            <li><a href="#"><i class="fas fa-hands-helping"></i> 成為志願者</a></li>
-            <li><a href="#"><i class="fas fa-handshake"></i> 合作洽詢</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2025 信毅會 Faith Learning Society. 保留所有權利。</p>
-        <div class="footer-legal">
-          <a href="#">隱私政策</a>
-          <a href="#">使用條款</a>
-          <a href="#">無障礙聲明</a>
-        </div>
-      </div>
-    </div>
+  <footer>
+    <p>© 2026 Nathan Yuen. All rights reserved.</p>
   </footer>
-
-  <!-- Scripts -->
-  <script src="js/main.js"></script>
 </body>
 
 </html>
