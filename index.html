@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <style>
     /* ========================================
@@ -254,10 +254,11 @@
     }
 
     .logo {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Montserrat', sans-serif;
       font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
       background: var(--primary-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -374,7 +375,7 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 5rem 2rem 4rem;
+      padding: 2rem 2rem 4rem;
       position: relative;
     }
 
@@ -450,12 +451,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: rainbowShift 5s linear infinite;
-      opacity: 0;
-      transition: opacity var(--transition-fast) ease;
-    }
-
-    .hero h1:hover .gradient-text::after {
+      animation: rainbowShift 3s linear infinite;
       opacity: 1;
     }
 
