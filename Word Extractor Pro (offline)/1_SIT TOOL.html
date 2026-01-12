@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIT Automation Tool v3.2 (UI Fix & Style)</title>
+    
+    <!-- 依賴庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- 使用 xlsx-js-style 以支援樣式設置 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+    <style>
+        :root {
+            --sit-dark: #1e293b;
+            --sit-blue: #3b82f6;
+            --sit-green: #22c55e;
+            --sit-red: #ef4444;
+            --sit-gray: #f1f5f9;
+            --sit-border: #cbd5e1;
+            --sit-teal: #0f766e;
+            --sit-orange: #f97316;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #334155; margin: 0; padding: 20px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Header */
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding-bottom: 20px; border-bottom: 1px solid var(--sit-border); 
+            flex-shrink: 0; background: #f8fafc;
+        }
+        .title h1 { margin: 0; font-size: 24px; color: var(--sit-dark); display: flex; align-items: center; gap: 10px; }
+        .badge { background: var(--sit-blue); color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; vertical-align: middle; }
+        
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        
+        /* Stats Bar */
+        .summary-bar { display: flex; gap: 15px; font-size: 14px; font-weight: bold; background: white; padding: 8px 15px; border-radius: 6px; border: 1px solid var(--sit-border); }
+        .stat-item { display: flex; align-items: center; gap: 6px; }
+        .stat-val { font-size: 16px; }
+
+        /* Buttons in Header */
+        .btn-reset-header { 
+            background: white; color: var(--sit-red); border: 1px solid var(--sit-red); 
+            padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: bold; 
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-reset-header:hover { background: #fee2e2; }
+
+        .export-group { display: flex; gap: 5px; margin-left: 10px; }
+        .btn-export {
+            border: none; padding: 10px 15px; font-weight: 600; font-size: 13px;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            transition: 0.2s; opacity: 0.5; pointer-events: none;
+            color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-export.active { opacity: 1; pointer-events: auto; }
+        .btn-export:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        
+        .btn-csv { background: var(--sit-orange); border-radius: 6px 0 0 6px; }
+        .btn-xlsx { background: var(--sit-teal); border-radius: 0 6px 6px 0; border-left: 1px solid rgba(255,255,255,0.2); }
+
+        /* Main Layout */
+        .main-area { display: flex; gap: 20px; flex: 1; overflow: hidden; margin-top: 20px; }
+        
+        /* Sidebar */
+        .sidebar { width: 300px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
+        .drop-zone { border: 2px dashed #94a3b8; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; background: white; }
+        .drop-zone:hover { border-color: var(--sit-blue); background: #eff6ff; }
+        .drop-zone.loaded { border-color: var(--sit-green); background: #f0fdf4; border-style: solid; }
+        .dz-icon { font-size: 24px; display: block; margin-bottom: 8px; }
+        .dz-title { font-weight: bold; color: var(--sit-dark); display: block; }
+        .dz-count { font-size: 12px; color: #64748b; margin-top: 4px; display: block; }
+        
+        .btn-run { background: var(--sit-blue); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); }
+        .btn-run:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        .btn-run:hover:not(:disabled) { transform: translateY(-2px); }
+
+        /* Report Area */
+        .report-area { flex: 1; overflow-y: auto; padding-right: 5px; }
+        
+        .case-card { background: white; border-radius: 8px; border: 1px solid var(--sit-border); margin-bottom: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .cc-header { padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid var(--sit-border); display: flex; justify-content: space-between; align-items: center; }
+        .cc-title { font-weight: bold; color: var(--sit-dark); }
+        .cc-status { font-size: 12px; padding: 3px 8px; border-radius: 12px; font-weight: bold; text-transform: uppercase; }
+        .st-pass { background: #dcfce7; color: #166534; }
+        .st-fail { background: #fee2e2; color: #991b1b; }
+
+        .result-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .result-table th { text-align: left; padding: 10px 15px; background: #f1f5f9; color: #475569; font-weight: 600; border-bottom: 1px solid var(--sit-border); }
+        .result-table td { padding: 10px 15px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        .result-table tr:last-child td { border-bottom: none; }
+        
+        .col-field { width: 20%; font-weight: 600; }
+        .col-exp { width: 35%; color: #059669; font-family: Consolas, monospace; background: #f0fdf4; }
+        .col-act { width: 35%; font-family: Consolas, monospace; }
+        .col-res { width: 10%; text-align: center; font-weight: bold; }
+
+        .cell-fail { background: #fef2f2; color: #dc2626; font-weight: bold; border-left: 3px solid #ef4444; }
+        .cell-pass { color: #16a34a; }
+        
+        .empty-state { text-align: center; color: #94a3b8; margin-top: 100px; }
+        
+        .engine-log { display: none; margin-top: 5px; font-size: 11px; color: #64748b; font-family: monospace; border-top: 1px dashed #e2e8f0; padding-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="title">
+        <h1>SIT Automation Tool <span class="badge">v3.2 (UI Fix)</span></h1>
+    </div>
+    <div class="header-actions">
+        <!-- Moved Reset Button Here for visibility -->
+        <button class="btn-reset-header" onclick="resetApp()">
+            ↺ 重設
+        </button>
+
+        <div class="summary-bar">
+            <div class="stat-item" style="color:#64748b">Total: <span class="stat-val" id="val-total">0</span></div>
+            <div class="stat-item" style="color:#22c55e">Pass: <span class="stat-val" id="val-pass">0</span></div>
+            <div class="stat-item" style="color:#ef4444">Fail: <span class="stat-val" id="val-fail">0</span></div>
+        </div>
+        
+        <div class="export-group">
+            <button id="btn-export-csv" class="btn-export btn-csv" onclick="exportCSV()">
+                📄 CSV
+            </button>
+            <button id="btn-export-xlsx" class="btn-export btn-xlsx" onclick="exportExcel()">
+                📥 Excel
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="main-area">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="drop-zone" id="dz-json" onclick="document.getElementById('in-json').click()">
+            <input type="file" id="in-json" multiple accept=".json" style="display:none">
+            <span class="dz-icon">⚙️</span>
+            <span class="dz-title">1. 上傳規則 (JSON)</span>
+            <span class="dz-count" id="txt-json">未選擇</span>
+        </div>
+
+        <div class="drop-zone" id="dz-docx" onclick="document.getElementById('in-docx').click()">
+            <input type="file" id="in-docx" multiple accept=".docx" style="display:none">
+            <span class="dz-icon">📄</span>
+            <span class="dz-title">2. 上傳考卷 (DOCX)</span>
+            <span class="dz-count" id="txt-docx">未選擇</span>
+        </div>
+
+        <button class="btn-run" id="btn-start" disabled>🚀 開始 SIT 自動化測試</button>
+    </div>
+
+    <!-- Report Area -->
+    <div class="report-area" id="report-container">
+        <div class="empty-state">
+            <h2>等待測試數據</h2>
+            <p>請上傳 UAT Kit 下載的 JSON 與 DOCX 文件。</p>
+            <p>引擎邏輯已與 Word Extractor Pro 主程式完全同步。</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =========================================================================
+    // 1. STATE & INIT
+    // =========================================================================
+    let state = {
+        configs: {}, // Map<ID, JSON_Content>
+        docs: {},    // Map<ID, File_Object>
+        results: []  // For Export
+    };
+
+    function updateUI() {
+        const cJson = Object.keys(state.configs).length;
+        const cDocx = Object.keys(state.docs).length;
+        
+        document.getElementById('txt-json').innerText = cJson > 0 ? `已加載 ${cJson} 個配置` : '未選擇';
+        document.getElementById('dz-json').classList.toggle('loaded', cJson > 0);
+        
+        document.getElementById('txt-docx').innerText = cDocx > 0 ? `已加載 ${cDocx} 個文檔` : '未選擇';
+        document.getElementById('dz-docx').classList.toggle('loaded', cDocx > 0);
+
+        const btn = document.getElementById('btn-start');
+        if (cJson > 0 && cDocx > 0) {
+            btn.disabled = false;
+            btn.innerHTML = `🚀 執行測試 (共 ${Object.keys(getMatchedIDs()).length} 組)`;
+        } else {
+            btn.disabled = true;
+            btn.innerHTML = '🚀 開始 SIT 自動化測試';
+        }
+    }
+
+    function getMatchedIDs() {
+        const ids = {};
+        Object.keys(state.configs).forEach(id => { if (state.docs[id]) ids[id] = true; });
+        return ids;
+    }
+
+    function resetApp() {
+        // Clear State
+        state = { configs: {}, docs: {}, results: [] };
+        
+        // Clear Inputs
+        document.getElementById('in-json').value = '';
+        document.getElementById('in-docx').value = '';
+        
+        // Clear UI
+        updateUI();
+        document.getElementById('report-container').innerHTML = `
+            <div class="empty-state">
+                <h2>等待測試數據</h2>
+                <p>數據已重置，請重新上傳文件。</p>
+            </div>
+        `;
+        document.getElementById('val-total').innerText = '0';
+        document.getElementById('val-pass').innerText = '0';
+        document.getElementById('val-fail').innerText = '0';
+        
+        // Disable Exports
+        document.getElementById('btn-export-csv').classList.remove('active');
+        document.getElementById('btn-export-xlsx').classList.remove('active');
+    }
+
+    // File Input Handlers
+    document.getElementById('in-json').addEventListener('change', e => {
+        Array.from(e.target.files).forEach(f => {
+            const m = f.name.match(/UAT_(\d{2})_/);
+            if (m) {
+                const r = new FileReader();
+                r.onload = ev => { state.configs[m[1]] = JSON.parse(ev.target.result); updateUI(); };
+                r.readAsText(f);
+            }
+        });
+    });
+
+    document.getElementById('in-docx').addEventListener('change', e => {
+        Array.from(e.target.files).forEach(f => {
+            const m = f.name.match(/UAT_(\d{2})_/);
+            if (m) { state.docs[m[1]] = f; updateUI(); }
+        });
+    });
+
+    // =========================================================================
+    // 2. EXTRACTION ENGINE
+    // =========================================================================
+    async function parseDocx(file) {
+        const zip = await JSZip.loadAsync(await file.arrayBuffer());
+        const parser = new DOMParser();
+        const items = [];
+        let page = 1;
+
+        const traverse = (node) => {
+            if(node.nodeName === 'w:br' && node.getAttribute('w:type') === 'page') page++;
+            if(node.nodeName === 'w:lastRenderedPageBreak') page++;
+            
+            if (node.nodeName === "w:p") {
+                let txt = ""; 
+                for (let t of node.getElementsByTagName("w:t")) txt += t.textContent;
+                if (txt.trim()) items.push({ type: 'p', text: txt, page: page });
+            }
+            if (node.nodeName === "w:tbl") {
+                const rows = [];
+                Array.from(node.childNodes).filter(n=>n.nodeName==='w:tr').forEach(tr => {
+                    const rowData = [];
+                    Array.from(tr.childNodes).filter(n=>n.nodeName==='w:tc').forEach(tc => {
+                        let txt = ""; for(let t of tc.getElementsByTagName("w:t")) txt += t.textContent;
+                        rowData.push(txt);
+                    });
+                    rows.push(rowData);
+                });
+                items.push({ type: 'tbl', data: rows, page: page });
+            }
+            if (node.childNodes) for (let child of node.childNodes) traverse(child);
+        };
+
+        const files = Object.keys(zip.files).sort();
+        for (let f of files) { if(f.match(/^word\/header\d+\.xml$/)) try { traverse(parser.parseFromString(await zip.file(f).async("string"), "text/xml").documentElement); } catch(e){} }
+        
+        const bodyXml = await zip.file("word/document.xml").async("string");
+        traverse(parser.parseFromString(bodyXml, "text/xml").getElementsByTagName("w:body")[0]);
+        
+        for (let f of files) { if(f.match(/^word\/footer\d+\.xml$/)) try { traverse(parser.parseFromString(await zip.file(f).async("string"), "text/xml").documentElement); } catch(e){} }
+        
+        return items;
+    }
+
+    function applyRule(items, r) {
+        if (r.source === 'text' && r.strategy === 'line') {
+            const paragraphs = items.filter(i => i.type === 'p');
+            const targetIdx = parseInt(r.line_index) - 1;
+            return (targetIdx >= 0 && targetIdx < paragraphs.length) ? paragraphs[targetIdx].text.trim() : "Not Found";
+        }
+
+        let inHead = !r.heading;
+        let matches = [];
+        const keys = (r.keywords || "").split('/').map(k=>k.trim()).filter(k=>k);
+
+        for (let item of items) {
+            if (r.heading && item.type === 'p' && item.text.includes(r.heading)) { inHead = true; continue; }
+            if (!inHead) continue;
+
+            if (r.source === 'table' && item.type === 'tbl') {
+                const off = parseInt(r.tbl_offset);
+                const tableData = item.data;
+                for(let i=0; i<tableData.length; i++) {
+                    for(let j=0; j<tableData[i].length; j++) {
+                        if (keys.some(k => tableData[i][j].includes(k))) {
+                            let tr=i, tc=j;
+                            if(r.tbl_dir==='right') tc+=off; else if(r.tbl_dir==='left') tc-=off;
+                            else if(r.tbl_dir==='down') tr+=off; else if(r.tbl_dir==='up') tr-=off;
+                            if (tableData[tr] && tableData[tr][tc] !== undefined) matches.push(tableData[tr][tc].trim());
+                        }
+                    }
+                }
+            } 
+            else if (r.source === 'text' && item.type === 'p') {
+                const text = item.text;
+                let bestIdx = -1, matchedLen = 0;
+                for(let k of keys) {
+                    let idx = text.indexOf(k);
+                    if(idx !== -1) { if(bestIdx === -1 || idx < bestIdx) { bestIdx = idx; matchedLen = k.length; } }
+                }
+                if (bestIdx !== -1) {
+                    let res = "";
+                    const type = r.txt_end_type || 'eol';
+                    const val = r.txt_end_val || "";
+                    
+                    if (type === 'len_bwd') {
+                        const len = parseInt(val) || 0;
+                        res = text.substring(Math.max(0, bestIdx - len), bestIdx);
+                    } else if (type === 'key_inc') {
+                        res = text.substring(bestIdx);
+                    } else if (type === 'key_exc') {
+                        res = text.substring(bestIdx + matchedLen);
+                    } else if (type === 'len_fwd') {
+                        const start = bestIdx + matchedLen;
+                        res = text.substring(start, start + (parseInt(val)||0));
+                    } else if (type === 'sym_inc' || type === 'sym_exc') {
+                        const start = bestIdx + matchedLen;
+                        const remaining = text.substring(start);
+                        const syms = val.split('/').map(s=>s.trim()).filter(s=>s);
+                        let minSymIdx = -1, foundSymLen = 0;
+                        for(let s of syms) {
+                            let idx = remaining.indexOf(s);
+                            if(idx !== -1 && (minSymIdx === -1 || idx < minSymIdx)) { minSymIdx = idx; foundSymLen = s.length; }
+                        }
+                        if(minSymIdx !== -1) {
+                            let cut = minSymIdx;
+                            if(type === 'sym_inc') cut += foundSymLen;
+                            res = remaining.substring(0, cut);
+                        } else res = remaining;
+                    } else { res = text.substring(bestIdx + matchedLen); }
+                    if(res) matches.push(res.trim());
+                }
+            }
+        }
+        
+        if (matches.length === 0) return "Not Found";
+        let selected;
+        if (r.occur_type === 'last') selected = matches[matches.length - 1];
+        else if (r.occur_type === 'fixed') selected = matches[parseInt(r.occur_index) - 1] || "Not Found";
+        else selected = matches[0];
+        return selected;
+    }
+
+    function cleanData(v, r) {
+        if(v === "Not Found") return v;
+        if(r.clean_custom && r.clean_custom_list) r.clean_custom_list.split('/').forEach(rm => v = v.split(rm.trim()).join(''));
+        if(r.clean_special) v = v.replace(/[^\w\s\u4e00-\u9fa5.\-%()]/g, '');
+        if(r.clean_trim) v = v.trim().replace(/\s+/g, ' ');
+        if(r.replacements && Array.isArray(r.replacements)) r.replacements.forEach(rep => { if(rep.old) v = v.split(rep.old).join(rep.new || ''); });
+        if(r.clean_number) { 
+            let isNeg = v.includes('(') && v.includes(')');
+            let n = parseFloat(v.replace(/[^0-9.\-]/g,'')); 
+            if(!isNaN(n)) v = isNeg ? (-Math.abs(n)).toString() : n.toString();
+        }
+        return v;
+    }
+
+    // =========================================================================
+    // 3. EXECUTION
+    // =========================================================================
+
+    document.getElementById('btn-start').addEventListener('click', async () => {
+        const container = document.getElementById('report-container');
+        container.innerHTML = '<div style="text-align:center;padding:50px;">正在執行核心引擎提取...<br>請稍候...</div>';
+        state.results = [];
+        
+        const matchedIDs = Object.keys(getMatchedIDs()).sort();
+        let totalPass = 0, totalFail = 0;
+        let html = '';
+
+        for (const id of matchedIDs) {
+            const rules = state.configs[id];
+            const file = state.docs[id];
+            
+            let docItems = [];
+            try { docItems = await parseDocx(file); } 
+            catch(e) { console.error(e); continue; }
+
+            let casePass = true;
+            let rowHtml = '';
+            
+            rules.forEach(r => {
+                let raw = applyRule(docItems, r);
+                let actual = cleanData(raw, r);
+                let expected = r.expected_value || "";
+
+                const normAct = String(actual).trim();
+                const normExp = String(expected).trim();
+                const isPass = (normAct === normExp);
+                
+                if (!isPass) casePass = false;
+
+                state.results.push({
+                    CaseID: id,
+                    Field: r.name,
+                    Expected: normExp,
+                    Actual: normAct,
+                    Status: isPass ? "PASS" : "FAIL"
+                });
+
+                rowHtml += `
+                    <tr>
+                        <td class="col-field">${r.name}<div class="engine-log">${getRuleDesc(r)}</div></td>
+                        <td class="col-exp">${normExp}</td>
+                        <td class="col-act ${isPass ? '' : 'cell-fail'}">${normAct}</td>
+                        <td class="col-res"><span class="${isPass ? 'cell-pass' : 'cell-fail'}">${isPass ? '✔' : '✘'}</span></td>
+                    </tr>
+                `;
+            });
+
+            if(casePass) totalPass++; else totalFail++;
+
+            html += `
+                <div class="case-card">
+                    <div class="cc-header">
+                        <span class="cc-title">Case ${id} - ${file.name}</span>
+                        <span class="cc-status ${casePass ? 'st-pass' : 'st-fail'}">${casePass ? 'PASS' : 'FAIL (檢視詳情)'}</span>
+                    </div>
+                    <table class="result-table">
+                        <thead><tr><th class="col-field">欄位名稱</th><th class="col-exp">Expected (預期)</th><th class="col-act">Actual (實測)</th><th class="col-res">結果</th></tr></thead>
+                        <tbody>${rowHtml}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        document.getElementById('val-total').innerText = matchedIDs.length;
+        document.getElementById('val-pass').innerText = totalPass;
+        document.getElementById('val-fail').innerText = totalFail;
+        container.innerHTML = html;
+        
+        document.getElementById('btn-export-csv').classList.add('active');
+        document.getElementById('btn-export-xlsx').classList.add('active');
+    });
+
+    function getRuleDesc(r) {
+        if(r.source === 'table') return `Table [${r.tbl_dir} +${r.tbl_offset}] KW:${r.keywords}`;
+        return `Text [${r.strategy}] KW:${r.keywords}`;
+    }
+
+    // =========================================================================
+    // 4. EXPORT FUNCTIONS (ENHANCED)
+    // =========================================================================
+
+    function exportCSV() {
+        if(state.results.length === 0) return;
+        
+        const headers = ["CaseID", "Field", "Expected", "Actual", "Status"];
+        const rows = state.results.map(r => [
+            r.CaseID, 
+            `"${r.Field}"`, 
+            `"${r.Expected.replace(/"/g, '""')}"`, 
+            `"${r.Actual.replace(/"/g, '""')}"`, 
+            r.Status
+        ]);
+        
+        const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "SIT_Results.csv";
+        link.click();
+    }
+
+    function exportExcel() {
+        if(state.results.length === 0) return;
+        
+        const ws = XLSX.utils.json_to_sheet(state.results);
+        
+        // 1. Calculate Auto Widths
+        const colWidths = [];
+        const dataKeys = Object.keys(state.results[0]);
+        
+        dataKeys.forEach((key, i) => {
+            let maxLen = key.length;
+            state.results.forEach(row => {
+                const val = row[key] ? String(row[key]) : "";
+                if (val.length > maxLen) maxLen = val.length;
+            });
+            colWidths.push({ wch: Math.min(maxLen + 2, 50) });
+        });
+        ws["!cols"] = colWidths;
+
+        // 2. Apply Styles
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        
+        const headerStyle = {
+            fill: { fgColor: { rgb: "E0E0E0" } },
+            font: { bold: true, color: { rgb: "000000" } },
+            border: {
+                top: { style: "thin", color: { rgb: "000000" } },
+                bottom: { style: "thin", color: { rgb: "000000" } },
+                left: { style: "thin", color: { rgb: "000000" } },
+                right: { style: "thin", color: { rgb: "000000" } }
+            }
+        };
+
+        const cellStyle = {
+            border: {
+                top: { style: "thin", color: { rgb: "CCCCCC" } },
+                bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+                left: { style: "thin", color: { rgb: "CCCCCC" } },
+                right: { style: "thin", color: { rgb: "CCCCCC" } }
+            }
+        };
+
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                if (!ws[cellRef]) ws[cellRef] = { t: 's', v: '' };
+                
+                if (R === 0) {
+                    ws[cellRef].s = headerStyle;
+                } else {
+                    // Start with basic border
+                    let currentStyle = { ...cellStyle };
+
+                    // Column E Logic (Index 4: A=0, B=1, C=2, D=3, E=4)
+                    if (C === 4) {
+                        const val = ws[cellRef].v;
+                        if (val === "PASS") {
+                            currentStyle.font = { bold: true, color: { rgb: "3B82F6" } }; // Blue
+                        } else if (val === "FAIL") {
+                            currentStyle.font = { bold: true, color: { rgb: "DC2626" } }; // Red
+                        }
+                    }
+                    
+                    ws[cellRef].s = currentStyle;
+                }
+            }
+        }
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "SIT_Results");
+        XLSX.writeFile(wb, "SIT_Report_Styled.xlsx");
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nathan Yuen 的作品展覽 - 網頁開發與軟體工具項目展示">
+    <meta name="keywords" content="Nathan Yuen, Portfolio, 網頁開發, 軟體工具, AI應用">
+    <meta name="author" content="Nathan Yuen">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Nathan Yuen - 作品展覽">
+    <meta property="og:description" content="網頁開發與軟體工具項目展示">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_TW">
+
+    <title>Nathan Yuen | 作品展覽</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --bg-card-hover: rgba(51, 65, 85, 0.8);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(15, 23, 42, 0.8);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+            --gradient-3: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --radius-sm: 0.5rem;
+            --radius-md: 1rem;
+            --radius-lg: 1.5rem;
+            --radius-xl: 2rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: var(--bg-darker);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--bg-darker);
+            overflow: hidden;
+        }
+
+        .bg-animated::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(14, 165, 233, 0.08) 0%, transparent 40%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(2%, 2%) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(-1%, 1%) rotate(-1deg);
+            }
+        }
+
+        /* Grid Pattern Overlay */
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 0;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            padding: 1rem 0;
+            background: rgba(2, 6, 23, 0.95);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-2);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: var(--primary-light);
+            margin-bottom: 2rem;
+        }
+
+        .hero-badge i {
+            font-size: 0.75rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-title .highlight {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-2);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--glass-border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Projects Section */
+        .section {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: var(--primary-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Project Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+            background: var(--bg-card-hover);
+        }
+
+        .project-image {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .project-image i {
+            font-size: 4rem;
+            opacity: 0.3;
+            color: var(--primary);
+        }
+
+        .project-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .project-card:hover .project-overlay {
+            opacity: 1;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .project-link {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1.25rem;
+        }
+
+        .project-link:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        .project-content {
+            padding: 1.5rem;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-tag {
+            padding: 0.25rem 0.75rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-light);
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        /* Coming Soon Card */
+        .project-card.coming-soon {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .project-card.coming-soon:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--glass-border);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent);
+            color: var(--bg-darker);
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 4rem 0 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            border-color: var(--primary);
+            color: var(--primary-light);
+            transform: translateY(-3px);
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Mobile Menu */
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-toggle span {
+            width: 25px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-5 {
+            animation-delay: 0.5s;
+        }
+
+        .delay-6 {
+            animation-delay: 0.6s;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background -->
+    <div class="bg-animated"></div>
+    <div class="grid-pattern"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="#" class="logo">Nathan Yuen</a>
+                <ul class="nav-links">
+                    <li><a href="#projects">作品集</a></li>
+                    <li><a href="#about">關於我</a></li>
+                    <li><a href="#contact">聯絡</a></li>
+                </ul>
+                <div class="mobile-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge animate">
+                    <i class="fas fa-sparkles"></i>
+                    作品展覽 Portfolio
+                </div>
+                <h1 class="hero-title animate delay-1">
+                    創造有意義的<br><span class="highlight">數位解決方案</span>
+                </h1>
+                <p class="hero-description animate delay-2">
+                    專注於網頁開發與實用工具的創建，致力於透過科技幫助他人解決問題、提升效率。
+                </p>
+                <div class="hero-cta animate delay-3">
+                    <a href="#projects" class="btn btn-primary">
+                        <i class="fas fa-folder-open"></i>
+                        瀏覽作品
+                    </a>
+                    <a href="#contact" class="btn btn-outline">
+                        <i class="fas fa-envelope"></i>
+                        聯絡我
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="section" id="projects">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-badge">
+                        <i class="fas fa-code"></i>
+                        精選作品
+                    </div>
+                    <h2 class="section-title">我的項目</h2>
+                    <p class="section-subtitle">
+                        以下是我開發的一些網頁應用程式和實用工具
+                    </p>
+                </div>
+
+                <div class="projects-grid">
+                    <!-- Project 1: 信毅會 -->
+                    <article class="project-card animate delay-1">
+                        <div class="project-image">
+                            <i class="fas fa-graduation-cap"></i>
+                            <div class="project-overlay">
+                                <div class="project-links">
+                                    <a href="../index.html" class="project-link" title="瀏覽網站">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="https://github.com/nathan927/faithwill" class="project-link"
+                                        title="GitHub">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="project-tag">HTML/CSS</span>
+                                <span class="project-tag">JavaScript</span>
+                                <span class="project-tag">NGO</span>
+                            </div>
+                            <h3 class="project-title">信毅會 FaithWill</h3>
+                            <p class="project-description">
+                                完全免費的 AI 學習障礙教學資源平台，為有學習困難的兒童提供專屬教學資源，秉持「信而有毅，學而無障」的理念。
+                            </p>
+                        </div>
+                    </article>
+
+                    <!-- Project 2: 癌症知識問與答 -->
+                    <article class="project-card animate delay-2">
+                        <div class="project-image">
+                            <i class="fas fa-heartbeat"></i>
+                            <div class="project-overlay">
+                                <div class="project-links">
+                                    <a href="../cancer-knowledge-kit/index.html" class="project-link" title="瀏覽網站">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="project-tag">TailwindCSS</span>
+                                <span class="project-tag">JavaScript</span>
+                                <span class="project-tag">健康</span>
+                            </div>
+                            <h3 class="project-title">癌症知識問與答</h3>
+                            <p class="project-description">
+                                提供癌症風險自我評估、癌症知識百科與問答測驗的綜合平台。支援多語言，包含超過130道問答題目。
+                            </p>
+                        </div>
+                    </article>
+
+                    <!-- Project 3: VBA 全能查詢工具 -->
+                    <article class="project-card animate delay-3">
+                        <div class="project-image">
+                            <i class="fas fa-file-code"></i>
+                            <div class="project-overlay">
+                                <div class="project-links">
+                                    <a href="../VBA-Bible/VBA離線全能查詢2.5.html" class="project-link" title="瀏覽工具">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="project-tag">VBA</span>
+                                <span class="project-tag">離線工具</span>
+                                <span class="project-tag">開發者</span>
+                            </div>
+                            <h3 class="project-title">VBA 全能查詢工具 (離線版)</h3>
+                            <p class="project-description">
+                                完整的 VBA 命令離線查詢工具，包含詳細的語法說明、範例代碼和分類目錄，適合 Excel VBA 開發者使用。
+                            </p>
+                        </div>
+                    </article>
+
+                    <!-- Project 4: Word Extractor Pro -->
+                    <article class="project-card animate delay-4">
+                        <div class="project-image">
+                            <i class="fas fa-file-word"></i>
+                            <div class="project-overlay">
+                                <div class="project-links">
+                                    <a href="../Word Extractor Pro (offline)/Word Extractor Pro (full ver).html"
+                                        class="project-link" title="瀏覽工具">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="project-tag">JavaScript</span>
+                                <span class="project-tag">離線工具</span>
+                                <span class="project-tag">文件處理</span>
+                            </div>
+                            <h3 class="project-title">Word Extractor Pro (離線版)</h3>
+                            <p class="project-description">
+                                離線版 Word 文檔內容提取工具，無需上傳即可本地解析 .docx 檔案，支援多種提取和匯出功能。
+                            </p>
+                        </div>
+                    </article>
+
+                    <!-- Coming Soon Projects -->
+                    <article class="project-card coming-soon animate delay-5">
+                        <span class="coming-soon-badge">即將推出</span>
+                        <div class="project-image">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="project-tag">待定</span>
+                            </div>
+                            <h3 class="project-title">更多項目開發中...</h3>
+                            <p class="project-description">
+                                正在開發更多實用工具和網頁應用，敬請期待！
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="project-card coming-soon animate delay-6">
+                        <span class="coming-soon-badge">即將推出</span>
+                        <div class="project-image">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="project-tag">待定</span>
+                            </div>
+                            <h3 class="project-title">更多項目開發中...</h3>
+                            <p class="project-description">
+                                正在開發更多實用工具和網頁應用，敬請期待！
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section" id="about" style="background: rgba(30, 41, 59, 0.3);">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-badge">
+                        <i class="fas fa-user"></i>
+                        關於
+                    </div>
+                    <h2 class="section-title">關於我</h2>
+                    <p class="section-subtitle" style="max-width: 800px;">
+                        我是一位熱衷於創造實用數位解決方案的開發者。我相信科技應該服務於人，幫助解決實際問題、提升生活品質。無論是學習障礙兒童的教育支援，還是提高工作效率的辦公工具，我都致力於打造真正有價值的應用。
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Nathan Yuen</div>
+                <div class="social-links">
+                    <a href="https://github.com/nathan927" class="social-link" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="mailto:ycm927@gmail.com" class="social-link" title="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+                <p class="footer-text">
+                    © 2025 Nathan Yuen. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', function () {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

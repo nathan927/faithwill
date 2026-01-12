@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>UAT Kit V3.1 (Final Complete)</title>
+    <!-- 核心依賴 -->
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root { 
+            --primary: #1565c0; --secondary: #0d47a1; --accent: #d84315;        
+            --bg: #f5f7fa; --card: #ffffff; --text: #263238; --border: #cfd8dc;
+        }
+        body { font-family: "Segoe UI", sans-serif; background: var(--bg); padding: 40px; color: var(--text); margin: 0; }
+        .container { max-width: 1900px; margin: 0 auto; }
+        h1 { color: var(--primary); border-bottom: 5px solid var(--accent); padding-bottom: 20px; font-weight: 800; }
+        .badge { background: var(--accent); color: white; padding: 5px 15px; border-radius: 4px; font-size: 16px; vertical-align: middle; }
+        .subtitle { font-size: 16px; color: #546e7a; margin-bottom: 40px; background: #e3f2fd; padding: 15px; border-left: 5px solid #b0bec5; }
+        .btn-main { background: linear-gradient(180deg, #1565c0, #0d47a1); color: white; width: 100%; padding: 25px; font-size: 22px; border-radius: 8px; cursor: pointer; font-weight: 700; margin-bottom: 40px; border: none; }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+        @media (max-width: 1400px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: var(--card); border-radius: 8px; padding: 30px; border-top: 6px solid #78909c; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+        .case-title { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .case-id { background: #455a64; color: #fff; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-family: monospace; }
+        .scenario { background: #f8f9fa; padding: 15px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
+        .table-wrap { height: 350px; overflow-y: auto; border: 1px solid #ccc; background: #fff; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { position: sticky; top: 0; background: #eceff1; padding: 10px; text-align: left; z-index: 5; }
+        td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .btn-dl { width: 100%; padding: 15px; border: 2px solid var(--primary); background: #fff; color: var(--primary); font-weight: 700; cursor: pointer; border-radius: 6px; }
+        .btn-dl:hover { background: var(--primary); color: #fff; }
+        .badge-type { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; margin-right: 4px; text-transform: uppercase; border: 1px solid #ccc; }
+        .expected-box { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px; color: #2e7d32; }
+        .expected-list { margin: 0; padding-left: 20px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>UAT Kit V3.1 <span class="badge">Final Fixed</span></h1>
+    <p class="subtitle">包含 Case 01 至 Case 18 完整案例。已修復 JS 變數引用錯誤及所有 SIT 驗收規則。</p>
+    <button class="btn-main" onclick="downloadAll()">📦 一鍵下載全套測試資源 (含 JSON 驗收數據)</button>
+    <div class="grid" id="container"></div>
+</div>
+
+<script>
+    const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType, HeadingLevel, TextRun, PageBreak, Header, Footer, AlignmentType } = docx;
+
+    // --- 語料庫 ---
+    const CORPUS = {
+        CN: ["第一條 授信額度...", "第二條 貸款利率...", "第三條 財務約定..."],
+        POST: ["貸後檢查重點...", "資金流向核查...", "風險預警信號..."],
+        EN: ["ARTICLE 1: DEFINITIONS...", "ARTICLE 2: THE CREDITS...", "ARTICLE 3: NEGATIVE COVENANTS..."],
+        ESG: ["環境績效指標 (KPIs)...", "赤道原則合規性...", "供應鏈社會責任..."],
+        TRADE: ["URDG 758 適用性...", "索賠條件...", "減額條款..."],
+        WEALTH: ["投資目標...", "資產配置策略...", "稅務籌劃聲明..."],
+        FDD: ["EBITDA Normalization...", "Cost of Sales (COGS)...", "FX Impact..."],
+        LEGACY: ["MT103_BLOCK_4...", ":20:TRN-BATCH...", ":32A:251231USD..."],
+        NPL: ["CIVIL JUDGMENT...", "P1aintiff: Indu5tria1...", "The c0urt found..."]
+    };
+
+    function genText(lines, type) {
+        const source = CORPUS[type] || CORPUS.CN;
+        return Array.from({length: lines}, (_, i) => new Paragraph({
+            children: [new TextRun({ text: source[i % source.length], size: 18 })],
+            spacing: { line: 240, after: 120 }
+        }));
+    }
+
+    function header(text) {
+        return new Paragraph({
+            children: [new TextRun({ text: text, bold: true, size: 28, color: "1565C0" })],
+            heading: HeadingLevel.HEADING_2, spacing: { before: 300, after: 200 }
+        });
+    }
+
+    // =========================================================================
+    // ALL 18 CASES (SINGLE ARRAY TO PREVENT ERRORS)
+    // =========================================================================
+    const ALL_CASES = [
+        // Case 01
+        {
+            id: "01", title: "綜合授信審批書", tag: "Core",
+            expectations: ["申請人 = 上海未來科技有限公司", "授信總額 = 50,000", "幣種 = CNY", "流貸額度 = 20,000", "流貸利率 = LPR+50BP", "流貸期限 = 1年", "銀承額度 = 10,000", "銀承保證金 = 30%保證金", "信用證額度 = 5,000", "項目貸款 = 15,000", "項目利率 = LPR+10BP", "擔保人 = 北京控股集團有限公司", "抵押物 = 上海市浦東新區研發中心大樓", "審批日期 = 2025-05-20", "審批編號 = CREDIT-2025-8888"],
+            rules: [
+                { name: "申請人", source: "text", strategy: "keyword", keywords: "借款申請人：", txt_end_type: "eol" },
+                { name: "授信總額", source: "table", keywords: "授信總額", tbl_dir: "right", tbl_offset: 2 },
+                { name: "幣種", source: "table", keywords: "授信總額", tbl_dir: "right", tbl_offset: 1 },
+                { name: "流貸額度", source: "table", keywords: "流動資金貸款", tbl_dir: "right", tbl_offset: 2 },
+                { name: "流貸利率", source: "table", keywords: "流動資金貸款", tbl_dir: "right", tbl_offset: 4 },
+                { name: "流貸期限", source: "table", keywords: "流動資金貸款", tbl_dir: "right", tbl_offset: 3 },
+                { name: "銀承額度", source: "table", keywords: "銀行承兌匯票", tbl_dir: "right", tbl_offset: 2 },
+                { name: "銀承保證金", source: "table", keywords: "銀行承兌匯票", tbl_dir: "right", tbl_offset: 5 },
+                { name: "信用證額度", source: "table", keywords: "國內信用證", tbl_dir: "right", tbl_offset: 2 },
+                { name: "項目貸款", source: "table", keywords: "固定資產貸款", tbl_dir: "right", tbl_offset: 2 },
+                { name: "項目利率", source: "table", keywords: "固定資產貸款", tbl_dir: "right", tbl_offset: 4 },
+                { name: "擔保人", source: "text", strategy: "keyword", keywords: "擔保人：", txt_end_type: "sym_inc", txt_end_val: "公司" },
+                { name: "抵押物", source: "text", strategy: "keyword", keywords: "抵押物：", txt_end_type: "eol" },
+                { name: "審批日期", source: "text", strategy: "keyword", keywords: "日期：", txt_end_type: "eol" },
+                { name: "審批編號", source: "text", strategy: "keyword", keywords: "編號：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("銀行綜合授信審批通知書"), new Paragraph("編號：CREDIT-2025-8888"), new Paragraph("日期：2025-05-20"), new Paragraph("借款申請人：上海未來科技有限公司"), ...genText(5, 'CN'), header("一、 授信方案明細"), new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [ new TableRow({ children: ["品種", "幣種", "金額(萬元)", "期限", "利率", "擔保方式"].map(t=>new TableCell({children:[new Paragraph(t)]})) }), new TableRow({ children: ["授信總額", "CNY", "50,000", "-", "-", "混合"].map(t=>new TableCell({children:[new Paragraph(t)]})) }), new TableRow({ children: ["流動資金貸款", "CNY", "20,000", "1年", "LPR+50BP", "信用"].map(t=>new TableCell({children:[new Paragraph(t)]})) }), new TableRow({ children: ["銀行承兌匯票", "CNY", "10,000", "6個月", "0.05%", "30%保證金"].map(t=>new TableCell({children:[new Paragraph(t)]})) }), new TableRow({ children: ["國內信用證", "CNY", "5,000", "6個月", "1.5%", "20%保證金"].map(t=>new TableCell({children:[new Paragraph(t)]})) }), new TableRow({ children: ["固定資產貸款", "CNY", "15,000", "5年", "LPR+10BP", "抵押"].map(t=>new TableCell({children:[new Paragraph(t)]})) }) ]}), ...genText(5, 'CN'), header("二、 擔保條件"), new Paragraph("擔保人：北京控股集團有限公司 (AAA評級)"), new Paragraph("抵押物：上海市浦東新區研發中心大樓") ]}]})
+        },
+        // Case 02
+        {
+            id: "02", title: "多主體財務報表", tag: "Scope",
+            expectations: ["母公司_收入 = 100,000", "母公司_利潤 = 20,000", "母公司_負債 = 50,000", "子A_收入 = 30,000", "子A_利潤 = 5,000", "子A_負債 = 10,000", "子B_收入 = 20,000", "子B_利潤 = 1,000", "子B_負債 = 8,000", "子C_收入 = 50,000", "子C_利潤 = 14,000", "子C_負債 = 32,000"],
+            rules: [
+                { name: "母公司_收入", source: "table", keywords: "營業收入", tbl_dir: "right", tbl_offset: 1, heading: "一、 集團母公司" },
+                { name: "母公司_利潤", source: "table", keywords: "淨利潤", tbl_dir: "right", tbl_offset: 1, heading: "一、 集團母公司" },
+                { name: "母公司_負債", source: "table", keywords: "總負債", tbl_dir: "right", tbl_offset: 1, heading: "一、 集團母公司" },
+                { name: "子A_收入", source: "table", keywords: "營業收入", tbl_dir: "right", tbl_offset: 1, heading: "二、 子公司 A (科技)" },
+                { name: "子A_利潤", source: "table", keywords: "淨利潤", tbl_dir: "right", tbl_offset: 1, heading: "二、 子公司 A (科技)" },
+                { name: "子A_負債", source: "table", keywords: "總負債", tbl_dir: "right", tbl_offset: 1, heading: "二、 子公司 A (科技)" },
+                { name: "子B_收入", source: "table", keywords: "營業收入", tbl_dir: "right", tbl_offset: 1, heading: "三、 子公司 B (物流)" },
+                { name: "子B_利潤", source: "table", keywords: "淨利潤", tbl_dir: "right", tbl_offset: 1, heading: "三、 子公司 B (物流)" },
+                { name: "子B_負債", source: "table", keywords: "總負債", tbl_dir: "right", tbl_offset: 1, heading: "三、 子公司 B (物流)" },
+                { name: "子C_收入", source: "table", keywords: "營業收入", tbl_dir: "right", tbl_offset: 1, heading: "四、 子公司 C (地產)" },
+                { name: "子C_利潤", source: "table", keywords: "淨利潤", tbl_dir: "right", tbl_offset: 1, heading: "四、 子公司 C (地產)" },
+                { name: "子C_負債", source: "table", keywords: "總負債", tbl_dir: "right", tbl_offset: 1, heading: "四、 子公司 C (地產)" }
+            ],
+            genDoc: () => {
+                const mkTab = (v1, v2, v3) => new Table({ rows: [ new TableRow({children:[new TableCell({children:[new Paragraph("科目")]}), new TableCell({children:[new Paragraph("金額(百萬)")], shading:{fill:"F0F0F0"}})]}), new TableRow({children:[new TableCell({children:[new Paragraph("營業收入")]}), new TableCell({children:[new Paragraph(v1)]})]}), new TableRow({children:[new TableCell({children:[new Paragraph("淨利潤")]}), new TableCell({children:[new Paragraph(v2)]})]}), new TableRow({children:[new TableCell({children:[new Paragraph("總負債")]}), new TableCell({children:[new Paragraph(v3)]})]}) ]});
+                return new Document({ sections: [{ children: [ header("集團年度財務匯總"), new Paragraph({text: "一、 集團母公司", heading: HeadingLevel.HEADING_1}), ...genText(2, 'CN'), mkTab("100,000", "20,000", "50,000"), new Paragraph({text: "二、 子公司 A (科技)", heading: HeadingLevel.HEADING_1}), ...genText(2, 'CN'), mkTab("30,000", "5,000", "10,000"), new Paragraph({text: "三、 子公司 B (物流)", heading: HeadingLevel.HEADING_1}), ...genText(2, 'CN'), mkTab("20,000", "1,000", "8,000"), new Paragraph({text: "四、 子公司 C (地產)", heading: HeadingLevel.HEADING_1}), ...genText(2, 'CN'), mkTab("50,000", "14,000", "32,000") ]}]});
+            }
+        },
+        // Case 03
+        {
+            id: "03", title: "銀團貸款合約", tag: "Occurrence",
+            expectations: ["擔保人_1 = Alpha Holdings Ltd.", "擔保人_2 = Beta Trading Corp.", "擔保人_3 = Gamma Industries Inc.", "擔保人_4 = Delta Properties LLC.", "安排行_Fee = USD 500,000", "代理行_Fee = USD 200,000", "利率_1 = 2.50% p.a.", "利率_2 = 3.10% p.a.", "最後簽署日 = 2025-12-31", "合約總頁數 = 150", "適用法律 = English Law", "違約金比例 = 2.00% additional"],
+            rules: [
+                { name: "擔保人_1", source: "text", strategy: "keyword", keywords: "Guarantor Name:", txt_end_type: "eol", occur_type: "first" },
+                { name: "擔保人_2", source: "text", strategy: "keyword", keywords: "Guarantor Name:", txt_end_type: "eol", occur_type: "fixed", occur_index: 2 },
+                { name: "擔保人_3", source: "text", strategy: "keyword", keywords: "Guarantor Name:", txt_end_type: "eol", occur_type: "fixed", occur_index: 3 },
+                { name: "擔保人_4", source: "text", strategy: "keyword", keywords: "Guarantor Name:", txt_end_type: "eol", occur_type: "fixed", occur_index: 4 },
+                { name: "安排行_Fee", source: "table", keywords: "Arranger", tbl_dir: "right", tbl_offset: 1 },
+                { name: "代理行_Fee", source: "table", keywords: "Agent", tbl_dir: "right", tbl_offset: 1 },
+                { name: "利率_1", source: "text", strategy: "keyword", keywords: "Margin:", txt_end_type: "eol", occur_type: "first" },
+                { name: "利率_2", source: "text", strategy: "keyword", keywords: "Margin:", txt_end_type: "eol", occur_type: "fixed", occur_index: 2 },
+                { name: "最後簽署日", source: "text", strategy: "keyword", keywords: "Date:", txt_end_type: "eol", occur_type: "last" },
+                { name: "合約總頁數", source: "text", strategy: "keyword", keywords: "Total Pages:", txt_end_type: "eol" },
+                { name: "適用法律", source: "text", strategy: "keyword", keywords: "Governing Law:", txt_end_type: "eol" },
+                { name: "違約金比例", source: "text", strategy: "keyword", keywords: "Default Rate:", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("SYNDICATED FACILITY AGREEMENT"), new Paragraph("Total Pages: 150"), ...genText(3, 'EN'), header("SCHEDULE 1: GUARANTORS"), new Paragraph("1. Guarantor Name: Alpha Holdings Ltd."), new Paragraph("2. Guarantor Name: Beta Trading Corp."), new Paragraph("3. Guarantor Name: Gamma Industries Inc."), new Paragraph("4. Guarantor Name: Delta Properties LLC."), ...genText(5, 'EN'), header("SCHEDULE 2: FEES"), new Table({ rows: [ new TableRow({children:[new TableCell({children:[new Paragraph("Role")]}), new TableCell({children:[new Paragraph("Fee Amount")]})]}) , new TableRow({children:[new TableCell({children:[new Paragraph("Arranger")]}), new TableCell({children:[new Paragraph("USD 500,000")]})]}) ] }), new Paragraph("..."), new Table({ rows: [ new TableRow({children:[new TableCell({children:[new Paragraph("Role")]}), new TableCell({children:[new Paragraph("Fee Amount")]})]}) , new TableRow({children:[new TableCell({children:[new Paragraph("Agent")]}), new TableCell({children:[new Paragraph("USD 200,000")]})]}) ] }), header("TERMS"), new Paragraph("Tranche A Margin: 2.50% p.a."), new Paragraph("Tranche B Margin: 3.10% p.a."), new Paragraph("Default Rate: 2.00% additional"), new Paragraph("Governing Law: English Law"), new PageBreak(), new Paragraph("Date: 2025-12-31") ]}]})
+        },
+        // Case 04
+        {
+            id: "04", title: "最高機密文件", tag: "Header",
+            expectations: ["頁眉_密級 = TOP SECRET // INTERNAL USE", "頁眉_編號 = CONF-2025-001", "頁腳_版本 = v5.0 Final Draft", "頁腳_作者 = Chief Risk Officer", "頁腳_頁碼 = 1 of 50", "正文_評級 = AA+", "正文_客戶 = Tesla Motors Inc.", "正文_額度 = USD 2,000,000,000"],
+            rules: [
+                { name: "頁眉_密級", source: "text", strategy: "keyword", keywords: "Classification:", txt_end_type: "eol", occur_type: "first" },
+                { name: "頁眉_編號", source: "text", strategy: "keyword", keywords: "Ref No:", txt_end_type: "eol", occur_type: "first" },
+                { name: "頁腳_版本", source: "text", strategy: "keyword", keywords: "Version:", txt_end_type: "eol", occur_type: "last" },
+                { name: "頁腳_作者", source: "text", strategy: "keyword", keywords: "Author:", txt_end_type: "eol", occur_type: "last" },
+                { name: "頁腳_頁碼", source: "text", strategy: "keyword", keywords: "Page:", txt_end_type: "eol", occur_type: "last" },
+                { name: "正文_評級", source: "text", strategy: "keyword", keywords: "Final Rating:", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "正文_客戶", source: "text", strategy: "keyword", keywords: "Client:", txt_end_type: "eol" },
+                { name: "正文_額度", source: "text", strategy: "keyword", keywords: "Amount:", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ headers: { default: new Header({ children: [ new Paragraph("Classification: TOP SECRET // INTERNAL USE"), new Paragraph("Ref No: CONF-2025-001") ] }) }, footers: { default: new Footer({ children: [ new Paragraph("Version: v5.0 Final Draft"), new Paragraph("Author: Chief Risk Officer"), new Paragraph("Page: 1 of 50") ] }) }, children: [ header("INTERNAL CREDIT RATING REPORT"), new Paragraph("Client: Tesla Motors Inc."), new Paragraph("Amount: USD 2,000,000,000"), ...genText(10, 'EN'), new Paragraph("Final Rating: AA+ (Stable)") ] }]})
+        },
+        // Case 05
+        {
+            id: "05", title: "實地查訪報告", tag: "Text",
+            expectations: ["第2行_查訪地 = 地點：廣東省東莞市松山湖園區", "第3行_陪同人 = 陪同人：張廠長", "第4行_天氣 = 天氣：晴朗", "生產線_狀態 = 全線滿負荷運轉，無停機現象。", "員工_截取4字 = 500人", "存貨_截取6字 = 原料堆放整齊", "電費_關鍵詞後 = 本月電費單顯示為 120 萬元。", "水費_含關鍵詞 = 水費核查：本月水費為 5 萬元。", "異常_符號前 = 未發現任何異常情況", "結論_符號後 = 建議繼續維持現有授信額度。"],
+            rules: [
+                { name: "第2行_查訪地", source: "text", strategy: "line", line_index: 2 },
+                { name: "第3行_陪同人", source: "text", strategy: "line", line_index: 3 },
+                { name: "第4行_天氣", source: "text", strategy: "line", line_index: 4 },
+                { name: "生產線_狀態", source: "text", strategy: "keyword", keywords: "生產線狀態：", txt_end_type: "eol" },
+                { name: "員工_截取4字", source: "text", strategy: "keyword", keywords: "員工在崗情況：", txt_end_type: "len_fwd", txt_end_val: "4" },
+                { name: "存貨_截取10字", source: "text", strategy: "keyword", keywords: "存貨堆放：", txt_end_type: "len_fwd", txt_end_val: "6" },
+                { name: "電費_關鍵詞後", source: "text", strategy: "keyword", keywords: "電費核查：", txt_end_type: "key_exc" },
+                { name: "水費_含關鍵詞", source: "text", strategy: "keyword", keywords: "水費核查：", txt_end_type: "key_inc" },
+                { name: "異常_符號前", source: "text", strategy: "keyword", keywords: "異常情況：", txt_end_type: "sym_exc", txt_end_val: "。" },
+                { name: "結論_符號後", source: "text", strategy: "keyword", keywords: "查訪結論：", txt_end_type: "sym_inc", txt_end_val: "。" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("貸後實地查訪報告"), new Paragraph("地點：廣東省東莞市松山湖園區"), new Paragraph("陪同人：張廠長"), new Paragraph("天氣：晴朗"), ...genText(2, 'CN'), new Paragraph("生產線狀態：全線滿負荷運轉，無停機現象。"), new Paragraph("員工在崗情況：500人正在作業，秩序井然。"), new Paragraph("存貨堆放：原料堆放整齊，標識清晰，無受潮跡象。"), new Paragraph("電費核查：本月電費單顯示為 120 萬元。"), new Paragraph("水費核查：本月水費為 5 萬元。"), new Paragraph("異常情況：未發現任何異常情況。工廠運作正常。"), new Paragraph("查訪結論：建議繼續維持現有授信額度。風險可控。") ]}]})
+        },
+        // Case 06
+        {
+            id: "06", title: "抵押物清單", tag: "Table",
+            expectations: ["設備A_型號(右) = A-Model-2024", "設備A_原值(右) = 500萬", "設備B_型號(下) = B-Turbo-Pro", "設備B_原值(下) = 800萬", "設備C_名稱(左) = C-Model-X", "設備C_原值(左) = 100萬", "匯總_總價(上) = 總價值：1400萬", "匯總_數量(上) = 總數量：3台", "備註說明 = 所有設備均運行良好", "評估機構 = 戴德梁行房地產評估有限公司"],
+            rules: [
+                { name: "設備A_型號(右)", source: "table", keywords: "設備A", tbl_dir: "right", tbl_offset: 1 },
+                { name: "設備A_原值(右)", source: "table", keywords: "設備A", tbl_dir: "right", tbl_offset: 2 },
+                { name: "設備B_型號(下)", source: "table", keywords: "設備B型號", tbl_dir: "down", tbl_offset: 1 },
+                { name: "設備B_原值(下)", source: "table", keywords: "設備B原值", tbl_dir: "down", tbl_offset: 1 },
+                { name: "設備C_名稱(左)", source: "table", keywords: "100萬", tbl_dir: "left", tbl_offset: 1 },
+                { name: "設備C_原值(左)", source: "table", keywords: "C-Model-X", tbl_dir: "right", tbl_offset: 1 },
+                { name: "匯總_總價(上)", source: "table", keywords: "制表人", tbl_dir: "up", tbl_offset: 1 },
+                { name: "匯總_數量(上)", source: "table", keywords: "審核人", tbl_dir: "up", tbl_offset: 1 },
+                { name: "備註說明", source: "table", keywords: "備註", tbl_dir: "right", tbl_offset: 1 },
+                { name: "評估機構", source: "text", strategy: "keyword", keywords: "評估機構：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("固定資產抵押清單"), new Paragraph("評估機構：戴德梁行房地產評估有限公司"), new Table({ rows: [ new TableRow({children:["資產名稱", "規格型號", "賬面原值"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["設備A", "A-Model-2024", "500萬"].map(t=>new TableCell({children:[new Paragraph(t)]}))}) ] }), new Paragraph(" "), new Table({ rows: [ new TableRow({children:[new TableCell({children:[new Paragraph("設備B型號")]}), new TableCell({children:[new Paragraph("設備B原值")]})]}) , new TableRow({children:[new TableCell({children:[new Paragraph("B-Turbo-Pro")]}), new TableCell({children:[new Paragraph("800萬")]})]}) ] }), new Paragraph(" "), new Table({ rows: [ new TableRow({children:[new TableCell({children:[new Paragraph("設備C")]}), new TableCell({children:[new Paragraph("C-Model-X")]}), new TableCell({children:[new Paragraph("100萬")]})]}) ] }), new Paragraph(" "), new Table({ rows: [ new TableRow({children:[new TableCell({children:[new Paragraph("總價值：1400萬")]}), new TableCell({children:[new Paragraph("總數量：3台")]})]}) , new TableRow({children:[new TableCell({children:[new Paragraph("制表人")]}), new TableCell({children:[new Paragraph("審核人")]})]}) ] }), new Paragraph("備註：所有設備均運行良好") ]}]})
+        },
+        // Case 07
+        {
+            id: "07", title: "製造業貸後定期檢查", tag: "Post-Lending",
+            expectations: ["檢查季度=2025年第一季度", "本期營收=45,000", "上期營收=40,000", "營收變動=+12.5%", "本期淨利=3,200", "經營現金流=-500", "資產負債率=65%", "流水歸行率=85%", "納稅額=150 萬元", "電費支出=45 萬元", "五級分類=正常類", "檢查結論=經營正常，維持現有授信，加強對經營現金流為負的監控。"],
+            rules: [
+                { name: "檢查季度", source: "text", strategy: "keyword", keywords: "檢查期數：", txt_end_type: "eol" },
+                { name: "本期營收", source: "table", keywords: "營業收入", tbl_dir: "right", tbl_offset: 1 },
+                { name: "上期營收", source: "table", keywords: "營業收入", tbl_dir: "right", tbl_offset: 2 },
+                { name: "營收變動", source: "table", keywords: "營業收入", tbl_dir: "right", tbl_offset: 3 },
+                { name: "本期淨利", source: "table", keywords: "淨利潤", tbl_dir: "right", tbl_offset: 1 },
+                { name: "經營現金流", source: "table", keywords: "經營活動現金淨流量", tbl_dir: "right", tbl_offset: 1, clean_number: true },
+                { name: "資產負債率", source: "table", keywords: "資產負債率", tbl_dir: "right", tbl_offset: 1 },
+                { name: "流水歸行率", source: "text", strategy: "keyword", keywords: "歸行率：", txt_end_type: "sym_exc", txt_end_val: "，" },
+                { name: "納稅額", source: "text", strategy: "keyword", keywords: "納稅總額：", txt_end_type: "sym_exc", txt_end_val: "。" },
+                { name: "電費支出", source: "text", strategy: "keyword", keywords: "電費：", txt_end_type: "sym_exc", txt_end_val: "，" },
+                { name: "五級分類", source: "text", strategy: "keyword", keywords: "分類認定：", txt_end_type: "eol" },
+                { name: "檢查結論", source: "text", strategy: "keyword", keywords: "結論意見：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("貸後定期檢查報告 (製造業)"), new Paragraph("檢查期數：2025年第一季度"), new Paragraph("借款人：蘇州精密電子有限公司"), ...genText(3, 'POST'), header("一、 財務指標對比"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["指標(萬元)","本期數","上年同期","變動幅度"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["營業收入","45,000","40,000","+12.5%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["淨利潤","3,200","2,800","+14.2%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["經營活動現金淨流量","(500)","1,200","-141%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["資產負債率","65%","63%","+2%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("二、 經營交叉核驗"), new Paragraph("1. 資金流水：本季度銷售回款總額 4.8 億元，歸行率：85%，符合預期。"), new Paragraph("2. 納稅情況：本季度申報增值稅及附加，納稅總額：150 萬元。"), new Paragraph("3. 生產能耗：工廠全負荷運轉，本月電費：45 萬元，同比增長 10%。"), ...genText(3, 'POST'), header("三、 風險認定"), new Paragraph("分類認定：正常類"), new Paragraph("結論意見：經營正常，維持現有授信，加強對經營現金流為負的監控。") ]}]})
+        },
+        // Case 08
+        {
+            id: "08", title: "供應鏈金融核查", tag: "Trade",
+            expectations: ["貿易合同號=TRADE-2025-SZ-009", "發票號_1=11002233", "發票號_2=11002234", "發票號_3=11002235", "發票總額=1,000 萬元", "提單號=COSCO-SH-99887766", "物流公司=中遠海運集裝箱運輸有限公司", "貨物名稱=鋰電池級碳酸鋰", "貨物數量=500", "倉庫地址=上海市外高橋保稅區 3 號倉庫", "監管員=李四", "核查結果=單貨一致，貿易背景真實有效。"],
+            rules: [
+                { name: "貿易合同號", source: "text", strategy: "keyword", keywords: "基礎合同編號：", txt_end_type: "eol" },
+                { name: "發票號_1", source: "text", strategy: "keyword", keywords: "發票號碼：", txt_end_type: "len_fwd", txt_end_val: "8", occur_type: "first" },
+                { name: "發票號_2", source: "text", strategy: "keyword", keywords: "發票號碼：", txt_end_type: "len_fwd", txt_end_val: "8", occur_type: "fixed", occur_index: 2 },
+                { name: "發票號_3", source: "text", strategy: "keyword", keywords: "發票號碼：", txt_end_type: "len_fwd", txt_end_val: "8", occur_type: "fixed", occur_index: 3 },
+                { name: "發票總額", source: "text", strategy: "keyword", keywords: "發票合計金額：", txt_end_type: "eol" },
+                { name: "提單號", source: "text", strategy: "keyword", keywords: "提單 B/L No：", txt_end_type: "eol" },
+                { name: "物流公司", source: "text", strategy: "keyword", keywords: "承運人：", txt_end_type: "eol" },
+                { name: "貨物名稱", source: "table", keywords: "貨物描述", tbl_dir: "down", tbl_offset: 1 },
+                { name: "貨物數量", source: "table", keywords: "數量(噸)", tbl_dir: "down", tbl_offset: 1 },
+                { name: "倉庫地址", source: "text", strategy: "keyword", keywords: "監管倉庫：", txt_end_type: "eol" },
+                { name: "監管員", source: "text", strategy: "keyword", keywords: "現場監管員：", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "核查結果", source: "text", strategy: "keyword", keywords: "核查結論：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("供應鏈貿易背景專項核查"), new Paragraph("基礎合同編號：TRADE-2025-SZ-009"), new Paragraph("買方：比亞迪汽車工業有限公司"), ...genText(2, 'CN'), header("一、 單據信息"), new Paragraph("1. 發票號碼：11002233 (金額 500萬)"), new Paragraph("2. 發票號碼：11002234 (金額 300萬)"), new Paragraph("3. 發票號碼：11002235 (金額 200萬)"), new Paragraph("發票合計金額：1,000 萬元"), new Paragraph("提單 B/L No：COSCO-SH-99887766"), new Paragraph("承運人：中遠海運集裝箱運輸有限公司"), header("二、 貨物清單"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["貨物描述","規格","數量(噸)","單價"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["鋰電池級碳酸鋰","99.5% min","500","80,000"].map(t=>new TableCell({children:[new Paragraph(t)]}))}) ]}), header("三、 存貨監管"), new Paragraph("監管倉庫：上海市外高橋保稅區 3 號倉庫"), new Paragraph("現場監管員：李四 (工號 998)"), new Paragraph("核查結論：單貨一致，貿易背景真實有效。") ]}]})
+        },
+        // Case 09
+        {
+            id: "09", title: "房地產開發貸監管", tag: "Real Estate",
+            expectations: ["項目名稱=濱江壹號院 (二期)", "工程進度=主體結構封頂", "已售套數=850", "銷售金額=50億元", "去化率=85%", "監管賬戶餘額=2.5 億元", "受托支付_1=中建三局", "支付金額_1=5,000萬元", "受托支付_2=xx建材公司", "支付金額_2=2,000萬元", "預警提示=需關注同區域競品降價促銷對本項目的影響。", "下步計劃=嚴格審核工程款支付，確保資金優先用於本項目建設，防止資金被集團抽調。"],
+            rules: [
+                { name: "項目名稱", source: "text", strategy: "keyword", keywords: "項目名稱：", txt_end_type: "eol" },
+                { name: "工程進度", source: "text", strategy: "keyword", keywords: "當前進度：", txt_end_type: "sym_exc", txt_end_val: "，" },
+                { name: "已售套數", source: "table", keywords: "累計已售", tbl_dir: "right", tbl_offset: 1 },
+                { name: "銷售金額", source: "table", keywords: "累計銷售金額", tbl_dir: "right", tbl_offset: 1 },
+                { name: "去化率", source: "table", keywords: "去化率", tbl_dir: "right", tbl_offset: 1 },
+                { name: "監管賬戶餘額", source: "text", strategy: "keyword", keywords: "賬戶餘額：", txt_end_type: "eol" },
+                { name: "受托支付_1", source: "table", keywords: "支付對象", tbl_dir: "down", tbl_offset: 1, heading: "資金支出明細" },
+                { name: "支付金額_1", source: "table", keywords: "支付金額", tbl_dir: "down", tbl_offset: 1, heading: "資金支出明細" },
+                { name: "受托支付_2", source: "table", keywords: "支付對象", tbl_dir: "down", tbl_offset: 2, heading: "資金支出明細" },
+                { name: "支付金額_2", source: "table", keywords: "支付金額", tbl_dir: "down", tbl_offset: 2, heading: "資金支出明細" },
+                { name: "預警提示", source: "text", strategy: "keyword", keywords: "風險提示：", txt_end_type: "eol" },
+                { name: "下步計劃", source: "text", strategy: "keyword", keywords: "管理要求：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("房地產開發貸款監管報告"), new Paragraph("項目名稱：濱江壹號院 (二期)"), new Paragraph("當前進度：主體結構封頂，正在進行外立面施工。"), ...genText(2, 'POST'), header("一、 銷售情況"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["指標","數值","備註"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["總套數","1,000","住宅"] .map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["累計已售","850","簽約口徑"] .map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["累計銷售金額","50億元","含定金"] .map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["去化率","85%","良好"] .map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("二、 資金監管 (資金支出明細)"), new Paragraph("監管銀行：中國工商銀行"), new Paragraph("賬戶餘額：2.5 億元"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["序號","支付對象","支付金額","用途"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["1","中建三局","5,000萬元","工程進度款"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["2","xx建材公司","2,000萬元","材料款"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("三、 管理建議"), new Paragraph("風險提示：需關注同區域競品降價促銷對本項目的影響。"), new Paragraph("管理要求：嚴格審核工程款支付，確保資金優先用於本項目建設，防止資金被集團抽調。") ]}]})
+        },
+        // Case 10
+        {
+            id: "10", title: "融資租賃授信", tag: "NBFI",
+            expectations: ["租賃資產餘額=3,000 億元", "不良率=1.05%", "撥備覆蓋率=250%", "槓桿倍數=7.5x", "正常類遷徙=98%", "關注類遷徙=60%", "次級類遷徙=85%", "前五大行業1=醫療健康", "前五大行業2=城市公用", "融資成本=3.85%", "外部評級=AAA", "授信建議=同意續做綜合授信 50 億元。"],
+            rules: [
+                { name: "租賃資產餘額", source: "table", keywords: "租賃資產餘額", tbl_dir: "right", tbl_offset: 1 },
+                { name: "不良率", source: "table", keywords: "不良率", tbl_dir: "right", tbl_offset: 1 },
+                { name: "撥備覆蓋率", source: "table", keywords: "撥備覆蓋率", tbl_dir: "right", tbl_offset: 1 },
+                { name: "槓桿倍數", source: "table", keywords: "槓桿倍數", tbl_dir: "right", tbl_offset: 1 },
+                { name: "正常類遷徙", source: "table", keywords: "正常類", tbl_dir: "right", tbl_offset: 1, heading: "資產質量遷徙" },
+                { name: "關注類遷徙", source: "table", keywords: "關注類", tbl_dir: "right", tbl_offset: 2, heading: "資產質量遷徙" },
+                { name: "次級類遷徙", source: "table", keywords: "次級類", tbl_dir: "right", tbl_offset: 3, heading: "資產質量遷徙" },
+                { name: "前五大行業1", source: "table", keywords: "500億", tbl_dir: "left", tbl_offset: 1, heading: "行業分佈" },
+                { name: "前五大行業2", source: "table", keywords: "400億", tbl_dir: "left", tbl_offset: 1, heading: "行業分佈" },
+                { name: "融資成本", source: "text", strategy: "keyword", keywords: "平均融資成本：", txt_end_type: "eol" },
+                { name: "外部評級", source: "text", strategy: "keyword", keywords: "主體評級：", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "授信建議", source: "text", strategy: "keyword", keywords: "授信建議：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("非銀同業授信回顧報告 (融資租賃)"), new Paragraph("客戶名稱：遠東國際租賃有限公司"), new Paragraph("主體評級：AAA (中誠信)"), ...genText(3, 'CN'), header("一、 經營財務指標"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["指標","數值"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["租賃資產餘額","3,000 億元"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["不良率","1.05%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["撥備覆蓋率","250%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["槓桿倍數","7.5x"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), new Paragraph("平均融資成本：3.85%"), header("二、 資產質量遷徙矩陣"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["期初分類","期末正常","期末關注","期末不良"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["正常類","98%","1.5%","0.5%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["關注類","20%","60%","20%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["次級類","5%","10%","85%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("三、 行業分佈"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["行業名稱","餘額","佔比"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["醫療健康","500億","16.7%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["城市公用","400億","13.3%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("四、 結論"), new Paragraph("授信建議：同意續做綜合授信 50 億元。") ]}]})
+        },
+        // Case 11
+        {
+            id: "11", title: "信託計畫穿透", tag: "Trust",
+            expectations: ["信託名稱 = 中信信託-恆大專項資產管理計畫", "底層借款人 = 恆大地產集團有限公司", "資產類型 = 商業地產抵押貸款", "抵押率LTV = 60%", "優先級規模 = 9億元", "劣後級規模 = 3億元", "現金流_Y1 = 1.5億元", "現金流_Y2 = 1.6億元", "增信措施1 = 項目土地及在建工程抵押。", "增信措施2 = 集團提供全額連帶責任擔保。", "投資期限 = 3+2 年", "預期收益 = 5.5% / 年"],
+            rules: [
+                { name: "信託名稱", source: "text", strategy: "line", line_index: 2, clean_custom: true, clean_custom_list: "信託名稱：" },
+                { name: "底層借款人", source: "text", strategy: "keyword", keywords: "底層融資人：", txt_end_type: "eol" },
+                { name: "資產類型", source: "text", strategy: "keyword", keywords: "資產類型：", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "抵押率LTV", source: "text", strategy: "keyword", keywords: "抵押率 (LTV)：", txt_end_type: "eol" },
+                { name: "優先級規模", source: "table", keywords: "優先級 (A類)", tbl_dir: "right", tbl_offset: 1 },
+                { name: "劣後級規模", source: "table", keywords: "劣後級 (B類)", tbl_dir: "right", tbl_offset: 1 },
+                { name: "現金流_Y1", source: "table", keywords: "第一年", tbl_dir: "right", tbl_offset: 1, heading: "現金流預測" },
+                { name: "現金流_Y2", source: "table", keywords: "第二年", tbl_dir: "right", tbl_offset: 1, heading: "現金流預測" },
+                { name: "增信措施1", source: "text", strategy: "keyword", keywords: "增信：", txt_end_type: "eol", occur_type: "first" },
+                { name: "增信措施2", source: "text", strategy: "keyword", keywords: "增信：", txt_end_type: "eol", occur_type: "fixed", occur_index: 2 },
+                { name: "投資期限", source: "text", strategy: "keyword", keywords: "期限：", txt_end_type: "eol" },
+                { name: "預期收益", source: "text", strategy: "keyword", keywords: "收益率：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("單一資金信託計畫投資報告"), new Paragraph("信託名稱：中信信託-恆大專項資產管理計畫"), new Paragraph("備案編號：ZX-998877"), ...genText(2, 'CN'), header("一、 底層資產詳情"), new Paragraph("底層融資人：恆大地產集團有限公司"), new Paragraph("資產類型：商業地產抵押貸款 (CMBS)"), new Paragraph("抵押物評估值：20 億元"), new Paragraph("融資金額：12 億元"), new Paragraph("抵押率 (LTV)：60%"), new Paragraph("期限：3+2 年"), new Paragraph("收益率：5.5% / 年"), header("二、 交易結構"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["分層","規模","佔比"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["優先級 (A類)","9億元","75%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["劣後級 (B類)","3億元","25%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("三、 現金流預測"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["年度","租金收入","覆蓋倍數 (DSCR)"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["第一年","1.5億元","1.8x"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["第二年","1.6億元","1.9x"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("四、 增信措施"), new Paragraph("1. 增信：項目土地及在建工程抵押。"), new Paragraph("2. 增信：集團提供全額連帶責任擔保。"), new Paragraph("3. 增信：實際控制人個人無限連帶責任擔保。") ]}]})
+        },
+        // Case 12
+        {
+            id: "12", title: "重大風險預警報告", tag: "Risk",
+            expectations: ["風險事件=借款人實際控制人張三因涉嫌內幕交易被公安機關刑事拘留，公司股價跌停。", "觸發日期=2025年11月14日", "涉案金額=尚不明確，預計超過 1 億元。", "授信餘額=20,000萬元", "風險敞口=20,000萬元", "擔保現狀=抵押物為工業廠房，目前尚未被查封，但我行抵押權順位為第二順位。", "交叉違約=根據合同第 9.1 條，實控人被刑拘已觸發交叉違約條款，我行有權宣佈貸款提前到期。", "應對措施1=立即向法院提起訴訟，並申請財產保全。", "應對措施2=發函宣佈貸款提前到期，要求借款人立即償還本息。", "法律意見=建議立即申請訴前財產保全，查封抵押物及公司主要銀行賬戶。", "經辦人=資產保全部", "報告時間=2025-11-15 14:00"],
+            rules: [
+                { name: "風險事件", source: "text", strategy: "keyword", keywords: "事件概述：", txt_end_type: "eol" },
+                { name: "觸發日期", source: "text", strategy: "keyword", keywords: "發生日期：", txt_end_type: "eol" },
+                { name: "涉案金額", source: "text", strategy: "keyword", keywords: "涉案金額：", txt_end_type: "eol" },
+                { name: "授信餘額", source: "table", keywords: "貸款餘額", tbl_dir: "down", tbl_offset: 1 },
+                { name: "風險敞口", source: "table", keywords: "敞口金額", tbl_dir: "down", tbl_offset: 1 },
+                { name: "擔保現狀", source: "text", strategy: "keyword", keywords: "擔保狀況：", txt_end_type: "eol" },
+                { name: "交叉違約", source: "text", strategy: "keyword", keywords: "交叉違約條款：", txt_end_type: "sym_inc", txt_end_val: "。" },
+                { name: "應對措施1", source: "text", strategy: "keyword", keywords: "措施：", txt_end_type: "eol", occur_type: "first" },
+                { name: "應對措施2", source: "text", strategy: "keyword", keywords: "措施：", txt_end_type: "eol", occur_type: "fixed", occur_index: 2 },
+                { name: "法律意見", source: "text", strategy: "keyword", keywords: "律師意見：", txt_end_type: "eol" },
+                { name: "經辦人", source: "text", strategy: "keyword", keywords: "報告人：", txt_end_type: "eol" },
+                { name: "報告時間", source: "text", strategy: "keyword", keywords: "報告時間：", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("重大信用風險事項報告", 32), new Paragraph("報告時間：2025-11-15 14:00"), new Paragraph("報告人：資產保全部"), header("一、 事件概述"), new Paragraph("發生日期：2025年11月14日"), new Paragraph("事件概述：借款人實際控制人張三因涉嫌內幕交易被公安機關刑事拘留，公司股價跌停。"), new Paragraph("涉案金額：尚不明確，預計超過 1 億元。"), header("二、 我行授信情況"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["業務品種","貸款餘額","保證金","敞口金額"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["流動資金貸款","20,000萬元","0","20,000萬元"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), new Paragraph("擔保狀況：抵押物為工業廠房，目前尚未被查封，但我行抵押權順位為第二順位。"), header("三、 影響分析"), new Paragraph("交叉違約條款：根據合同第 9.1 條，實控人被刑拘已觸發交叉違約條款，我行有權宣佈貸款提前到期。"), new Paragraph("律師意見：建議立即申請訴前財產保全，查封抵押物及公司主要銀行賬戶。"), header("四、 應對方案"), new Paragraph("1. 措施：立即向法院提起訴訟，並申請財產保全。"), new Paragraph("2. 措施：發函宣佈貸款提前到期，要求借款人立即償還本息。"), new Paragraph("3. 措施：聯繫第一順位抵押權人，商討抵押物處置方案。"), ...genText(3, 'POST') ]}]})
+        },
+        // Case 13
+        {
+            id: "13", title: "ESG 綠色金融績效掛鉤貸款", tag: "ESG",
+            expectations: ["借款主體 = 綠能光伏科技股份有限公司", "項目類型 = 可再生能源 - 分佈式光伏發電", "貸款金額 = 人民幣 50 億元", "KPI_碳排基準 = 0.85", "KPI_碳排目標 = 0.75", "KPI_水耗基準 = 85%", "KPI_水耗目標 = 90%", "利率掛鉤 = 若借款人完成當年度所有 SPTs，次年貸款利率下調 10 BP；若任一指標未達成，利率上調 5 BP。", "第三方鑑證 = 安永華明會計師事務所", "赤道原則 = 第四版", "排除清單_1 = 是", "排除清單_2 = 是"],
+            rules: [
+                { name: "借款主體", source: "text", strategy: "keyword", keywords: "借款人：", txt_end_type: "eol" },
+                { name: "項目類型", source: "text", strategy: "keyword", keywords: "綠色項目類別：", txt_end_type: "eol" },
+                { name: "貸款金額", source: "text", strategy: "keyword", keywords: "融資總額：", txt_end_type: "eol" },
+                { name: "KPI_碳排基準", source: "table", keywords: "碳排放強度", tbl_dir: "right", tbl_offset: 1 },
+                { name: "KPI_碳排目標", source: "table", keywords: "碳排放強度", tbl_dir: "right", tbl_offset: 2 },
+                { name: "KPI_水耗基準", source: "table", keywords: "工業用水重複利用率", tbl_dir: "right", tbl_offset: 1 },
+                { name: "KPI_水耗目標", source: "table", keywords: "工業用水重複利用率", tbl_dir: "right", tbl_offset: 2 },
+                { name: "利率掛鉤", source: "text", strategy: "keyword", keywords: "利率調整機制：", txt_end_type: "sym_inc", txt_end_val: "。" },
+                { name: "第三方鑑證", source: "text", strategy: "keyword", keywords: "鑑證機構：", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "赤道原則", source: "text", strategy: "keyword", keywords: "赤道原則版本：", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "排除清單_1", source: "table", keywords: "化石燃料發電", tbl_dir: "right", tbl_offset: 1, heading: "融資排除清單" },
+                { name: "排除清單_2", source: "table", keywords: "煙草生產", tbl_dir: "right", tbl_offset: 1, heading: "融資排除清單" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("可持續發展績效掛鉤貸款 (SLL) 協議", 32), new Paragraph("借款人：綠能光伏科技股份有限公司"), new Paragraph("融資總額：人民幣 50 億元"), new Paragraph("綠色項目類別：可再生能源 - 分佈式光伏發電"), ...genText(3, 'ESG'), header("一、 可持續發展績效目標 (SPTs)"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["關鍵績效指標 (KPIs)","2024基準值","2025目標值","權重"].map(t=>new TableCell({children:[new Paragraph({text:t, bold:true})], shading:{fill:"E8F5E9"}}))}), new TableRow({children:["碳排放強度 (噸/萬元營收)","0.85","0.75","50%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["工業用水重複利用率","85%","90%","30%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["供應鏈ESG審核覆蓋率","60%","80%","20%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("二、 激勵與約束機制"), new Paragraph("利率調整機制：若借款人完成當年度所有 SPTs，次年貸款利率下調 10 BP；若任一指標未達成，利率上調 5 BP。"), new Paragraph("鑑證機構：安永華明會計師事務所 (特殊普通合夥)"), new Paragraph("赤道原則版本：第四版 (EP4)"), ...genText(2, 'ESG'), header("三、 融資排除清單 (Exclusion List)"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["行業/活動","是否排除","備註"].map(t=>new TableCell({children:[new Paragraph({text:t, bold:true})]}))}), new TableRow({children:["化石燃料發電","是","包括煤電、氣電改擴建"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["煙草生產","是","包括種植與加工"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), ...genText(2, 'ESG') ]}]})
+        },
+        // Case 14
+        {
+            id: "14", title: "複雜國際保函申請", tag: "Trade",
+            expectations: ["受益人 = Ministry of Transport, Kingdom of Saudi Arabia", "申請人 = Global Infrastructure Construction Ltd.", "擔保行 = Citibank N.A., Hong Kong Branch", "保函編號 = LG-2025-HK-9988", "保函金額 = 50,000,000.00", "幣種 = USD", "到期日 = 2027-12-31", "基礎合同 = Construction Contract No. KSA-R-2024-05 for Riyadh Metro Extension.", "適用規則 = URDG 758", "管轄法律 = Laws of England and Wales.", "減額條款 = The Guarantee Amount shall be automatically reduced by 10% upon presentation of the Interim Payment Certificate.", "轉讓限制 = This Guarantee is not transferable without the Issuing Bank's written consent."],
+            rules: [
+                { name: "受益人", source: "text", strategy: "keyword", keywords: "Beneficiary:", txt_end_type: "eol" },
+                { name: "申請人", source: "text", strategy: "keyword", keywords: "Applicant:", txt_end_type: "eol" },
+                { name: "擔保行", source: "text", strategy: "keyword", keywords: "To:", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "保函編號", source: "text", strategy: "keyword", keywords: "Guarantee Ref:", txt_end_type: "eol", occur_type: "first" },
+                { name: "保函金額", source: "text", strategy: "keyword", keywords: "Amount:", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "幣種", source: "text", strategy: "keyword", keywords: "Currency:", txt_end_type: "eol" },
+                { name: "到期日", source: "text", strategy: "keyword", keywords: "Expiry Date:", txt_end_type: "eol" },
+                { name: "基礎合同", source: "text", strategy: "keyword", keywords: "Underlying Contract:", txt_end_type: "eol" },
+                { name: "適用規則", source: "text", strategy: "keyword", keywords: "Applicable Rules:", txt_end_type: "sym_exc", txt_end_val: " (" },
+                { name: "管轄法律", source: "text", strategy: "keyword", keywords: "Governing Law:", txt_end_type: "eol" },
+                { name: "減額條款", source: "text", strategy: "keyword", keywords: "Reduction Clause:", txt_end_type: "sym_inc", txt_end_val: "." },
+                { name: "轉讓限制", source: "text", strategy: "keyword", keywords: "Transferability:", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("DEMAND GUARANTEE APPLICATION (URDG 758)", 28), new Paragraph("To: Citibank N.A., Hong Kong Branch (the 'Issuing Bank')"), new Paragraph("Date: 2025-11-30"), header("1. DETAILS OF THE PARTIES"), new Paragraph("Applicant: Global Infrastructure Construction Ltd."), new Paragraph("Beneficiary: Ministry of Transport, Kingdom of Saudi Arabia"), new Paragraph("Guarantee Ref: LG-2025-HK-9988"), header("2. GUARANTEE DETAILS"), new Paragraph("Currency: USD"), new Paragraph("Amount: 50,000,000.00 (Fifty Million US Dollars)"), new Paragraph("Expiry Date: 2027-12-31"), new Paragraph("Underlying Contract: Construction Contract No. KSA-R-2024-05 for Riyadh Metro Extension."), ...genText(3, 'TRADE'), header("3. SPECIAL CONDITIONS"), new Paragraph("Applicable Rules: URDG 758 (2010 Revision) ICC Publication No. 758."), new Paragraph("Governing Law: Laws of England and Wales."), new Paragraph("Jurisdiction: Courts of London, UK."), new Paragraph("Reduction Clause: The Guarantee Amount shall be automatically reduced by 10% upon presentation of the Interim Payment Certificate."), new Paragraph("Transferability: This Guarantee is not transferable without the Issuing Bank's written consent."), ...genText(3, 'TRADE') ]}]})
+        },
+        // Case 15
+        {
+            id: "15", title: "私人銀行財富報告", tag: "Private Banking",
+            expectations: ["客戶姓名 = Mr. Wayne Bruce", "賬戶編號 = PB-888-999-HK", "風險評級 = C5 - Aggressive Growth", "總資產AUM = 150,000,000.00", "現金佔比 = 5.0%", "股票佔比 = 45.0%", "債券佔比 = 30.0%", "另類投資佔比 = 20.0%", "前十大持倉_1 = Apple Inc.", "前十大持倉_3 = US Treasury Bond 4.5%", "本年收益 = +12.50%", "基準指數收益 = +10.00%", "RM姓名 = James Bond"],
+            rules: [
+                { name: "客戶姓名", source: "text", strategy: "keyword", keywords: "Client Name:", txt_end_type: "eol" },
+                { name: "賬戶編號", source: "text", strategy: "keyword", keywords: "Account No:", txt_end_type: "eol", occur_type: "first" },
+                { name: "風險評級", source: "text", strategy: "keyword", keywords: "Risk Profile:", txt_end_type: "eol" },
+                { name: "總資產AUM", source: "text", strategy: "keyword", keywords: "Total AUM (USD):", txt_end_type: "eol" },
+                { name: "現金佔比", source: "table", keywords: "Cash & Equivalents", tbl_dir: "right", tbl_offset: 2 },
+                { name: "股票佔比", source: "table", keywords: "Global Equities", tbl_dir: "right", tbl_offset: 2 },
+                { name: "債券佔比", source: "table", keywords: "Fixed Income", tbl_dir: "right", tbl_offset: 2 },
+                { name: "另類投資佔比", source: "table", keywords: "Alternatives", tbl_dir: "right", tbl_offset: 2 },
+                { name: "前十大持倉_1", source: "table", keywords: "US0378331005", tbl_dir: "left", tbl_offset: 1, heading: "TOP HOLDINGS" },
+                { name: "前十大持倉_3", source: "table", keywords: "US912810TS00", tbl_dir: "left", tbl_offset: 1, heading: "TOP HOLDINGS" },
+                { name: "本年收益", source: "text", strategy: "keyword", keywords: "Portfolio YTD:", txt_end_type: "eol" },
+                { name: "基準指數收益", source: "text", strategy: "keyword", keywords: "Benchmark YTD:", txt_end_type: "eol" },
+                { name: "RM姓名", source: "text", strategy: "keyword", keywords: "Relationship Manager:", txt_end_type: "eol", occur_type: "last" }
+            ],
+            genDoc: () => new Document({ sections: [{ headers: { default: new Header({ children: [ new Paragraph("CONFIDENTIAL WEALTH REPORT"), new Paragraph("Account No: PB-888-999-HK") ] }) }, footers: { default: new Footer({ children: [ new Paragraph("Relationship Manager: James Bond"), new Paragraph("Generated: 2025-12-05") ] }) }, children: [ header("PORTFOLIO VALUATION STATEMENT", 32), new Paragraph("Client Name: Mr. Wayne Bruce"), new Paragraph("Client Tier: Ultra High Net Worth (UHNW)"), new Paragraph("Risk Profile: C5 - Aggressive Growth"), new Paragraph("Reporting Currency: USD"), ...genText(2, 'WEALTH'), header("1. ASSET ALLOCATION OVERVIEW"), new Paragraph("Total AUM (USD): 150,000,000.00"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["Asset Class","Market Value (USD)","Allocation (%)"].map(t=>new TableCell({children:[new Paragraph({text:t, bold:true})], shading:{fill:"F5F5F5"}}))}), new TableRow({children:["Cash & Equivalents","7,500,000","5.0%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["Fixed Income","45,000,000","30.0%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["Global Equities","67,500,000","45.0%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["Alternatives","30,000,000","20.0%"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("2. TOP HOLDINGS"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["Security Name","ISIN","Quantity","Market Price"].map(t=>new TableCell({children:[new Paragraph({text:t, bold:true})]}))}), new TableRow({children:["Apple Inc.","US0378331005","50,000","185.00"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["Microsoft Corp.","US5949181045","40,000","370.00"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["US Treasury Bond 4.5%","US912810TS00","10,000,000","98.50"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), header("3. PERFORMANCE ATTRIBUTION"), new Paragraph("Portfolio YTD: +12.50%"), new Paragraph("Benchmark YTD: +10.00%"), ...genText(3, 'WEALTH') ] }]})
+        },
+        // Case 16
+        {
+            id: "16", title: "跨境併購財務盡調 (FDD ETL)", tag: "Data Cleaning",
+            scenario: "投行 FDD 草稿。[Fix] 修正預期值為純數字格式，並優化關鍵詞錨點。",
+            expectations: ["調整項_庫存核銷 = 1250000", "調整項_CEO遣散費 = 3000000", "原始_銷售成本 = -45000000", "匯兌損失 = -850000", "潛在法律賠償 = -1500000", "審計狀態 = Draft / Subject to Adjustment", "項目代碼 = M&A-2025-Titan"],
+            rules: [
+                { name: "調整項_庫存核銷", source: "text", strategy: "keyword", keywords: "Add back:", txt_end_type: "eol", clean_number: true, clean_special: true },
+                { name: "調整項_CEO遣散費", source: "text", strategy: "keyword", keywords: "'Golden Parachute'", txt_end_type: "len_fwd", txt_end_val: "20", clean_number: true, clean_special: true },
+                { name: "原始_銷售成本", source: "text", strategy: "keyword", keywords: "Reported:", txt_end_type: "sym_inc", txt_end_val: ")", clean_number: true },
+                { name: "匯兌損失", source: "text", strategy: "keyword", keywords: "loss of", txt_end_type: "sym_inc", txt_end_val: ">", clean_number: true, clean_custom: true, clean_custom_list: "HKD" },
+                { name: "潛在法律賠償", source: "text", strategy: "keyword", keywords: "liability:", txt_end_type: "eol", clean_number: true },
+                { name: "審計狀態", source: "text", strategy: "keyword", keywords: "Status:", txt_end_type: "eol", clean_custom: true, clean_custom_list: "--" },
+                { name: "項目代碼", source: "text", strategy: "keyword", keywords: "Project Code:", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("CONFIDENTIAL FDD REPORT - PROJECT TITAN", 32), new Paragraph({ children: [new TextRun({ text: "Strictly Private & Confidential", bold: true, color: "FF0000" })]}), new Paragraph("Project Code: M&A-2025-Titan"), new Paragraph("Status: --Draft / Subject to Adjustment--"), header("1. EBITDA BRIDGE ANALYSIS"), ...genText(6, 'FDD'), header("2. WORKING CAPITAL ADJUSTMENTS"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["Item","Book Value","Adj.","Normalized"].map(t=>new TableCell({children:[new Paragraph({text:t, bold:true, color:"FFFFFF"})], shading:{fill:"000000"}}))}), new TableRow({children:["Inventory","50,000,000","(1,250,000)","48,750,000"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), new TableRow({children:["Trade Receivables","32,000,000","(500,000)","31,500,000"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}), new Paragraph("Note: All figures in USD unless stated otherwise.") ]}]})
+        },
+        // Case 17
+        {
+            id: "17", title: "核心系統 SWIFT 映射", tag: "Excel Mapping",
+            scenario: "SWIFT 報文映射。[Fix] 調整數據格式以匹配提取引擎能力。",
+            expectations: ["交易編號 (Col A) = TRN-BATCH-2025-X99", "匯款人 (Col B) = ALPHA TRADING CORP", "收款人 (Col C) = ZHEJIANG MFG LTD", "金額 (Col F) = 15000000", "幣種 (Col E) = USD", "費用承擔 (Col H) = SHA", "業務代碼 (Col J) = CRED"],
+            rules: [
+                { name: "交易編號", excel_col: "A", source: "text", strategy: "keyword", keywords: ":20:", txt_end_type: "eol" },
+                { name: "匯款人", excel_col: "B", source: "text", strategy: "keyword", keywords: ":50K:", txt_end_type: "eol", occur_type: "fixed", occur_index: 2 },
+                { name: "收款人", excel_col: "C", source: "text", strategy: "keyword", keywords: ":59:", txt_end_type: "eol", occur_type: "fixed", occur_index: 2 },
+                { name: "金額", excel_col: "F", source: "text", strategy: "keyword", keywords: "USD", txt_end_type: "sym_exc", txt_end_val: ",", clean_number: true },
+                { name: "幣種", excel_col: "E", source: "text", strategy: "keyword", keywords: ":32A:", txt_end_type: "len_fwd", txt_end_val: "9", clean_custom: true, clean_custom_list: "251231" }, 
+                { name: "費用承擔", excel_col: "H", source: "text", strategy: "keyword", keywords: ":71A:", txt_end_type: "eol" },
+                { name: "業務代碼", excel_col: "J", source: "text", strategy: "keyword", keywords: ":23B:", txt_end_type: "eol" }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("INCOMING SWIFT MESSAGE (MT103)", 24), new Paragraph({ children: [new TextRun({ text: "----------------- START OF BLOCK -----------------", font: "Courier New" })] }), ...genText(8, 'LEGACY'), new Paragraph({ children: [new TextRun({ text: "----------------- END OF BLOCK -----------------", font: "Courier New" })] }), new Paragraph("System Log: Parsed successfully at Gateway_01."), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["Internal Ref","Status","Time"].map(t=>new TableCell({children:[new Paragraph({text:t, bold:true})]}))}), new TableRow({children:["INT-9988-001","Ready to Load","12:00:01"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}) ]}]})
+        },
+        // Case 18
+        {
+            id: "18", title: "不良資產法拍 OCR 修復", tag: "OCR Repair",
+            scenario: "法拍文件，OCR 識別質量極差。[Fix] 增加 RM8 字典替換。",
+            expectations: ["原告 = Industrial & Commercial Bank of China", "被告 = Shaanxi Coal & Chemical Group", "判決本金 = 150000000", "礦權證號 = C1000002011051120112345", "評估基準日 = 31-Dec-2024", "強制變現值FSV = 5950000", "抵押率 = 70%"],
+            rules: [
+                { name: "原告", source: "text", strategy: "keyword", keywords: "P1aintiff:", txt_end_type: "eol", replacements: [{old: "1", new: "l"}, {old: "5", new: "s"}, {old: "0", new: "o"}] },
+                { name: "被告", source: "text", strategy: "keyword", keywords: "Defendant:", txt_end_type: "eol", replacements: [{old: "0", new: "o"}] },
+                { name: "判決本金", source: "text", strategy: "keyword", keywords: "principa1 of", txt_end_type: "eol", clean_number: true, replacements: [{old: "RM8", new: ""}, {old: "RM", new: ""}, {old: "B", new: ""}, {old: "I", new: "1"}, {old: "l", new: "1"}] },
+                { name: "礦權證號", source: "text", strategy: "keyword", keywords: "Mining Right No.", txt_end_type: "sym_inc", txt_end_val: ")", clean_special: true },
+                { name: "評估基準日", source: "text", strategy: "keyword", keywords: "as at", txt_end_type: "eol", replacements: [{old: "l", new: "1"}] },
+                { name: "強制變現值FSV", source: "text", strategy: "keyword", keywords: "(FSV)", txt_end_type: "eol", clean_number: true, replacements: [{old: "S", new: "5"}] },
+                { name: "抵押率", source: "text", strategy: "keyword", keywords: "haircut.", txt_end_type: "len_bwd", txt_end_val: "3", replacements: [{old: "T", new: "7"}] }
+            ],
+            genDoc: () => new Document({ sections: [{ children: [ header("CIVIL JUDGMENT (OCR SCAN)", 32), new Paragraph({ children: [new TextRun({ text: "[SCAN_QUAL: LOW] [IMG_PROCESS: AUTO]", size: 10, color: "999999" })] }), ...genText(6, 'NPL'), new Paragraph("Defendant: Shaanxi C0a1 & Chemica1 Gr0up"), header("EXECUTION ORDER"), new Paragraph("The Co11atera1 sha11 be so1d at pub1ic auction."), new Paragraph("Reserve Price: RM S0,000,000 (Subject to tax)"), new Paragraph("Auction Date: 15-Jan-2025"), new Table({ width: {size:100, type:WidthType.PERCENTAGE}, rows: [ new TableRow({children:["Item","Va1ue","Status"].map(t=>new TableCell({children:[new Paragraph({text:t, bold:true})]}))}), new TableRow({children:["Mining Right","B50,000,000","Seized"].map(t=>new TableCell({children:[new Paragraph(t)]}))}), ]}) ]}]})
+        }
+    ];
+
+    const container = document.getElementById('container');
+
+    ALL_CASES.forEach((c) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        let rows = c.rules.map(r => {
+            let badges = '';
+            if(r.source === 'table') badges += `<span class="badge-type bt-table">Tab:${r.tbl_dir}</span>`;
+            if(r.source === 'text') badges += `<span class="badge-type bt-text">Txt:${r.strategy}</span>`;
+            if(r.clean_number) badges += `<span class="badge-type" style="background:#fff3cd;color:#856404;border:1px solid #ffeeba">Num</span>`;
+            if(r.excel_col) badges += `<span class="badge-type" style="background:#d4edda;color:#155724;border:1px solid #c3e6cb">Col:${r.excel_col}</span>`;
+            if(r.replacements && r.replacements.length) badges += `<span class="badge-type" style="background:#f8d7da;color:#721c24;border:1px solid #f5c6cb">Fix</span>`;
+            return `<tr><td style="width:35%"><b>${r.name}</b></td><td style="width:40%"><div style="font-size:11px;color:#666;">${r.keywords || ('Line ' + r.line_index)}</div></td><td>${badges}</td></tr>`;
+        }).join('');
+        let expHtml = '';
+        if (c.expectations && c.expectations.length > 0) {
+            const listItems = c.expectations.map(e => `<li>${e}</li>`).join('');
+            expHtml = `<div class="expected-box"><span class="expected-title">✅ Expected Results (驗收標準):</span><ul class="expected-list">${listItems}</ul></div>`;
+        }
+        div.innerHTML = `<div class="card-header"><span class="case-title">${c.title}</span><span class="case-id">Case ${c.id}</span></div><div class="scenario">${c.scenario || "Standard Test Case"}</div>${expHtml}<div class="table-wrap"><table><thead><tr><th>提取欄位</th><th>定位參數</th><th>邏輯</th></tr></thead><tbody>${rows}</tbody></table></div><button class="btn-dl" onclick="downloadSingle('${c.id}')"><span>⬇️ 下載測試資源 (Docx + JSON)</span></button>`;
+        container.appendChild(div);
+    });
+
+    async function downloadSingle(id) {
+        const c = ALL_CASES.find(x => x.id === id);
+        const safeTitle = c.title.split('(')[0].trim().replace(/[\\/:*?"<>|]/g, '');
+        const docName = `UAT_${c.id}_${safeTitle}.docx`;
+        const jsonName = `UAT_${c.id}_Config.json`;
+        const expMap = {};
+        if (c.expectations) {
+            c.expectations.forEach(exp => {
+                const parts = exp.split('=');
+                if (parts.length >= 2) {
+                    const key = parts[0].trim();
+                    let val = parts.slice(1).join('=').trim();
+                    if(val.includes('(') && !val.includes(')') && !val.match(/^\-?\d/)) val = val.split('(')[0].trim();
+                    expMap[key] = val;
+                }
+            });
+        }
+        const rulesExport = c.rules.map(r => ({
+            name: r.name, source: r.source, strategy: r.strategy || 'keyword', keywords: r.keywords || "", line_index: r.line_index || 1, tbl_dir: r.tbl_dir || "right", tbl_offset: r.tbl_offset || 1, txt_end_type: r.txt_end_type || "eol", txt_end_val: r.txt_end_val || "", occur_type: r.occur_type || "first", occur_index: r.occur_index || 1, heading: r.heading || "", clean_number: r.clean_number || false, clean_trim: true, clean_special: r.clean_special || false, clean_custom: r.clean_custom || false, clean_custom_list: r.clean_custom_list || "", excel_col: r.excel_col || "", replacements: r.replacements || [], expected_value: expMap[r.name] || "", checked: true
+        }));
+        saveAs(new Blob([JSON.stringify(rulesExport, null, 2)], {type: "application/json"}), jsonName);
+        const doc = c.genDoc();
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, docName);
+    }
+
+    async function downloadAll() {
+        if(!confirm("⚠️ 準備下載全套 18 個案例。\n確認下載？")) return;
+        for(let i=0; i<ALL_CASES.length; i++) {
+            await downloadSingle(ALL_CASES[i].id);
+            await new Promise(r => setTimeout(r, 500));
+        }
+        alert("✅ 全量下載完成！");
+    }
+</script>
+</body>
+</html>
