@@ -770,7 +770,21 @@
       transition: color var(--transition-fast) ease;
     }
 
-    .project-card:hover .project-title {
+    .project-title a {
+      color: inherit;
+      text-decoration: none;
+      transition: all var(--transition-fast) ease;
+    }
+
+    .project-title a:hover {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .project-card:hover .project-title,
+    .project-card:hover .project-title a {
       background: var(--primary-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -1017,11 +1031,87 @@
               <span class="project-tag ai">AI</span>
               <span class="project-tag">教育科技</span>
             </div>
-            <h3 class="project-title">信毅會 Faith Learning Society</h3>
+            <h3 class="project-title"><a href="/faithwill/">信毅會 Faith Learning Society</a></h3>
             <p class="project-description">
               AI 驅動的特殊教育資源平台，為有學習障礙的孩子提供專屬教學資源，讓信心與毅力成為他們前進的力量。
             </p>
             <a href="/faithwill/" class="project-link">瀏覽專案</a>
+          </div>
+        </article>
+
+        <!-- AI Teacher -->
+        <article class="project-card reveal">
+          <div class="project-image-wrapper">
+            <img src="images/portfolio/ai-teacher.png" alt="AI 作文老師" class="project-image">
+            <div class="project-overlay"></div>
+          </div>
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag ai">AI</span>
+              <span class="project-tag">教育科技</span>
+            </div>
+            <h3 class="project-title"><a href="/AI Teacher.html">AI 作文老師</a></h3>
+            <p class="project-description">
+              智能作文評改系統，支援多頁上傳、範文生成及語音朗讀，為中小學生提供即時、專業的作文指導。
+            </p>
+            <a href="/AI Teacher.html" class="project-link">瀏覽專案</a>
+          </div>
+        </article>
+
+        <!-- Speak English With AI -->
+        <article class="project-card reveal">
+          <div class="project-image-wrapper">
+            <img src="images/portfolio/speakenglish.png" alt="Speak English With AI" class="project-image">
+            <div class="project-overlay"></div>
+          </div>
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag ai">AI</span>
+              <span class="project-tag">語言學習</span>
+            </div>
+            <h3 class="project-title"><a href="/speakenglishwithai/">Speak English With AI</a></h3>
+            <p class="project-description">
+              AI 驅動的英語口說練習平台，透過即時語音對話及發音分析，幫助用戶提升英語會話能力。
+            </p>
+            <a href="/speakenglishwithai/" class="project-link">瀏覽專案</a>
+          </div>
+        </article>
+
+        <!-- MindMap Generator -->
+        <article class="project-card reveal">
+          <div class="project-image-wrapper">
+            <img src="images/portfolio/mindmap.png" alt="MindMap 一鍵生成器" class="project-image">
+            <div class="project-overlay"></div>
+          </div>
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag ai">AI</span>
+              <span class="project-tag tool">工具</span>
+            </div>
+            <h3 class="project-title"><a href="/MindMap.html">MindMap 一鍵生成器</a></h3>
+            <p class="project-description">
+              輸入主題即可自動生成專業心智圖，支援多種佈局、即時編輯及匯出為 PNG/PDF 格式。
+            </p>
+            <a href="/MindMap.html" class="project-link">瀏覽專案</a>
+          </div>
+        </article>
+
+        <!-- Shooting Game -->
+        <article class="project-card reveal">
+          <div class="project-image-wrapper">
+            <img src="images/portfolio/shooting-game.png" alt="打飛機遊戲" class="project-image">
+            <div class="project-overlay"></div>
+          </div>
+          <div class="project-content">
+            <div class="project-tags">
+              <span class="project-tag">遊戲</span>
+              <span class="project-tag">娛樂</span>
+            </div>
+            <h3 class="project-title"><a href="/打飛機.html">Bullet Storm 打飛機</a></h3>
+            <p class="project-description">
+              經典射擊遊戲重新演繹，精美畫面、流暢操控、多種敵機和 Boss 關卡，挑戰你的反應極限。
+            </p>
+            <a href="/打飛機.html" class="project-link">瀏覽專案</a>
           </div>
         </article>
 
@@ -1036,7 +1126,7 @@
               <span class="project-tag ai">AI</span>
               <span class="project-tag health">健康醫療</span>
             </div>
-            <h3 class="project-title">癌症知識問與答</h3>
+            <h3 class="project-title"><a href="/cancer-knowledge-kit/">癌症知識問與答</a></h3>
             <p class="project-description">
               整合癌症風險評估、知識百科與照顧指南的完整平台，協助用戶深入了解癌症預防、檢查與治療資訊。
             </p>
@@ -1055,7 +1145,7 @@
               <span class="project-tag tool">工具</span>
               <span class="project-tag">離線版</span>
             </div>
-            <h3 class="project-title">VBA 全能查詢工具</h3>
+            <h3 class="project-title"><a href="/VBA-Bible/VBA離線全能查詢2.5.html">VBA 全能查詢工具</a></h3>
             <p class="project-description">
               收錄超過 2000 條 VBA 指令說明的離線查詢工具，涵蓋 Excel、Word、Outlook、PowerPoint 等全方位應用。
             </p>
@@ -1074,7 +1164,8 @@
               <span class="project-tag tool">工具</span>
               <span class="project-tag">自動化</span>
             </div>
-            <h3 class="project-title">Word Extractor Pro</h3>
+            <h3 class="project-title"><a href="/Word Extractor Pro (offline)/Word Extractor Pro (full ver).html">Word
+                Extractor Pro</a></h3>
             <p class="project-description">
               本地端 Word 文檔批量提取工具，支援自訂規則配置，可快速從多個文件中提取關鍵資訊並匯出結果。
             </p>

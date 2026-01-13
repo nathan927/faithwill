@@ -1,0 +1,502 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Playful kid-friendly color palette */
+    --background: 45 100% 96%;
+    --foreground: 220 50% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 50% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 50% 20%;
+
+    /* Bright red for taxi/primary actions */
+    --primary: 0 85% 55%;
+    --primary-foreground: 220 50% 15%;
+
+    /* Green for minibus/secondary */
+    --secondary: 120 60% 45%;
+    --secondary-foreground: 220 50% 15%;
+
+    /* Sunny yellow for highlights */
+    --accent: 45 100% 55%;
+    --accent-foreground: 220 50% 15%;
+
+    /* Muted backgrounds */
+    --muted: 200 30% 90%;
+    --muted-foreground: 220 20% 50%;
+
+    /* Sky blue for tram/special */
+    --sky: 195 90% 50%;
+    --sky-foreground: 0 0% 100%;
+
+    /* Orange for bus */
+    --orange: 25 95% 55%;
+    --orange-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 30% 85%;
+    --input: 200 30% 85%;
+    --ring: 0 85% 55%;
+
+    --radius: 1rem;
+
+    /* Game specific colors */
+    --game-road: 220 10% 40%;
+    --game-grass: 120 60% 40%;
+    --game-gold: 45 100% 50%;
+    --game-success: 120 60% 45%;
+    --game-warning: 45 100% 55%;
+    --game-danger: 0 85% 55%;
+
+    /* Shadows for depth */
+    --shadow-playful: 0 8px 30px -10px hsl(0 85% 55% / 0.3);
+    --shadow-card: 0 10px 40px -15px hsl(220 50% 20% / 0.15);
+    --shadow-button: 0 6px 20px -5px hsl(0 85% 55% / 0.4);
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(195 90% 50%), hsl(195 90% 70%));
+    --gradient-sunset: linear-gradient(135deg, hsl(25 95% 55%), hsl(45 100% 55%));
+    --gradient-grass: linear-gradient(180deg, hsl(120 60% 50%), hsl(120 60% 35%));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Noto Sans TC', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Sans TC', system-ui, sans-serif;
+    font-weight: 900;
+  }
+}
+
+@layer components {
+  /* Bouncy button effect */
+  .btn-bounce {
+    @apply transition-all duration-200 ease-out;
+    box-shadow: var(--shadow-button);
+  }
+  
+  .btn-bounce:hover {
+    @apply -translate-y-1;
+    box-shadow: 0 10px 30px -5px hsl(0 85% 55% / 0.5);
+  }
+  
+  .btn-bounce:active {
+    @apply translate-y-0 scale-95;
+  }
+
+  /* Card with playful shadow */
+  .card-playful {
+    @apply bg-card rounded-3xl p-6;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Vehicle selection card */
+  .vehicle-card {
+    @apply bg-card rounded-3xl p-4 cursor-pointer transition-all duration-300 ease-out border-4 border-transparent;
+    box-shadow: var(--shadow-card);
+  }
+  
+  .vehicle-card:hover {
+    @apply -translate-y-2 border-primary;
+    box-shadow: var(--shadow-playful);
+  }
+  
+  .vehicle-card.selected {
+    @apply border-primary bg-primary/10;
+  }
+
+  /* Vehicle image with chroma key background removal */
+  .vehicle-image {
+    mix-blend-mode: multiply;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+  }
+  
+  /* Alternative: use isolation for better blending */
+  .vehicle-container {
+    isolation: isolate;
+    background: transparent;
+  }
+  
+  .vehicle-container .vehicle-image {
+    mix-blend-mode: multiply;
+  }
+
+  /* Game container */
+  .game-container {
+    @apply relative overflow-hidden rounded-3xl;
+    box-shadow: 0 20px 60px -20px hsl(220 50% 20% / 0.3);
+  }
+
+  /* Floating animation */
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Pulse glow animation */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  /* Jump animation for game */
+  .jump {
+    animation: jump 0.5s ease-out;
+  }
+
+  /* Road scrolling animation */
+  .road-scroll {
+    animation: roadScroll 2s linear infinite;
+  }
+
+  /* Obstacle moving animation */
+  .obstacle-move {
+    animation: obstacleMove 3s linear infinite;
+  }
+
+  /* Success celebration */
+  .celebrate {
+    animation: celebrate 0.6s ease-out;
+  }
+
+  /* Shake on collision */
+  .shake {
+    animation: shake 0.4s ease-out;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(0 85% 55% / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(0 85% 55% / 0.6);
+  }
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-100px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes roadScroll {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -200px 0;
+  }
+}
+
+@keyframes obstacleMove {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-100px);
+  }
+}
+
+@keyframes celebrate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes speedLine {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(200%);
+    opacity: 0;
+  }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 0.8; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.bounce-continuous {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* Stars sparkle effect */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+.sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+/* Explosion effect animations */
+.explosion-effect {
+  animation: explosionFade 0.6s ease-out forwards;
+}
+
+.explosion-star {
+  animation: explosionStar 0.6s ease-out forwards;
+}
+
+.explosion-particle-1 {
+  animation: explosionParticle1 0.6s ease-out forwards;
+}
+
+.explosion-particle-2 {
+  animation: explosionParticle2 0.6s ease-out forwards;
+}
+
+.explosion-particle-3 {
+  animation: explosionParticle3 0.6s ease-out forwards;
+}
+
+.explosion-particle-4 {
+  animation: explosionParticle4 0.6s ease-out forwards;
+}
+
+@keyframes explosionFade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+@keyframes explosionStar {
+  0% {
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+  }
+  100% {
+    transform: scale(0.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes explosionParticle1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-30px, -40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes explosionParticle2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(30px, -40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes explosionParticle3 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-30px, 30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes explosionParticle4 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(30px, 30px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Fullscreen and landscape support */
+@media (orientation: landscape) {
+  .game-container {
+    max-height: 100vh;
+    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+}
+
+/* Fullscreen mode styling */
+:fullscreen .game-container,
+:-webkit-full-screen .game-container {
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: none !important;
+}
+
+/* Mobile landscape optimizations */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .game-container {
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+  
+  /* Smaller HUD elements in landscape */
+  .game-container .text-2xl {
+    font-size: 1rem !important;
+  }
+  
+  .game-container .text-3xl {
+    font-size: 1.25rem !important;
+  }
+  
+  .game-container .py-6 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+}
+
+/* Driving game collect effects */
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-40px);
+  }
+}
+
+@keyframes sparkle-out {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--rotation, 0deg)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--rotation, 0deg)) translateY(-30px) scale(0);
+  }
+}
+
+@keyframes pulse-out {
+  0% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* Screen shake for driving game */
+.screen-shake {
+  animation: screenShake 0.3s ease-in-out;
+}
+
+@keyframes screenShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px) rotate(-1deg); }
+  40% { transform: translateX(8px) rotate(1deg); }
+  60% { transform: translateX(-6px) rotate(-0.5deg); }
+  80% { transform: translateX(6px) rotate(0.5deg); }
+}
+
+/* Scenery scroll animation for driving game - seamless loop */
+@keyframes sceneryScroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(50%);
+  }
+}
+
+.animate-scenery-scroll {
+  animation: sceneryScroll 6s linear infinite;
+  will-change: transform;
+}

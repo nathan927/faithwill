@@ -1,0 +1,3446 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MindMap一鍵生成器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.7/d3.layout.cloud.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: #f0f2f5;
+            color: #1a1a1a;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            /* Ensure body takes full height for result page flex */
+            flex-direction: column;
+        }
+
+        /* 第一頁 - 設定頁面 */
+        .setup-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex-grow: 1;
+            /* Added for full height display */
+        }
+
+        .setup-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            padding: 25px 30px;
+            max-width: 600px;
+            width: 100%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .setup-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .setup-header h1 {
+            font-size: clamp(22px, 5vw, 32px);
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .setup-header p {
+            color: #666;
+            font-size: clamp(13px, 3vw, 15px);
+        }
+
+        /* 語言切換 */
+        .lang-selector {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .lang-selector-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .lang-buttons {
+            display: inline-flex;
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 8px;
+            color: #666;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-input,
+        .form-select {
+            /* Combined for brevity */
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input.valid {
+            border-color: #10b981;
+        }
+
+        .form-input.invalid {
+            border-color: #ef4444;
+        }
+
+        .form-select {
+            cursor: pointer;
+            background: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 18px;
+            padding-right: 35px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .range-container {
+            position: relative;
+        }
+
+        .range-input {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #e0e0e0 0%, #e0e0e0 100%);
+            outline: none;
+            border-radius: 4px;
+            margin: 12px 0;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            background: #667eea;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            transition: all 0.2s;
+        }
+
+        .range-input::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .range-input::-moz-range-thumb {
+            /* Similar styles for Firefox */
+            width: 22px;
+            height: 22px;
+            background: #667eea;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            border: none;
+        }
+
+        .range-value {
+            position: absolute;
+            top: -25px;
+            right: 0;
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .content-style-selector {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .style-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .style-option:hover {
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .style-option.active {
+            border-color: #667eea;
+            background: #f3f4ff;
+        }
+
+        .style-option input[type="radio"] {
+            display: none;
+        }
+
+        .style-option-label {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .style-option-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* 第二頁 - 結果頁面 */
+        .result-page {
+            display: none;
+            /* Initially hidden */
+            min-height: 100vh;
+            background: #f5f7fa;
+            flex-direction: column;
+            flex-grow: 1;
+            /* Takes remaining height */
+        }
+
+        .result-header {
+            background: white;
+            padding: 12px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            /* Increased z-index */
+        }
+
+        .result-title {
+            font-size: clamp(18px, 3.5vw, 24px);
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-right: auto;
+            /* Pushes other items to the right */
+        }
+
+        .header-controls {
+            /* Wrapper for layout, checkbox and edit tools */
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .layout-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f0f0;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .layout-btn {
+            padding: 5px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            color: #555;
+        }
+
+        .layout-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-color-toggle {
+            display: flex;
+            align-items: center;
+        }
+
+        #textToBlackCheckbox {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .text-color-toggle label {
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        #randomizeCloudBtn {
+            padding: 5px 12px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            display: none;
+            /* Hidden by default */
+        }
+
+        #randomizeCloudBtn:hover {
+            background: #f0f4ff;
+        }
+
+        .edit-toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toolbar-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .toolbar-btn.active {
+            background: #10b981;
+        }
+
+        .toolbar-btn.delete {
+            background: #ef4444;
+        }
+
+        .toolbar-btn.delete:hover {
+            background: #dc2626;
+        }
+
+        #mindmap-canvas {
+            flex: 1;
+            /* Takes available space */
+            background: #ffffff;
+            position: relative;
+            /* For absolute positioned children like gradient */
+            overflow: hidden;
+            touch-action: pan-x pan-y;
+            margin: 0;
+            padding-bottom: 65px;
+            /* Space for fixed export section */
+        }
+
+        #mindmap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node-group {
+            transition: all 0.3s ease;
+        }
+
+        .node-shape {
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
+            transition: all 0.3s ease;
+        }
+
+        .node-group:hover .node-shape {
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.15));
+        }
+
+        .node-group.selected .node-shape {
+            stroke: #f59e0b !important;
+            stroke-width: 2.5px !important;
+            filter: drop-shadow(0 3px 8px rgba(245, 158, 11, 0.3));
+        }
+
+        .node-text-content text {
+            font-family: 'Noto Sans TC', sans-serif;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .link-path {
+            fill: none;
+            stroke-linecap: round;
+            transition: stroke 0.3s ease, opacity 0.3s ease;
+        }
+
+        .link-path.highlighted {
+            stroke-width: 3.5px !important;
+            opacity: 1 !important;
+        }
+
+        /* 節點編輯輸入框 */
+        .node-input {
+            position: absolute;
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Noto Sans TC', sans-serif;
+            background: white;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 右鍵菜單 */
+        .context-menu {
+            position: absolute;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 8px 0;
+            display: none;
+            z-index: 1001;
+            min-width: 180px;
+        }
+
+        .context-menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #333;
+        }
+
+        .context-menu-item:hover {
+            background: #f5f5f5;
+            color: #667eea;
+        }
+
+        .context-menu-item.delete {
+            color: #ef4444;
+        }
+
+        /* 浮動編輯面板 - 優化版 */
+        .floating-edit-panel {
+            position: absolute;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            display: none;
+            z-index: 1002;
+            min-width: 220px;
+        }
+
+        .floating-edit-panel h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .floating-edit-panel .edit-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .floating-edit-panel button {
+            padding: 12px 16px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: left;
+            color: #333;
+        }
+
+        .floating-edit-panel button:hover {
+            background: #e3f2fd;
+            color: #667eea;
+            transform: translateX(2px);
+        }
+
+        .floating-edit-panel button.danger {
+            color: #ef4444;
+        }
+
+        .floating-edit-panel button.danger:hover {
+            background: #fee2e2;
+        }
+
+        .export-section {
+            background: white;
+            padding: 10px 15px;
+            border-top: 1px solid #e8e8e8;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 150;
+            /* Above mindmap-canvas, below header */
+        }
+
+        .export-buttons-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .export-btn {
+            padding: 8px 16px;
+            border: 1.5px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            color: #333;
+        }
+
+        .export-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 1px 5px rgba(102, 126, 234, 0.1);
+        }
+
+        .export-btn.back {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .export-btn.back:hover {
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .export-btn.log {
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .export-btn.log:hover {
+            border-color: #7c3aed;
+            color: #7c3aed;
+        }
+
+        /* 日志面板 - 優化版 */
+        .log-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            max-width: 90vw;
+            height: 100vh;
+            background: white;
+            box-shadow: -8px 0 24px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1003;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-panel.show {
+            right: 0;
+        }
+
+        .log-panel-header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .log-panel-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .log-panel-close:hover {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .log-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            border-left: 4px solid transparent;
+        }
+
+        .log-entry.info {
+            border-left-color: #3b82f6;
+        }
+
+        .log-entry.success {
+            border-left-color: #10b981;
+        }
+
+        .log-entry.error {
+            border-left-color: #ef4444;
+        }
+
+        .log-entry-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .log-panel-actions {
+            padding: 16px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .log-panel-actions button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .log-panel-actions button:hover {
+            background: #5a67d8;
+        }
+
+        /* Loading 動畫 - 優化版 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            /* 確保預設是隱藏的 */
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+            /* 確保在頂層 */
+            backdrop-filter: blur(4px);
+        }
+
+        .loading.active {
+            display: flex;
+            /* 確保 active 時顯示 */
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* 錯誤訊息 - 優化版 */
+        .error-message {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #ef4444;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+            display: none;
+            z-index: 1001;
+            max-width: calc(100vw - 48px);
+            font-weight: 500;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* API 說明樣式 */
+        .api-help {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .api-help a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .api-help a:hover {
+            text-decoration: underline;
+        }
+
+        .api-status {
+            font-size: 13px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .api-status.checking {
+            color: #f59e0b;
+        }
+
+        .api-status.valid {
+            color: #10b981;
+        }
+
+        .api-status.invalid {
+            color: #ef4444;
+        }
+
+        .status-icon {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* 移動端優化 */
+        @media (max-width: 768px) {
+            .setup-container {
+                padding: 30px 20px;
+            }
+
+            .export-section {
+                padding: 12px 16px;
+            }
+
+            .export-buttons-row {
+                gap: 8px;
+            }
+
+            .export-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .result-header {
+                padding: 12px 16px;
+            }
+
+            .edit-toolbar {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .layout-selector {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .log-panel {
+                right: -100vw;
+            }
+        }
+
+        /* 高分辨率導出用畫布 */
+        #export-canvas {
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            z-index: -1;
+        }
+
+        /* 提示訊息 */
+        .message-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1002;
+            animation: slideUp 0.3s ease;
+            font-weight: 500;
+        }
+
+        /* 思維導圖專業漸變背景 */
+        .mindmap-gradient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Word Cloud Specific Styles */
+        #mindmap-canvas.wordcloud-active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wordcloud-text {
+            cursor: default;
+            transition: opacity 0.3s;
+        }
+
+        .wordcloud-text:hover {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .setup-container {
+                padding: 20px 15px;
+            }
+
+            .result-header {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .result-title {
+                text-align: center;
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+
+            .header-controls {
+                justify-content: center;
+            }
+
+            .edit-toolbar {
+                justify-content: center;
+            }
+
+            .layout-selector {
+                order: 1;
+                margin-bottom: 5px;
+                justify-content: center;
+            }
+
+            .text-color-toggle {
+                order: 2;
+                margin-bottom: 5px;
+                justify-content: center;
+            }
+
+            #randomizeCloudBtn {
+                order: 2;
+                margin-bottom: 5px;
+            }
+
+            .edit-toolbar {
+                order: 3;
+            }
+
+            #mindmap-canvas {
+                padding-bottom: 60px;
+            }
+
+            /* Adjust for potentially smaller export bar */
+            .export-section {
+                padding: 8px 10px;
+            }
+
+            .export-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 第一頁：設定頁面 -->
+    <div class="setup-page" id="setupPage">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h1 data-i18n="title">MindMap一鍵生成器</h1>
+                <p data-i18n="subtitle">輸入主題，AI 自動生成智能佈局的思維導圖</p>
+            </div>
+
+            <div class="lang-selector">
+                <label class="lang-selector-label" data-i18n="langLabel">選擇語言</label>
+                <div class="lang-buttons">
+                    <button class="lang-btn active" onclick="switchLanguage('zh-TW')">繁體中文</button>
+                    <button class="lang-btn" onclick="switchLanguage('zh-CN')">简体中文</button>
+                </div>
+            </div>
+
+            <form id="setupForm" onsubmit="generateMindmap(event)">
+                <div class="form-group">
+                    <label class="form-label" for="topic" data-i18n="topicLabel">主題</label>
+                    <input type="text" id="topic" class="form-input" placeholder="例如：人工智能的應用" required
+                        data-i18n-placeholder="topicPlaceholder">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="apiProvider" data-i18n="apiProviderLabel">AI 服務</label>
+                        <select id="apiProvider" class="form-select" onchange="updateApiInfo()">
+                            <option value="openrouter-gemini" selected>OpenRouter(Gemini 2.5)</option>
+                            <option value="openrouter">OpenRouter(DeepSeek)</option>
+                            <option value="moonshot">Moonshot</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="gemini">Google Gemini</option>
+                            <option value="glm">智譜 GLM</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="apiKey" data-i18n="apiKeyLabel">API 密鑰</label>
+                        <input type="password" id="apiKey" class="form-input" placeholder="輸入 API 密鑰" required
+                            data-i18n-placeholder="apiKeyPlaceholder">
+                        <div class="api-status" id="apiStatus"></div>
+                        <div class="api-help" id="apiHelp">
+                            <a href="https://platform.moonshot.cn/console/api-keys" target="_blank"
+                                data-i18n="getApiKey">獲取 API 密鑰</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="branches" data-i18n="branchesLabel">主分支數量</label>
+                        <div class="range-container">
+                            <input type="range" id="branches" class="range-input" min="2" max="10" value="5"
+                                oninput="updateRangeValue('branches')">
+                            <span class="range-value" id="branchesValue">5</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="depth" data-i18n="depthLabel">層級深度</label>
+                        <div class="range-container">
+                            <input type="range" id="depth" class="range-input" min="2" max="8" value="3"
+                                oninput="updateRangeValue('depth')">
+                            <span class="range-value" id="depthValue">3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="contentStyleLabel">內容風格</label>
+                    <div class="content-style-selector">
+                        <label class="style-option active">
+                            <input type="radio" name="contentStyle" value="concise" checked
+                                onchange="updateContentStyle('concise')">
+                            <div class="style-option-label" data-i18n="conciseStyle">精簡詞語</div>
+                            <div class="style-option-desc" data-i18n="conciseStyleDesc">簡潔的關鍵詞</div>
+                        </label>
+                        <label class="style-option">
+                            <input type="radio" name="contentStyle" value="detailed"
+                                onchange="updateContentStyle('detailed')">
+                            <div class="style-option-label" data-i18n="detailedStyle">完整句子</div>
+                            <div class="style-option-desc" data-i18n="detailedStyleDesc">詳細的描述句</div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="generate-btn" id="generateBtn" data-i18n="generateBtn">
+                    生成思維導圖
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 第二頁：結果頁面 -->
+    <div class="result-page" id="resultPage">
+        <div class="result-header">
+            <h2 class="result-title" id="resultTitle">思維導圖</h2>
+            <div class="header-controls">
+                <div class="layout-selector">
+                    <button class="layout-btn active" id="autoLayoutBtn" onclick="setLayout('auto')"
+                        data-i18n="autoLayout">自動</button>
+                    <button class="layout-btn" id="treeLayoutBtn" onclick="setLayout('tree')"
+                        data-i18n="treeLayout">樹形</button>
+                    <button class="layout-btn" id="radialLayoutBtn" onclick="setLayout('radial')"
+                        data-i18n="radialLayout">放射</button>
+                    <button class="layout-btn" id="orgChartLayoutBtn" onclick="setLayout('orgChart')"
+                        data-i18n="orgChartLayout">組織圖</button>
+                    <button class="layout-btn" id="cloudLayoutBtn" onclick="setLayout('cloud')"
+                        data-i18n="cloudLayout">雲圖</button>
+                </div>
+                <div class="text-color-toggle">
+                    <input type="checkbox" id="textToBlackCheckbox" onchange="toggleAllTextBlack(this.checked)">
+                    <label for="textToBlackCheckbox" data-i18n="textToBlackLabel">所有文字轉黑色</label>
+                </div>
+                <button id="randomizeCloudBtn" onclick="randomizeCloud()" data-i18n="randomizeCloudBtn">隨機排列</button>
+                <div class="edit-toolbar">
+                    <button class="toolbar-btn" id="editModeBtn" onclick="toggleEditMode()" data-i18n="editMode">
+                        編輯模式
+                    </button>
+                    <button class="toolbar-btn" onclick="addNewNode()" data-i18n="addNode">
+                        + 新增節點
+                    </button>
+                    <button class="toolbar-btn delete" onclick="deleteSelectedNode()" data-i18n="deleteNode">
+                        刪除節點
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mindmap-canvas">
+            <div class="mindmap-gradient-bg"></div>
+            <svg id="mindmap"></svg>
+            <input type="text" class="node-input" id="nodeInput" />
+            <div class="context-menu" id="contextMenu">
+                <div class="context-menu-item" onclick="editNodeFromMenu()">編輯節點</div>
+                <div class="context-menu-item" onclick="addChildFromMenu()">新增子節點</div>
+                <div class="context-menu-item delete" onclick="deleteNodeFromMenu()">刪除節點</div>
+            </div>
+            <div class="floating-edit-panel" id="floatingEditPanel">
+                <h4 data-i18n="editPanelTitle">編輯節點</h4>
+                <div class="edit-actions">
+                    <button onclick="editSelectedNode()"><span data-i18n="editText">編輯文字</span></button>
+                    <button onclick="addChildToSelected()"><span data-i18n="addChild">新增子節點</span></button>
+                    <button class="danger" onclick="deleteSelectedFromPanel()"><span
+                            data-i18n="deleteThis">刪除此節點</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <div class="export-buttons-row">
+                <button class="export-btn back" onclick="backToSetup()" data-i18n="backBtn">返回</button>
+                <button class="export-btn" onclick="exportSVG()" data-i18n="exportSvg">SVG</button>
+                <button class="export-btn" onclick="exportPNG()" data-i18n="exportPng">PNG</button>
+                <button class="export-btn" onclick="exportPDF()" data-i18n="exportPdf">PDF</button>
+                <button class="export-btn" onclick="exportMarkdown()" data-i18n="exportMarkdown">MD</button>
+                <button class="export-btn" onclick="exportTXT()" data-i18n="exportTxt">TXT</button>
+                <button class="export-btn log" onclick="showLogPanel()" data-i18n="exportLog">日志</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading"> /* ... */ </div>
+    <div class="error-message" id="errorMessage"></div>
+    <div id="export-canvas"></div>
+    <div class="log-panel" id="logPanel"> /* ... */ </div>
+
+    <script>
+        // i18n Translations
+        const i18n = {
+            'zh-TW': {
+                title: 'MindMap一鍵生成器',
+                subtitle: '輸入主題，AI 自動生成智能佈局的思維導圖',
+                langLabel: '選擇語言',
+                topicLabel: '主題',
+                topicPlaceholder: '例如：人工智能的應用',
+                apiProviderLabel: 'AI 服務',
+                apiKeyLabel: 'API 密鑰',
+                apiKeyPlaceholder: '輸入 API 密鑰',
+                getApiKey: '獲取 API 密鑰',
+                branchesLabel: '主分支數量',
+                depthLabel: '層級深度',
+                contentStyleLabel: '內容風格',
+                conciseStyle: '精簡詞語',
+                conciseStyleDesc: '簡潔的關鍵詞',
+                detailedStyle: '完整句子',
+                detailedStyleDesc: '詳細的描述句',
+                generateBtn: '生成思維導圖',
+                autoLayout: '自動',
+                treeLayout: '樹形',
+                radialLayout: '放射',
+                forceLayout: '力導向', // 雖然代碼中沒有 forceLayout，但 i18n 保留
+                editMode: '編輯模式',
+                addNode: '+ 新增節點',
+                deleteNode: '刪除節點',
+                backBtn: '返回重新設定',
+                exportSvg: '導出 SVG',
+                exportPng: '導出 PNG',
+                exportPdf: '導出 PDF',
+                exportMarkdown: '導出 Markdown',
+                exportTxt: '導出 TXT',
+                exportLog: '查看詳細日志',
+                loadingText: '正在生成思維導圖...',
+                apiStatusChecking: '檢查中...',
+                apiStatusValid: 'API 密鑰有效',
+                apiStatusInvalid: 'API 密鑰無效',
+                editPanelTitle: '編輯節點',
+                editText: '編輯文字',
+                addChild: '新增子節點',
+                deleteThis: '刪除此節點',
+                logPanelTitle: '詳細日志',
+                downloadLog: '下載日志文件',
+                orgChartLayout: '組織圖',
+                cloudLayout: '雲圖',
+                textToBlackLabel: '所有文字轉黑色',
+                randomizeCloudBtn: '隨機排列雲圖',
+                errorMessages: {
+                    networkError: '網絡連接失敗，請檢查網絡',
+                    apiError: 'API 錯誤',
+                    parseError: '數據解析失敗',
+                    invalidKey: 'API 密鑰無效或已過期',
+                    cannotDeleteRoot: '不能刪除根節點'
+                }
+            },
+            'zh-CN': {
+                title: 'MindMap一键生成器',
+                subtitle: '输入主题，AI 自动生成智能布局的思维导图',
+                langLabel: '选择语言',
+                topicLabel: '主题',
+                topicPlaceholder: '例如：人工智能的应用',
+                apiProviderLabel: 'AI 服务',
+                apiKeyLabel: 'API 密钥',
+                apiKeyPlaceholder: '输入 API 密钥',
+                getApiKey: '获取 API 密钥',
+                branchesLabel: '主分支数量',
+                depthLabel: '层级深度',
+                contentStyleLabel: '内容风格',
+                conciseStyle: '精简词语',
+                conciseStyleDesc: '简洁的关键词',
+                detailedStyle: '完整句子',
+                detailedStyleDesc: '详细的描述句',
+                generateBtn: '生成思维导图',
+                autoLayout: '自动',
+                treeLayout: '树形',
+                radialLayout: '放射',
+                forceLayout: '力导向',
+                editMode: '编辑模式',
+                addNode: '+ 新增节点',
+                deleteNode: '删除节点',
+                backBtn: '返回重新设定',
+                exportSvg: '导出 SVG',
+                exportPng: '导出 PNG',
+                exportPdf: '导出 PDF',
+                exportMarkdown: '导出 Markdown',
+                exportTxt: '导出 TXT',
+                exportLog: '查看详细日志',
+                loadingText: '正在生成思维导图...',
+                apiStatusChecking: '检查中...',
+                apiStatusValid: 'API 密钥有效',
+                apiStatusInvalid: 'API 密钥无效',
+                editPanelTitle: '编辑节点',
+                editText: '编辑文字',
+                addChild: '新增子节点',
+                deleteThis: '删除此节点',
+                logPanelTitle: '详细日志',
+                downloadLog: '下载日志文件',
+                orgChartLayout: '组织图',
+                cloudLayout: '云图',
+                textToBlackLabel: '所有文字转黑色',
+                randomizeCloudBtn: '随机排列云图',
+                errorMessages: {
+                    networkError: '网络连接失败，请检查网络',
+                    apiError: 'API 错误',
+                    parseError: '数据解析失败',
+                    invalidKey: 'API 密钥无效或已过期',
+                    cannotDeleteRoot: '不能删除根节点'
+                }
+            }
+        };
+
+        let currentLang = 'zh-TW';
+        let currentData = null;
+        let apiCheckTimeout = null;
+        let isEditMode = false;
+        let selectedNode = null;
+        let currentContextNode = null;
+        let nodeIdCounter = 0;
+        let currentLayout = 'auto';
+        let totalNodeCount = 0;
+        let systemLogs = [];
+        let contentStyle = 'concise';
+        // let simulation = null; // simulation 相關代碼似乎已被移除，所以註釋掉
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleString();
+            const logEntry = { time: timestamp, type: type, message: message };
+            systemLogs.push(logEntry);
+            if (document.getElementById('logPanel')?.classList.contains('show')) {
+                appendLogToPanel(logEntry);
+            }
+        }
+
+        function appendLogToPanel(logEntry) {
+            const logContent = document.getElementById('logContent');
+            if (!logContent) return;
+            const entryDiv = document.createElement('div');
+            entryDiv.className = `log-entry ${logEntry.type}`;
+            entryDiv.innerHTML = `<div class="log-entry-time">${logEntry.time}</div><div>${logEntry.message}</div>`;
+            logContent.appendChild(entryDiv);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function showLogPanel() {
+            const logPanel = document.getElementById('logPanel');
+            const logContent = document.getElementById('logContent');
+            if (!logPanel || !logContent) return;
+            logContent.innerHTML = '';
+            systemLogs.forEach(log => appendLogToPanel(log));
+            logPanel.classList.add('show');
+            addLog("打開日誌面板", "info");
+        }
+
+        function hideLogPanel() {
+            document.getElementById('logPanel')?.classList.remove('show');
+            addLog("關閉日誌面板", "info");
+        }
+
+        function exportLogToFile() {
+            const logText = systemLogs.map(log => `[${log.time}] [${log.type.toUpperCase()}] ${log.message}`).join('\n');
+            const blob = new Blob([logText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `mindmap_log_${new Date().getTime()}.log`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            addLog('日志文件已導出', 'success');
+        }
+
+        function updateContentStyle(style) {
+            contentStyle = style;
+            document.querySelectorAll('.style-option').forEach(option => {
+                option.classList.toggle('active', option.querySelector('input').value === style);
+            });
+            addLog(`內容風格已切換為: ${style === 'concise' ? (i18n[currentLang]?.conciseStyle || '精簡詞語') : (i18n[currentLang]?.detailedStyle || '完整句子')}`, 'info');
+        }
+
+        // 預設 API Keys
+        const defaultApiKeys = {
+            moonshot: 'sk-tzOzaWavoeLQbniUQCOGevfOSJX0r8IoHczmEoQ9q0RjWJDG',
+            deepseek: '',
+            glm: 'b85a05c320c0036cb33e501b9235a28e.MA7MO25YLE5Q6fIX',
+            gemini: 'AIzaSyCx6mMV1AKHtppRoCduDyZoVS-mmyiZOFw',
+            openrouter: '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',
+            'openrouter-gemini': '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'
+        };
+
+        // API 配置
+        const apiConfigs = {
+            moonshot: {
+                name: 'Moonshot',
+                endpoint: 'https://api.moonshot.cn/v1/chat/completions',
+                helpUrl: 'https://platform.moonshot.cn/console/api-keys',
+                headers: (apiKey) => ({
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                }),
+                buildUrl: (endpoint, apiKey) => endpoint,
+                buildBody: (prompt) => ({
+                    model: 'moonshot-v1-128k',
+                    messages: [{
+                        role: 'user',
+                        content: prompt
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 8192
+                }),
+                parseResponse: (data) => data.choices[0].message.content,
+                validateKey: async (apiKey) => {
+                    try {
+                        const response = await fetch('https://api.moonshot.cn/v1/models', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${apiKey}`
+                            }
+                        });
+                        return response.ok;
+                    } catch {
+                        return false;
+                    }
+                }
+            },
+            deepseek: {
+                name: 'DeepSeek',
+                endpoint: 'https://api.deepseek.com/v1/chat/completions',
+                helpUrl: 'https://platform.deepseek.com/api_keys',
+                headers: (apiKey) => ({
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                }),
+                buildUrl: (endpoint, apiKey) => endpoint,
+                buildBody: (prompt) => ({
+                    model: 'deepseek-chat',
+                    messages: [{
+                        role: 'user',
+                        content: prompt
+                    }],
+                    temperature: 0.7,
+                    stream: false,
+                    max_tokens: 8192
+                }),
+                parseResponse: (data) => data.choices[0].message.content,
+                validateKey: async (apiKey) => {
+                    try {
+                        const response = await fetch('https://api.deepseek.com/v1/models', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${apiKey}`
+                            }
+                        });
+                        return response.ok;
+                    } catch {
+                        return false;
+                    }
+                }
+            },
+            gemini: {
+                name: 'Google Gemini',
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta',
+                helpUrl: 'https://makersuite.google.com/app/apikey',
+                headers: (apiKey) => ({
+                    'Content-Type': 'application/json',
+                }),
+                buildUrl: (endpoint, apiKey) =>
+                    `${endpoint}/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`,
+                buildBody: (prompt) => ({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }]
+                }),
+                parseResponse: (data) => {
+                    if (data.candidates?.[0]?.content) {
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                    throw new Error('Invalid response format');
+                },
+                validateKey: async (apiKey) => {
+                    const testPrompt = '測試';
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ contents: [{ parts: [{ text: testPrompt }] }] })
+                        });
+                        return response.ok;
+                    } catch {
+                        return false;
+                    }
+                }
+            },
+            glm: {
+                name: '智譜 GLM',
+                endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+                helpUrl: 'https://open.bigmodel.cn/usercenter/apikeys',
+                headers: (apiKey) => ({
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                }),
+                buildUrl: (endpoint, apiKey) => endpoint,
+                buildBody: (prompt) => ({
+                    model: 'glm-4',
+                    messages: [{
+                        role: 'user',
+                        content: prompt
+                    }],
+                    temperature: 0.7
+                }),
+                parseResponse: (data) => data.choices[0].message.content,
+                validateKey: async (apiKey) => {
+                    return true;
+                }
+            },
+            openrouter: {
+                name: 'OpenRouter (DeepSeek)',
+                endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+                helpUrl: 'https://openrouter.ai/keys',
+                headers: (apiKey) => ({
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                }),
+                buildUrl: (endpoint, apiKey) => endpoint,
+                buildBody: (prompt) => ({
+                    model: 'deepseek/deepseek-chat-v3-0324',
+                    messages: [{
+                        role: 'user',
+                        content: prompt
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 4096
+                }),
+                parseResponse: (data) => data.choices[0].message.content,
+                validateKey: async (apiKey) => {
+                    try {
+                        const response = await fetch('https://openrouter.ai/api/v1/models', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${apiKey}`
+                            }
+                        });
+                        return response.ok;
+                    } catch {
+                        return false;
+                    }
+                }
+            },
+            'openrouter-gemini': {
+                name: 'OpenRouter (Gemini 2.5)',
+                endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+                helpUrl: 'https://openrouter.ai/keys',
+                headers: (apiKey) => ({
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                }),
+                buildUrl: (endpoint, apiKey) => endpoint,
+                buildBody: (prompt) => ({
+                    model: 'google/gemini-2.5-flash-preview-05-20',
+                    messages: [{
+                        role: 'user',
+                        content: prompt
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 4096
+                }),
+                parseResponse: (data) => data.choices[0].message.content,
+                validateKey: async (apiKey) => {
+                    try {
+                        const response = await fetch('https://openrouter.ai/api/v1/models', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${apiKey}`
+                            }
+                        });
+                        return response.ok;
+                    } catch {
+                        return false;
+                    }
+                }
+            }
+        };
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function () {
+            updateApiInfo();
+            // updateEstimatedNodeCount(); // This was removed
+            addLog('頁面初始化完成', 'info');
+            document.querySelectorAll('.range-input').forEach(input => updateRangeProgress(input));
+            document.addEventListener('click', function () {
+                document.getElementById('contextMenu').style.display = 'none';
+                hideFloatingEditPanel();
+            });
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.getElementById('apiKey')?.addEventListener('input', validateApiKey);
+        });
+
+        function updateRangeProgress(input) {
+            const percentage = ((input.value - input.min) / (input.max - input.min)) * 100;
+            input.style.background = `linear-gradient(to right, #667eea 0%, #667eea ${percentage}%, #e0e0e0 ${percentage}%, #e0e0e0 100%)`;
+        }
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            addLog(`語言切換為: ${lang}`, 'info');
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === (i18n[lang]?.langLabel === '選擇語言' ? (lang === 'zh-TW' ? '繁體中文' : '简体中文') : (lang === 'zh-TW' ? '繁體中文' : '简体中文'))); // More robust check
+            });
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const keys = key.split('.');
+                let value = i18n[lang];
+                keys.forEach(k => { if (value && value[k] !== undefined) value = value[k]; else value = key; }); // Fallback to key if not found
+                element.textContent = value;
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                element.placeholder = i18n[lang]?.[key] || key;
+            });
+        }
+
+        function updateApiInfo() {
+            const provider = document.getElementById('apiProvider').value;
+            const config = apiConfigs[provider];
+            const helpLink = document.getElementById('apiHelp').querySelector('a');
+            helpLink.href = config.helpUrl;
+
+            const apiKeyInput = document.getElementById('apiKey');
+            if (defaultApiKeys[provider]) {
+                apiKeyInput.value = defaultApiKeys[provider];
+                if (provider !== 'deepseek') {
+                    validateApiKey();
+                }
+            } else {
+                apiKeyInput.value = '';
+                document.getElementById('apiStatus').innerHTML = '';
+                apiKeyInput.classList.remove('valid', 'invalid');
+            }
+
+            addLog(`API 提供商切換為: ${config.name}`, 'info');
+        }
+
+        async function validateApiKey() {
+            const provider = document.getElementById('apiProvider').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const statusDiv = document.getElementById('apiStatus');
+            const apiKeyInput = document.getElementById('apiKey');
+
+            if (!apiKey) {
+                statusDiv.innerHTML = '';
+                apiKeyInput.classList.remove('valid', 'invalid');
+                return;
+            }
+
+            statusDiv.innerHTML = `<span class="status-icon"></span> ${i18n[currentLang].apiStatusChecking}`;
+            statusDiv.className = 'api-status checking';
+            apiKeyInput.classList.remove('valid', 'invalid');
+
+            if (apiCheckTimeout) {
+                clearTimeout(apiCheckTimeout);
+            }
+
+            apiCheckTimeout = setTimeout(async () => {
+                try {
+                    const config = apiConfigs[provider];
+                    const isValid = await config.validateKey(apiKey);
+
+                    if (isValid) {
+                        statusDiv.innerHTML = `<span class="status-icon"></span> ${i18n[currentLang].apiStatusValid}`;
+                        statusDiv.className = 'api-status valid';
+                        apiKeyInput.classList.add('valid');
+                        apiKeyInput.classList.remove('invalid');
+                        addLog(`API 密鑰驗證成功: ${provider}`, 'success');
+                    } else {
+                        statusDiv.innerHTML = `<span class="status-icon"></span> ${i18n[currentLang].apiStatusInvalid}`;
+                        statusDiv.className = 'api-status invalid';
+                        apiKeyInput.classList.add('invalid');
+                        apiKeyInput.classList.remove('valid');
+                        addLog(`API 密鑰驗證失敗: ${provider}`, 'error');
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<span class="status-icon"></span> ${i18n[currentLang].apiStatusInvalid}`;
+                    statusDiv.className = 'api-status invalid';
+                    apiKeyInput.classList.add('invalid');
+                    apiKeyInput.classList.remove('valid');
+                    addLog(`API 密鑰驗證錯誤: ${error.message}`, 'error');
+                }
+            }, 500);
+        }
+
+        function updateRangeValue(id) {
+            const input = document.getElementById(id);
+            const valueDisplay = document.getElementById(id + 'Value');
+            if (input && valueDisplay) valueDisplay.textContent = input.value;
+            updateRangeProgress(input);
+            // Removed call to updateEstimatedNodeCount
+        }
+
+        function setLayout(layout) {
+            currentLayout = layout;
+            addLog(`佈局模式切換為: ${layout}`, 'info');
+
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(`${layout}LayoutBtn`).classList.add('active');
+
+            if (currentData) {
+                renderMindmap(currentData);
+            }
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.getElementById('editModeBtn')?.classList.toggle('active', isEditMode);
+            if (!isEditMode) {
+                d3.selectAll('.node-group').classed('selected', false);
+                selectedNode = null;
+                document.getElementById('nodeInput').style.display = 'none';
+                hideFloatingEditPanel();
+            }
+            const msgKey = isEditMode ? '編輯模式已開啟' : '編輯模式已關閉'; // Simplified message logic
+            showMessage(msgKey, 'info');
+            addLog(msgKey, 'info');
+        }
+
+
+        function showFloatingEditPanel(node) {
+            if (!isEditMode) return;
+
+            const panel = document.getElementById('floatingEditPanel');
+            const canvas = document.getElementById('mindmap-canvas'); // The direct parent of the SVG
+            const svgElement = document.getElementById('mindmap'); // The SVG itself
+
+            const canvasRect = canvas.getBoundingClientRect(); // Use canvas for window-relative positioning
+            const g = d3.select('#mindmap g');
+            const transform = g.node().getCTM();
+
+            // Calculate the node's visual center on the screen, relative to the viewport
+            const visualNodeCenterX = canvasRect.left + transform.e + (node.x * transform.a);
+            const visualNodeCenterY = canvasRect.top + transform.f + (node.y * transform.d);
+
+            // Get node's visual dimensions considering current SVG scale
+            const visualNodeWidth = node.width * transform.a;
+            const visualNodeHeight = node.height * transform.d;
+
+            panel.style.display = 'block'; // Display first to get its dimensions
+            const panelRect = panel.getBoundingClientRect();
+            const panelWidth = panelRect.width;
+            const panelHeight = panelRect.height;
+
+            let targetLeft, targetTop;
+            const offset = 10; // Small gap between node and panel
+
+            // Preferred: To the right of the node, vertically aligned with node's top
+            targetLeft = visualNodeCenterX + visualNodeWidth / 2 + offset;
+            targetTop = visualNodeCenterY - visualNodeHeight / 2;
+
+            // If right position is off-screen, try left of the node
+            if (targetLeft + panelWidth > window.innerWidth - offset) {
+                targetLeft = visualNodeCenterX - visualNodeWidth / 2 - panelWidth - offset;
+            }
+
+            // If top position is off-screen (too high), try below the node
+            if (targetTop < offset) {
+                targetTop = visualNodeCenterY + visualNodeHeight / 2 + offset;
+            }
+            // If bottom position is off-screen (too low after trying below), adjust upwards
+            if (targetTop + panelHeight > window.innerHeight - offset) {
+                targetTop = window.innerHeight - panelHeight - offset;
+                // If it's still too high after this adjustment (e.g. very tall panel), cap at top
+                if (targetTop < offset) targetTop = offset;
+            }
+
+            // Final boundary checks for left position
+            if (targetLeft < offset) {
+                targetLeft = offset;
+            }
+            if (targetLeft + panelWidth > window.innerWidth - offset) {
+                targetLeft = window.innerWidth - panelWidth - offset;
+            }
+
+
+            panel.style.left = targetLeft + 'px';
+            panel.style.top = targetTop + 'px';
+        }
+
+        function hideFloatingEditPanel() { document.getElementById('floatingEditPanel').style.display = 'none'; }
+        function editSelectedNode() { if (selectedNode) editNode(selectedNode); hideFloatingEditPanel(); }
+        function addChildToSelected() { if (selectedNode) addNewNode(); hideFloatingEditPanel(); }
+        function deleteSelectedFromPanel() { if (selectedNode && selectedNode.depth > 0) { if (confirm(i18n[currentLang].deleteThis.replace('此節點', '此節點及其所有子節點') + '?')) { deleteNode(selectedNode); showMessage(i18n[currentLang].deleteNode + '成功', 'success'); } } else if (selectedNode && selectedNode.depth === 0) showError(i18n[currentLang].errorMessages.cannotDeleteRoot || '不能刪除根節點'); hideFloatingEditPanel(); }
+
+        function addNewNode() {
+            if (!isEditMode) {
+                showError(currentLang === 'zh-TW' ? '請先開啟編輯模式' : '请先开启编辑模式');
+                return;
+            }
+
+            if (!selectedNode) {
+                showError(currentLang === 'zh-TW' ? '請先選擇一個節點作為父節點' : '请先选择一个节点作为父节点');
+                return;
+            }
+
+            const newNodeName = prompt(currentLang === 'zh-TW' ? '請輸入新節點名稱：' : '请输入新节点名称：');
+            if (!newNodeName || !newNodeName.trim()) return;
+
+            const newNode = {
+                name: newNodeName.trim(),
+                children: [],
+                id: `node-${nodeIdCounter++}`
+            };
+
+            if (!selectedNode.data.children) {
+                selectedNode.data.children = [];
+            }
+            selectedNode.data.children.push(newNode);
+
+            renderMindmap(currentData);
+
+            showMessage(currentLang === 'zh-TW' ? '節點已添加' : '节点已添加', 'success');
+            addLog(`新增節點: ${newNodeName.trim()}`, 'success');
+        }
+
+        function deleteSelectedNode() {
+            if (!isEditMode) {
+                showError(currentLang === 'zh-TW' ? '請先開啟編輯模式' : '请先开启编辑模式');
+                return;
+            }
+
+            if (!selectedNode) {
+                showError(currentLang === 'zh-TW' ? '請先選擇要刪除的節點' : '请先选择要删除的节点');
+                return;
+            }
+
+            if (selectedNode.depth === 0) {
+                showError(currentLang === 'zh-TW' ? '不能刪除根節點' : '不能删除根节点');
+                return;
+            }
+
+            const confirmMsg = currentLang === 'zh-TW' ?
+                '確定要刪除此節點及其所有子節點嗎？' :
+                '确定要删除此节点及其所有子节点吗？';
+
+            if (confirm(confirmMsg)) {
+                const nodeName = selectedNode.data.name;
+                deleteNode(selectedNode);
+                showMessage(currentLang === 'zh-TW' ? '節點已刪除' : '节点已删除', 'success');
+                addLog(`刪除節點: ${nodeName}`, 'success');
+            }
+        }
+
+        function deleteNode(node) {
+            if (node.parent) {
+                const parentData = node.parent.data;
+                const index = parentData.children.indexOf(node.data);
+                if (index > -1) {
+                    parentData.children.splice(index, 1);
+                }
+                if (parentData.children.length === 0) {
+                    delete parentData.children;
+                }
+            }
+
+            selectedNode = null;
+            hideFloatingEditPanel();
+            renderMindmap(currentData);
+        }
+
+        function showContextMenu(event, d) {
+            event.preventDefault();
+            currentContextNode = d;
+
+            const contextMenu = document.getElementById('contextMenu');
+            const svg = document.getElementById('mindmap');
+            const svgRect = svg.getBoundingClientRect();
+            const g = d3.select('#mindmap g');
+            const transform = g.node().getCTM();
+
+            const nodeX = svgRect.left + transform.e + d.x * transform.a;
+            const nodeY = svgRect.top + transform.f + d.y * transform.d;
+
+            const isMobile = window.innerWidth < 768;
+            let left, top;
+
+            if (isMobile) {
+                left = nodeX + (d.width / 2 + 10) * transform.a;
+                top = nodeY - 40;
+            } else {
+                left = event.pageX;
+                top = event.pageY;
+            }
+
+            contextMenu.style.display = 'block';
+            const menuRect = contextMenu.getBoundingClientRect();
+
+            if (left + menuRect.width > window.innerWidth) {
+                left = window.innerWidth - menuRect.width - 10;
+            }
+
+            if (top + menuRect.height > window.innerHeight) {
+                top = window.innerHeight - menuRect.height - 10;
+            }
+
+            if (left < 10) left = 10;
+            if (top < 10) top = 10;
+
+            contextMenu.style.left = left + 'px';
+            contextMenu.style.top = top + 'px';
+        }
+
+        function editNodeFromMenu() { if (currentContextNode) editNode(currentContextNode); document.getElementById('contextMenu').style.display = 'none'; }
+        function addChildFromMenu() { if (currentContextNode) { selectedNode = currentContextNode; addNewNode(); } document.getElementById('contextMenu').style.display = 'none'; }
+        function deleteNodeFromMenu() { if (currentContextNode && currentContextNode.depth > 0) { if (confirm(i18n[currentLang].deleteNode + '?')) { const nodeName = currentContextNode.data.name; deleteNode(currentContextNode); showMessage(i18n[currentLang].deleteNode + '成功', 'success'); addLog(`刪除節點: ${nodeName}`, 'success'); } } else if (currentContextNode && currentContextNode.depth === 0) showError(i18n[currentLang].errorMessages.cannotDeleteRoot || '不能刪除根節點'); document.getElementById('contextMenu').style.display = 'none'; }
+
+        function editNode(node) {
+            const input = document.getElementById('nodeInput');
+            const svgRect = document.getElementById('mindmap').getBoundingClientRect();
+            const g = d3.select('#mindmap g');
+            const transform = g.node().getCTM();
+
+            const x = svgRect.left + transform.e + node.x * transform.a;
+            const y = svgRect.top + transform.f + node.y * transform.d;
+
+            input.style.left = x + 'px';
+            input.style.top = y + 'px';
+            input.style.display = 'block';
+            input.value = node.data.name;
+            input.focus();
+            input.select();
+
+            input.onblur = input.onkeydown = function (e) {
+                if (e.type === 'blur' || e.keyCode === 13) {
+                    if (e.keyCode === 13) e.preventDefault();
+
+                    const newName = input.value.trim();
+                    if (newName && newName !== node.data.name) {
+                        const oldName = node.data.name;
+                        node.data.name = newName;
+                        renderMindmap(currentData);
+                        showMessage(currentLang === 'zh-TW' ? '節點已更新' : '节点已更新', 'success');
+                        addLog(`節點更新: "${oldName}" -> "${newName}"`, 'success');
+                    }
+
+                    input.style.display = 'none';
+                    input.onblur = input.onkeydown = null;
+                }
+
+                if (e.keyCode === 27) {
+                    input.style.display = 'none';
+                    input.onblur = input.onkeydown = null;
+                }
+            };
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-toast';
+            messageDiv.textContent = message;
+
+            const colors = {
+                info: '#3b82f6',
+                success: '#10b981',
+                error: '#ef4444'
+            };
+
+            messageDiv.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1002;
+                animation: slideUp 0.3s ease;
+                font-weight: 500;
+            `;
+
+            document.body.appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageDiv.style.animation = 'slideDown 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(messageDiv);
+                }, 300);
+            }, 2000);
+        }
+
+        function setLayout(layout) {
+            currentLayout = layout;
+            addLog(`佈局模式切換為: ${layout}`, 'info');
+            document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`${layout}LayoutBtn`)?.classList.add('active');
+            const randomizeBtn = document.getElementById('randomizeCloudBtn');
+            const mindmapCanvas = document.getElementById('mindmap-canvas');
+            if (layout === 'cloud') {
+                if (randomizeBtn) randomizeBtn.style.display = 'inline-block';
+                if (mindmapCanvas) mindmapCanvas.classList.add('wordcloud-active');
+            } else {
+                if (randomizeBtn) randomizeBtn.style.display = 'none';
+                if (mindmapCanvas) mindmapCanvas.classList.remove('wordcloud-active');
+            }
+            if (currentData) renderMindmap(currentData);
+        }
+
+        function randomizeCloud() {
+            if (currentLayout === 'cloud' && currentData) {
+                addLog('隨機排列雲圖', 'info');
+                renderMindmap(currentData);
+            }
+        }
+
+        let originalTextColors = new Map();
+
+        function storeOriginalTextColors() {
+            originalTextColors.clear();
+            d3.select("#mindmap").selectAll(".node-text-content text, .wordcloud-text") // Include wordcloud text
+                .each(function (d) {
+                    // For regular nodes, d is the node data. For wordcloud, d is the word object.
+                    const id = d && d.id ? d.id : (d && d.text ? 'cloud-' + d.text.replace(/\s+/g, '-') : null);
+                    if (id) {
+                        originalTextColors.set(id, d3.select(this).style("fill"));
+                    }
+                });
+        }
+
+        function toggleAllTextBlack(isChecked) {
+            addLog(`文字顏色切換: ${isChecked ? '全部轉黑' : '恢復原色'}`, 'info');
+            if (currentData) {
+                // We will let renderMindmap handle the color application based on the checkbox state
+                renderMindmap(currentData);
+            }
+        }
+
+
+        async function generateMindmap(event) {
+            event.preventDefault();
+            const topic = document.getElementById('topic').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const provider = document.getElementById('apiProvider').value;
+            const branches = document.getElementById('branches').value;
+            const depth = document.getElementById('depth').value;
+            addLog(`生成: ${topic}, API: ${provider}, 分支: ${branches}, 深度: ${depth}, 風格: ${contentStyle}`, 'info');
+            showLoading(true);
+            try {
+                const mindmapData = await callAI(topic, apiKey, provider, branches, depth);
+                currentData = mindmapData;
+                addNodeIds(currentData);
+                totalNodeCount = countNodes(currentData);
+                addLog(`生成成功 - 節點數: ${totalNodeCount}`, 'success');
+                document.getElementById('setupPage').style.display = 'none';
+                document.getElementById('resultPage').style.display = 'flex';
+                document.getElementById('resultTitle').textContent = topic;
+                isEditMode = true;
+                document.getElementById('editModeBtn').classList.add('active');
+
+                let autoSelectedLayout = currentLayout === 'auto' ? null : currentLayout;
+                if (currentLayout === 'auto') {
+                    if (totalNodeCount > 70) autoSelectedLayout = 'radial';
+                    else if (totalNodeCount > 35) autoSelectedLayout = 'orgChart'; // 正確
+                    else autoSelectedLayout = 'tree';
+                    addLog(`自動選擇佈局: ${autoSelectedLayout}`, 'info');
+                }
+                setLayout(autoSelectedLayout || 'tree'); // 如果 autoSelectedLayout 是 null (例如初始 currentLayout 不是 'auto' 且未被修改)，則默認為 'tree'
+
+                showLoading(false); // <--- 確保在成功或失敗時都被調用
+                showMessage(i18n[currentLang].generateBtn.replace('生成', '已生成'), 'success');
+            } catch (error) {
+                addLog(`生成思維導圖失敗: ${error.message}`, 'error');
+                showError(error.message);
+                showLoading(false); // <--- 確保在 catch 塊中也被調用
+            }
+        }
+
+        function countNodes(node) { let c = 1; if (node.children) node.children.forEach(child => c += countNodes(child)); return c; }
+        function addNodeIds(node) { if (!node.id) node.id = `node-${nodeIdCounter++}`; if (node.children) node.children.forEach(addNodeIds); }
+
+        async function callAI(topic, apiKey, provider, branches, depth) {
+            const config = apiConfigs[provider];
+            const isSimplified = currentLang === 'zh-CN';
+
+            const maxNodes = Math.min(50, branches * Math.pow(2, depth - 1));
+
+            let prompt;
+            if (contentStyle === 'detailed') {
+                prompt = `請為"${topic}"生成思維導圖JSON結構。
+
+🚨 嚴格要求（必須遵守）：
+1. 根節點下必須恰好有 ${branches} 個主分支，不能多不能少
+2. 最大深度嚴格限制為 ${depth} 層，第${depth}層之後不能再有children
+3. 總節點數必須控制在 ${maxNodes} 個以內
+4. 使用${isSimplified ? '簡體中文' : '繁體中文'}
+5. 第1-2層使用簡潔詞語（2-6個字），第3層開始可用完整句子（8-20個字）
+
+JSON格式要求：
+- 根節點只能有 ${branches} 個 children
+- 每個主分支最多3-4個子分支
+- 嚴格控制深度為 ${depth} 層
+
+範例結構：
+{
+  "name": "${topic}",
+  "children": [
+    {"name": "主分支1", "children": [...]},
+    {"name": "主分支2", "children": [...]}
+    // 總共恰好 ${branches} 個主分支
+  ]
+}
+
+只返回JSON，嚴格遵守分支數量和深度限制！`;
+            } else {
+                prompt = `請為"${topic}"生成思維導圖JSON結構。
+
+🚨 嚴格要求（必須遵守）：
+1. 根節點下必須恰好有 ${branches} 個主分支，不能多不能少
+2. 最大深度嚴格限制為 ${depth} 層，超過就停止
+3. 總節點數必須控制在 ${maxNodes} 個以內
+4. 使用${isSimplified ? '簡體中文' : '繁體中文'}
+5. 節點名稱簡潔（2-8個字）
+
+結構控制：
+- 根節點：1個（主題）
+- 第1層：恰好 ${branches} 個主分支
+- 第2層：每個主分支最多3個子分支
+- 第3層及以上：每個節點最多2個子分支
+- 第${depth}層：不能再有children（葉子節點）
+
+只返回JSON，嚴格控制數量！`;
+            }
+
+            addLog(`正在調用 AI API: ${config.name}，嚴格控制 ${branches} 分支 ${depth} 層`, 'info');
+
+            try {
+                const url = config.buildUrl(config.endpoint, apiKey);
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: config.headers(apiKey),
+                    body: JSON.stringify(config.buildBody(prompt))
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API Error:', errorData);
+                    addLog(`API 錯誤: ${errorData.error?.message || response.statusText}`, 'error');
+                    throw new Error(i18n[currentLang].errorMessages.apiError + ': ' + (errorData.error?.message || response.statusText));
+                }
+
+                const data = await response.json();
+                let text = config.parseResponse(data);
+
+                addLog('AI 回應接收成功，開始解析並驗證結構', 'info');
+                console.log('AI Response:', text);
+
+                let parsedData = null;
+
+                try {
+                    parsedData = JSON.parse(text);
+                } catch (e1) {
+                    try {
+                        const jsonMatch = text.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            parsedData = JSON.parse(jsonMatch[0]);
+                        }
+                    } catch (e2) {
+                        try {
+                            let cleanJson = text
+                                .replace(/```json/g, '')
+                                .replace(/```/g, '')
+                                .replace(/,(\s*[}\]])/g, '$1')
+                                .replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)(\s*):/g, '$1"$2"$3:')
+                                .trim();
+
+                            const match = cleanJson.match(/\{[\s\S]*\}/);
+                            if (match) {
+                                parsedData = JSON.parse(match[0]);
+                            }
+                        } catch (e3) {
+                            console.error('JSON解析失敗:', e3);
+                            addLog('JSON解析失敗，使用嚴格控制的備用生成', 'error');
+                            parsedData = generateControlledFallbackMindmap(topic, branches, depth, isSimplified);
+                        }
+                    }
+                }
+
+                if (!parsedData) {
+                    addLog('使用嚴格控制的備用生成方法', 'info');
+                    parsedData = generateControlledFallbackMindmap(topic, branches, depth, isSimplified);
+                }
+
+                // 強制執行結構控制
+                parsedData = enforceStructureControl(parsedData, topic, branches, depth);
+
+                const finalNodeCount = countNodes(parsedData);
+                addLog(`結構控制完成 - 分支: ${parsedData.children?.length || 0}/${branches}, 總節點: ${finalNodeCount}`, 'success');
+
+                return parsedData;
+
+            } catch (error) {
+                console.error('API調用錯誤:', error);
+                addLog(`API調用錯誤，使用嚴格控制的備用生成`, 'error');
+                return generateControlledFallbackMindmap(topic, branches, depth, isSimplified);
+            }
+        }
+
+        // 強制執行結構控制
+        function enforceStructureControl(data, topic, targetBranches, maxDepth) {
+            addLog(`開始強制結構控制 - 目標分支: ${targetBranches}, 最大深度: ${maxDepth}`, 'info');
+
+            // 確保根節點正確
+            if (!data || !data.name) {
+                data = { name: topic, children: [] };
+            }
+
+            // 強制控制主分支數量
+            if (!data.children || !Array.isArray(data.children)) {
+                data.children = [];
+            }
+
+            // 如果分支太多，截取前N個
+            if (data.children.length > targetBranches) {
+                addLog(`分支數量超標 (${data.children.length}>${targetBranches})，強制截取`, 'info');
+                data.children = data.children.slice(0, targetBranches);
+            }
+
+            // 如果分支太少，補充
+            while (data.children.length < targetBranches) {
+                const branchIndex = data.children.length + 1;
+                const newBranch = {
+                    name: `主題${branchIndex}`,
+                    children: []
+                };
+                data.children.push(newBranch);
+                addLog(`補充分支: 主題${branchIndex}`, 'info');
+            }
+
+            // 遞歸控制深度和節點數量
+            function controlDepthAndNodes(node, currentDepth) {
+                if (currentDepth >= maxDepth) {
+                    // 達到最大深度，移除所有子節點
+                    if (node.children && node.children.length > 0) {
+                        addLog(`深度 ${currentDepth} 達到上限，移除 ${node.children.length} 個子節點`, 'info');
+                        delete node.children;
+                    }
+                    return;
+                }
+
+                if (node.children && Array.isArray(node.children)) {
+                    // 控制每層的子節點數量
+                    const maxChildrenPerNode = currentDepth === 1 ? 4 : currentDepth === 2 ? 3 : 2;
+
+                    if (node.children.length > maxChildrenPerNode) {
+                        addLog(`第 ${currentDepth} 層節點子節點過多 (${node.children.length}>${maxChildrenPerNode})，強制截取`, 'info');
+                        node.children = node.children.slice(0, maxChildrenPerNode);
+                    }
+
+                    // 遞歸處理每個子節點
+                    node.children.forEach(child => {
+                        if (child && typeof child === 'object') {
+                            controlDepthAndNodes(child, currentDepth + 1);
+                        }
+                    });
+
+                    // 如果沒有有效的子節點，移除 children 屬性
+                    if (node.children.length === 0) {
+                        delete node.children;
+                    }
+                }
+            }
+
+            // 從根節點開始控制
+            controlDepthAndNodes(data, 0);
+
+            const finalCount = countNodes(data);
+            addLog(`結構控制完成 - 最終節點數: ${finalCount}`, 'success');
+
+            return data;
+        }
+
+        // 嚴格控制的備用生成函數
+        function generateControlledFallbackMindmap(topic, branches, depth, isSimplified) {
+            addLog(`開始嚴格控制的備用生成 - ${branches} 分支 ${depth} 層`, 'info');
+
+            const templates = {
+                '人工智能': {
+                    branches: isSimplified ?
+                        ['核心技术', '应用领域', '发展趋势', '技术挑战', '社会影响', '研究方向', '产业生态', '未来展望'] :
+                        ['核心技術', '應用領域', '發展趨勢', '技術挑戰', '社會影響', '研究方向', '產業生態', '未來展望'],
+                    subs: isSimplified ?
+                        ['机器学习', '深度学习', '自然语言', '计算机视觉', '强化学习', '知识图谱', '算法优化', '数据处理'] :
+                        ['機器學習', '深度學習', '自然語言', '計算機視覺', '強化學習', '知識圖譜', '算法優化', '數據處理']
+                },
+                default: {
+                    branches: isSimplified ?
+                        ['基础概念', '核心要素', '主要特点', '应用场景', '发展方向', '相关技术', '重要影响', '实施方法'] :
+                        ['基礎概念', '核心要素', '主要特點', '應用場景', '發展方向', '相關技術', '重要影響', '實施方法'],
+                    subs: isSimplified ?
+                        ['定义说明', '原理分析', '技术方案', '实际案例', '优势特点', '局限性', '改进方向', '未来展望'] :
+                        ['定義說明', '原理分析', '技術方案', '實際案例', '優勢特點', '局限性', '改進方向', '未來展望']
+                }
+            };
+
+            const template = templates[topic] || templates.default;
+
+            // 嚴格控制：恰好取所需的分支數量
+            const selectedBranches = [];
+            for (let i = 0; i < branches; i++) {
+                const branchName = template.branches[i % template.branches.length];
+                selectedBranches.push(branchName);
+            }
+
+            function createControlledStructure(name, currentDepth, maxDepth, parentIndex = 0) {
+                const node = { name };
+
+                // 嚴格深度控制
+                if (currentDepth >= maxDepth) {
+                    // 達到最大深度，不再添加子節點
+                    return node;
+                }
+
+                // 根據層級控制子節點數量
+                let maxChildren;
+                if (currentDepth === 0) {
+                    maxChildren = branches; // 根節點的子節點數 = 分支數
+                } else if (currentDepth === 1) {
+                    maxChildren = Math.min(3, Math.max(2, Math.floor((maxDepth - currentDepth) * 1.5))); // 主分支下2-3個
+                } else {
+                    maxChildren = Math.min(2, Math.max(1, maxDepth - currentDepth)); // 更深層級1-2個
+                }
+
+                const children = [];
+                for (let i = 0; i < maxChildren && currentDepth < maxDepth - 1; i++) {
+                    let childName;
+
+                    if (contentStyle === 'detailed' && currentDepth >= 2) {
+                        // 完整句子模式
+                        const sentenceTemplates = [
+                            `關於${name}的具體實施和操作方法`,
+                            `${name}的核心技術要點和關鍵特征`,
+                            `${name}的發展趨勢和未來方向分析`,
+                            `${name}的最佳實踐經驗和案例研究`
+                        ];
+                        childName = sentenceTemplates[i % sentenceTemplates.length];
+                    } else {
+                        // 簡潔模式
+                        if (currentDepth === 0) {
+                            childName = selectedBranches[i];
+                        } else {
+                            const subName = template.subs[(parentIndex * 3 + i) % template.subs.length];
+                            childName = subName;
+                        }
+                    }
+
+                    const childNode = createControlledStructure(childName, currentDepth + 1, maxDepth, parentIndex * 10 + i);
+                    children.push(childNode);
+                }
+
+                if (children.length > 0) {
+                    node.children = children;
+                }
+
+                return node;
+            }
+
+            const result = createControlledStructure(topic, 0, depth);
+
+            const nodeCount = countNodes(result);
+            addLog(`備用生成完成 - 分支: ${result.children?.length || 0}, 節點總數: ${nodeCount}`, 'success');
+
+            return result;
+        }
+
+        function renderMindmap(data) {
+            const container = document.getElementById('mindmap-canvas');
+            if (!container) { console.error("Mindmap container not found"); return; }
+            const width = container.offsetWidth || 800;
+            const height = container.offsetHeight || 600;
+            const isMobile = window.innerWidth < 768;
+            const gradients = [
+                { id: "gradient1", start: "#667eea", end: "#764ba2" }, { id: "gradient2", start: "#f093fb", end: "#f5576c" },
+                { id: "gradient3", start: "#4facfe", end: "#00f2fe" }, { id: "gradient4", start: "#43e97b", end: "#38f9d7" },
+                { id: "gradient5", start: "#fa709a", end: "#fee140" }, { id: "gradient6", start: "#30cfd0", end: "#330867" },
+                { id: "gradient7", start: "#a8edea", end: "#fed6e3" }, { id: "gradient8", start: "#ff9a9e", end: "#fecfef" },
+                { id: "gradient9", start: "#fbc2eb", end: "#a6c1ee" }, { id: "gradient10", start: "#fdcbf1", end: "#e6dee9" }
+            ];
+
+            addLog(`渲染 - 尺寸: ${width}x${height}, 佈局: ${currentLayout}`, 'info');
+            d3.select("#mindmap").selectAll("*").remove();
+            const svg = d3.select("#mindmap").attr("width", width).attr("height", height);
+            const defs = svg.append("defs");
+            gradients.forEach(grad => {
+                const gradient = defs.append("linearGradient").attr("id", grad.id).attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "100%");
+                gradient.append("stop").attr("offset", "0%").attr("stop-color", grad.start);
+                gradient.append("stop").attr("offset", "100%").attr("stop-color", grad.end);
+            });
+            const filter = defs.append("filter").attr("id", "shadow").attr("x", "-50%").attr("y", "-50%").attr("width", "200%").attr("height", "200%");
+            filter.append("feGaussianBlur").attr("in", "SourceAlpha").attr("stdDeviation", isMobile ? 2 : 3);
+            filter.append("feOffset").attr("dx", 0).attr("dy", isMobile ? 1 : 2).attr("result", "offsetblur");
+            filter.append("feFlood").attr("flood-color", "#000000").attr("flood-opacity", "0.1");
+            filter.append("feComposite").attr("in2", "offsetblur").attr("operator", "in");
+            const feMerge = filter.append("feMerge"); feMerge.append("feMergeNode"); feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+            const g = svg.append("g");
+            const zoom = d3.zoom().scaleExtent([0.05, 8]).on("zoom", (event) => g.attr("transform", event.transform));
+            svg.call(zoom).on("dblclick.zoom", null);
+
+            if (currentLayout === 'cloud') {
+                layoutCloud(data, svg, g, width, height, isMobile); // Pass g to layoutCloud
+                showLoading(false);
+                return;
+            }
+
+            const hierarchyData = d3.hierarchy(data);
+            const nodes = hierarchyData.descendants();
+            const links = hierarchyData.links();
+
+            const tempSvgForTextMeasure = d3.create("svg").attr("style", "position:absolute; visibility:hidden;pointer-events:none;");
+            document.body.appendChild(tempSvgForTextMeasure.node());
+
+            nodes.forEach(node => {
+                const depth = node.depth; const textContent = node.data.name || "";
+                let currentFontSize;
+                if (depth === 0) currentFontSize = isMobile ? 16 : 19; else if (depth === 1) currentFontSize = isMobile ? 13 : 15;
+                else if (depth === 2) currentFontSize = isMobile ? 11 : 13; else currentFontSize = isMobile ? 10 : 12;
+                node.fontSize = currentFontSize; node.padding = { x: isMobile ? 10 : 18, y: isMobile ? 6 : 10 };
+
+                const textElement = tempSvgForTextMeasure.append("text").attr("font-family", "'Noto Sans TC', sans-serif")
+                    .attr("font-size", node.fontSize + "px").attr("font-weight", depth === 0 ? "700" : (depth === 1 ? "600" : "500")).text(textContent);
+                node.idealTextWidth = textElement.node().getComputedTextLength(); textElement.remove();
+            });
+
+            const maxWidthPerDepth = {};
+            if (currentLayout === 'tree' || currentLayout === 'orgChart') {
+                nodes.forEach(node => {
+                    const depth = node.depth; if (!maxWidthPerDepth[depth]) maxWidthPerDepth[depth] = 0;
+                    maxWidthPerDepth[depth] = Math.max(maxWidthPerDepth[depth], node.idealTextWidth);
+                });
+            }
+
+            nodes.forEach(node => {
+                const depth = node.depth;
+                if ((currentLayout === 'tree' || currentLayout === 'orgChart') && maxWidthPerDepth[depth] !== undefined) node.width = maxWidthPerDepth[depth] + node.padding.x * 2;
+                else node.width = node.idealTextWidth + node.padding.x * 2;
+                let minWidth = isMobile ? 50 : 70; if (depth === 0) minWidth = isMobile ? 90 : 130; else if (depth === 1) minWidth = isMobile ? 70 : 100;
+                node.width = Math.max(node.width, minWidth);
+
+                const textContent = node.data.name || ""; const availableTextWidth = node.width - node.padding.x * 2;
+                node.actualLinesArray = [];
+                if (availableTextWidth <= 5 && textContent.length > 0) node.actualLinesArray.push(textContent.substring(0, isMobile ? 5 : 8) + (textContent.length > (isMobile ? 5 : 8) ? "..." : ""));
+                else if (availableTextWidth <= 0 && textContent.length > 0) node.actualLinesArray.push(textContent[0] + "...");
+                else if (textContent.length > 0) {
+                    const words = textContent.split('');
+                    let currentLine = "";
+                    const tempText = tempSvgForTextMeasure.append("text")
+                        .attr("font-family", "'Noto Sans TC', sans-serif").attr("font-size", node.fontSize + "px")
+                        .attr("font-weight", depth === 0 ? "700" : (depth === 1 ? "600" : "500"));
+                    for (const char of words) {
+                        tempText.text(currentLine + char);
+                        if (tempText.node().getComputedTextLength() > availableTextWidth && currentLine !== "") {
+                            node.actualLinesArray.push(currentLine); currentLine = char;
+                        } else { currentLine += char; }
+                    }
+                    if (currentLine) node.actualLinesArray.push(currentLine);
+                    tempText.remove();
+                }
+                if (node.actualLinesArray.length === 0 && textContent) node.actualLinesArray.push(textContent); // Ensure even single short lines are added
+
+                node.lines = node.actualLinesArray.length || 1; // Ensure at least 1 line for height calculation
+                const baseLineHeightFactor = 1.35;
+                node.height = node.lines * node.fontSize * baseLineHeightFactor + node.padding.y * 2;
+                let minHeight = isMobile ? 26 : 30; if (depth === 0) minHeight = isMobile ? 40 : 50; else if (depth === 1) minHeight = isMobile ? 32 : 42;
+                node.height = Math.max(node.height, minHeight);
+
+                if (depth === 0) node.rx = Math.min(node.height / 2.2, 20); else if (depth === 1) node.rx = Math.min(node.height / 2.2, 16);
+                else node.rx = Math.min(node.height / 2.2, 8);
+
+                if (depth === 0) { node.gradient = "url(#gradient1)"; node.textColor = "#ffffff"; }
+                else if (depth === 1) {
+                    const rootNodeData = nodes.find(n => n.depth === 0);
+                    const mainBranchIndex = rootNodeData?.children?.indexOf(node) ?? nodes.filter(n => n.depth === 1).indexOf(node);
+                    const gradientIndex = ((mainBranchIndex === -1 ? 0 : mainBranchIndex) % (gradients.length - 1)) + 1;
+                    node.gradient = `url(#gradient${Math.max(1, gradientIndex)})`; node.textColor = "#ffffff";
+                    node.lineGradient = gradients[Math.max(1, gradientIndex) - 1];
+                } else {
+                    let ancestorWithGradient = node.parent;
+                    while (ancestorWithGradient && ancestorWithGradient.depth > 1 && !ancestorWithGradient.lineGradient) { ancestorWithGradient = ancestorWithGradient.parent; }
+                    if (ancestorWithGradient && ancestorWithGradient.lineGradient && ancestorWithGradient.lineGradient.start) {
+                        node.fillColor = d3.color(ancestorWithGradient.lineGradient.start).brighter(2.8).formatHex();
+                        node.textColor = d3.color(ancestorWithGradient.lineGradient.start).darker(1.2).formatHex();
+                        node.strokeColor = d3.color(ancestorWithGradient.lineGradient.start).darker(0.3).formatHex();
+                        node.lineColor = ancestorWithGradient.lineGradient.start;
+                    } else { node.fillColor = "#eef2f7"; node.textColor = "#34495e"; node.strokeColor = "#cad3de"; node.lineColor = "#cad3de"; }
+                }
+            });
+
+            const textToBlackCheckbox = document.getElementById('textToBlackCheckbox');
+            if (textToBlackCheckbox && textToBlackCheckbox.checked) {
+                nodes.forEach(node => {
+                    if (node.textColor !== "#1a1a1a" && !node.originalTextColorBeforeBlackout) node.originalTextColorBeforeBlackout = node.textColor;
+                    node.textColor = "#1a1a1a";
+                });
+            } else {
+                nodes.forEach(node => {
+                    if (node.originalTextColorBeforeBlackout) { node.textColor = node.originalTextColorBeforeBlackout; delete node.originalTextColorBeforeBlackout; }
+                });
+            }
+            if (document.body.contains(tempSvgForTextMeasure.node())) tempSvgForTextMeasure.remove();
+
+
+            let actualLayoutType = currentLayout;
+            if (actualLayoutType === 'auto') {
+                if (totalNodeCount > 60) actualLayoutType = 'radial';
+                else if (totalNodeCount > 30) actualLayoutType = 'orgChart';
+                else actualLayoutType = 'tree';
+                addLog(`自動選擇佈局: ${actualLayoutType}`, 'info');
+            }
+
+            if (actualLayoutType === 'tree') layoutTree(hierarchyData, width, height, isMobile);
+            else if (actualLayoutType === 'radial') layoutRadial(hierarchyData, width, height, isMobile);
+            else if (actualLayoutType === 'orgChart') layoutOrgChart(hierarchyData, width, height, isMobile);
+
+            const linkGroups = g.selectAll(".link-group").data(links).enter().append("g").attr("class", "link-group");
+            linkGroups.append("path").attr("class", "link-path")
+                .attr("d", d => {
+                    let sourceX, sourceY, targetX, targetY;
+
+                    if (actualLayoutType === 'tree') {
+                        sourceX = d.source.x;
+                        sourceY = d.source.y + d.source.height / 2; // 從父節點底部中心出發
+                        targetX = d.target.x;
+                        targetY = d.target.y - d.target.height / 2; // 連接到子節點頂部中心
+
+                        const cornerY = sourceY + (targetY - sourceY) / 2;
+                        return `M ${sourceX} ${sourceY} V ${cornerY} H ${targetX} V ${targetY}`;
+
+                    } else if (actualLayoutType === 'orgChart') {
+                        sourceX = d.source.x + d.source.width / 2; // 從父節點右側中心出發
+                        sourceY = d.source.y;
+                        targetX = d.target.x - d.target.width / 2; // 連接到子節點左側中心
+                        targetY = d.target.y;
+
+                        const cornerX = sourceX + (targetX - sourceX) / 2;
+                        return `M ${sourceX} ${sourceY} H ${cornerX} V ${targetY} H ${targetX}`;
+
+                    } else if (actualLayoutType === 'radial') {
+                        const dx = d.target.x - d.source.x;
+                        const dy = d.target.y - d.source.y;
+                        const dr = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dr < 1) { // 如果節點幾乎重合，畫一條極短的線或不畫
+                            return `M ${d.source.x} ${d.source.y} L ${d.target.x + 0.1} ${d.target.y + 0.1}`;
+                        }
+
+                        const angle = Math.atan2(dy, dx);
+
+                        // 計算精確的矩形邊界交點
+                        function getEdgePoint(node, angleToTarget) {
+                            const w = node.width / 2;
+                            const h = node.height / 2;
+                            const tanAngle = Math.tan(angleToTarget);
+
+                            let xEdge = node.x;
+                            let yEdge = node.y;
+
+                            // 判斷交點在哪條邊
+                            if (Math.abs(h * (1 / tanAngle)) <= w) { // 交點在上下邊
+                                yEdge += (dy > 0 ? h : -h);
+                                xEdge += (dy > 0 ? h / tanAngle : -h / tanAngle);
+                            } else { // 交點在左右邊
+                                xEdge += (dx > 0 ? w : -w);
+                                yEdge += (dx > 0 ? w * tanAngle : -w * tanAngle);
+                            }
+                            // 確保交點不會超出矩形範圍 (Math.tan 可能導致極大/小值)
+                            xEdge = Math.max(node.x - w, Math.min(node.x + w, xEdge));
+                            yEdge = Math.max(node.y - h, Math.min(node.y + h, yEdge));
+                            return { x: xEdge, y: yEdge };
+                        }
+
+                        const sourceEdge = getEdgePoint(d.source, angle);
+                        const targetEdge = getEdgePoint(d.target, angle + Math.PI); // 指向源節點的角度
+
+                        sourceX = sourceEdge.x;
+                        sourceY = sourceEdge.y;
+                        targetX = targetEdge.x;
+                        targetY = targetEdge.y;
+
+                        // 對於根節點到主分支的線，如果太短，強制一個最小長度視覺效果
+                        if (d.source.depth === 0) {
+                            const actualDistance = Math.sqrt(Math.pow(targetX - sourceX, 2) + Math.pow(targetY - sourceY, 2));
+                            const minLineForRoot = isMobile ? 10 : 15;
+                            if (actualDistance < minLineForRoot) {
+                                targetX = sourceX + Math.cos(angle) * minLineForRoot;
+                                targetY = sourceY + Math.sin(angle) * minLineForRoot;
+                            }
+                            return `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
+                        } else {
+                            // 使用貝塞爾曲線連接其他節點，控制點基於節點的理想半徑和角度
+                            const midR = (d.source.r + d.target.r) / 2;
+                            const c1Angle = d.source.angle + (d.target.angle - d.source.angle) * 0.3;
+                            const c2Angle = d.source.angle + (d.target.angle - d.source.angle) * 0.7;
+
+                            const c1X = midR * Math.cos(c1Angle - Math.PI / 2);
+                            const c1Y = midR * Math.sin(c1Angle - Math.PI / 2);
+                            const c2X = midR * Math.cos(c2Angle - Math.PI / 2);
+                            const c2Y = midR * Math.sin(c2Angle - Math.PI / 2);
+
+                            return `M ${sourceX} ${sourceY} C ${c1X} ${c1Y}, ${c2X} ${c2Y}, ${targetX} ${targetY}`;
+                        }
+                    }
+                    // Fallback straight line if no layout type matches (should not happen with auto layout)
+                    return `M ${d.source.x || 0} ${d.source.y || 0} L ${d.target.x || 0} ${d.target.y || 0}`;
+                })
+                .style("stroke-linejoin", "round")
+                .style("stroke-linecap", "round")
+                .style("stroke", d => d.target.lineColor || "#ced4da") // Fallback color
+                .style("stroke-width", d => Math.max(1, (isMobile ? 2.5 : 3.5) - d.source.depth * 0.6)) // Slightly more pronounced depth difference
+                .style("opacity", 0); // Initial opacity for animation
+
+            const nodeGroups = g.selectAll(".node-group").data(nodes).enter().append("g")
+                .attr("class", "node-group").style("opacity", 0);
+
+            nodeGroups.each(function (dNode) {
+                const group = d3.select(this);
+                const shape = group.append("rect").attr("class", "node-shape")
+                    .attr("x", -dNode.width / 2).attr("y", -dNode.height / 2)
+                    .attr("width", dNode.width).attr("height", dNode.height)
+                    .attr("rx", dNode.rx).attr("ry", dNode.rx);
+                if (dNode.gradient) shape.style("fill", dNode.gradient).style("filter", "url(#shadow)");
+                else shape.style("fill", dNode.fillColor).style("stroke", dNode.strokeColor).style("stroke-width", 1.5);
+
+                const textContentGroup = group.append("g").attr("class", "node-text-content");
+                if (dNode.actualLinesArray && dNode.actualLinesArray.length > 0) {
+                    const lineHeightFactor = 1.35;
+                    const singleLineHeight = dNode.fontSize * lineHeightFactor;
+                    const startY = - (dNode.lines - 1) * singleLineHeight / 2;
+                    dNode.actualLinesArray.forEach((line, i) => {
+                        textContentGroup.append("text")
+                            .attr("x", 0).attr("y", startY + i * singleLineHeight)
+                            .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+                            .style("font-size", dNode.fontSize + "px")
+                            .style("font-weight", dNode.depth === 0 ? "700" : (dNode.depth === 1 ? "600" : "500"))
+                            .style("fill", dNode.textColor).text(line);
+                    });
+                }
+                group.append("rect").attr("class", "node-overlay")
+                    .attr("x", -dNode.width / 2).attr("y", -dNode.height / 2).attr("width", dNode.width).attr("height", dNode.height)
+                    .attr("rx", dNode.rx).attr("ry", dNode.rx).style("fill", "transparent");
+            });
+            nodeGroups.select(".node-overlay")
+                .on("click", function (event, dNode) { if (isEditMode) { event.stopPropagation(); d3.selectAll('.node-group').classed('selected', false); hideFloatingEditPanel(); d3.select(this.parentNode).classed('selected', true); selectedNode = dNode; showFloatingEditPanel(dNode); } })
+                .on("dblclick", function (event, dNode) { event.stopPropagation(); editNode(dNode); })
+                .on("contextmenu", function (event, dNode) { if (isEditMode) showContextMenu(event, dNode); })
+                .on("mouseover", function (event, dNode) { if (!isEditMode) { d3.select(this.parentNode).select(".node-shape").style("transform", "scale(1.03)"); linkGroups.selectAll(".link-path").classed("highlighted", l => l.source === dNode || l.target === dNode).style("stroke", l => (l.source === dNode || l.target === dNode) ? (dNode.lineGradient ? dNode.lineGradient.end : (dNode.strokeColor || "#667eea")) : (l.target.lineColor || "#e0e0e0")).style("opacity", l => (l.source === dNode || l.target === dNode) ? 1 : 0.15); } })
+                .on("mouseout", function (event, dNode) { if (!isEditMode) { d3.select(this.parentNode).select(".node-shape").style("transform", "scale(1)"); linkGroups.selectAll(".link-path").classed("highlighted", false).style("stroke", l => l.target.lineColor || "#e0e0e0").style("opacity", 0.65); } });
+
+
+            nodeGroups.attr("transform", d => `translate(${d.x || 0}, ${d.y || 0})`)
+                .transition().duration(500).delay((d, i) => d.depth * 80 + i * 8).style("opacity", 1);
+            linkGroups.selectAll(".link-path").transition().duration(350).delay((d, i) => d.source.depth * 80 + 150).style("opacity", 0.65);
+
+            const finalBounds = g.node()?.getBBox();
+            if (finalBounds && finalBounds.width > 0 && finalBounds.height > 0) {
+                const scalePadding = isMobile ? 0.75 : 0.85;
+                let scale = Math.min(width / finalBounds.width, height / finalBounds.height) * scalePadding;
+                scale = Math.min(scale, 1.5); scale = Math.max(scale, 0.1);
+                const translateX = width / 2 - (finalBounds.x + finalBounds.width / 2) * scale;
+                const translateY = height / 2 - (finalBounds.y + finalBounds.height / 2) * scale;
+                svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(scale));
+            } else {
+                svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(0.8));
+            }
+            addLog('思維導圖渲染完成', 'success');
+            storeOriginalTextColors();
+        }
+
+        // Corrected and properly structured Layout Functions:
+        function layoutTree(hierarchy, width, height, isMobile) {
+            addLog('開始樹形佈局計算 (垂直)', 'info');
+            const nodeVertMargin = isMobile ? 20 : 30;
+            const nodeHorizSeparationFactor = 1.2; // Multiplier for horizontal separation based on node width
+
+            // 輔助函數：計算每個節點及其所有子節點在水平方向上佔據的總寬度
+            function calculateSubtreeWidth(node) {
+                if (!node.children || node.children.length === 0) {
+                    node.subtreeLayoutWidth = node.width; // 葉節點的子樹寬度就是自身寬度
+                    return node.width;
+                }
+                let childrenTotalWidth = 0;
+                node.children.forEach(child => {
+                    childrenTotalWidth += calculateSubtreeWidth(child);
+                });
+                // 總寬度 = 所有子節點的子樹寬度之和 + 它們之間的間距 (基於節點寬度動態調整)
+                let spacing = 0;
+                if (node.children.length > 1) {
+                    for (let i = 0; i < node.children.length - 1; i++) {
+                        spacing += (node.children[i].width / 2 + node.children[i + 1].width / 2) * nodeHorizSeparationFactor;
+                    }
+                }
+                node.subtreeLayoutWidth = Math.max(childrenTotalWidth + spacing, node.width);
+                return node.subtreeLayoutWidth;
+            }
+
+            calculateSubtreeWidth(hierarchy);
+
+            // 輔助函數：遞歸設置每個節點的 x, y 座標
+            function positionNodes(node, currentYOffset, parentXCenter) {
+                node.x = parentXCenter; // 節點的 X 座標與父節點的 X 中心對齊 (在垂直樹中)
+                node.y = currentYOffset + node.height / 2; // 節點的 Y 座標
+
+                if (node.children && node.children.length > 0) {
+                    const nextLevelYOffset = node.y + node.height / 2 + nodeVertMargin;
+                    // 計算子節點組的起始 X 座標
+                    let currentChildX = parentXCenter - node.subtreeLayoutWidth / 2;
+
+                    node.children.forEach(child => {
+                        // 子節點的中心 X 座標 = 當前子節點組的起始 X + 該子節點子樹寬度的一半
+                        const childGroupCenterX = currentChildX + child.subtreeLayoutWidth / 2;
+                        child.x = childGroupCenterX; // 設定子節點 X
+
+                        positionNodes(child, nextLevelYOffset, childGroupCenterX);
+                        currentChildX += child.subtreeLayoutWidth + (child.width / 2 + (node.children.find((c, idx) => idx > node.children.indexOf(child))?.width || 0) / 2) * nodeHorizSeparationFactor;
+                    });
+                }
+            }
+            // 設置根節點的初始 Y 座標 (使其靠近畫布頂部)
+            const initialRootY = -height / 2 + (isMobile ? 20 : 40);
+            positionNodes(hierarchy, initialRootY, 0); // 根節點的 parentXCenter 設為 0
+            addLog('樹形佈局計算完成', 'success');
+        }
+
+        function layoutOrgChart(hierarchy, width, height, isMobile) {
+            addLog('開始組織圖佈局計算', 'info');
+            const nodeVertSpacing = isMobile ? 15 : 20;
+            const levelHorizGap = isMobile ? 30 : 50;
+
+            function calculateSubtreeHeight(node) {
+                if (!node.children || node.children.length === 0) {
+                    node.subtreeTotalHeight = node.height;
+                    return node.height;
+                }
+                let childrenTotalHeight = 0;
+                node.children.forEach(child => {
+                    childrenTotalHeight += calculateSubtreeHeight(child);
+                });
+                node.subtreeTotalHeight = childrenTotalHeight + (node.children.length - 1) * nodeVertSpacing;
+                node.subtreeTotalHeight = Math.max(node.subtreeTotalHeight, node.height);
+                return node.subtreeTotalHeight;
+            }
+            calculateSubtreeHeight(hierarchy);
+
+            function positionNodes(node, currentXOffset, parentYCenter) {
+                node.x = currentXOffset + node.width / 2;
+                if (!node.parent) {
+                    node.y = 0;
+                }
+                if (node.children && node.children.length > 0) {
+                    const nextLevelXOffset = node.x + node.width / 2 + levelHorizGap;
+                    let currentChildY = parentYCenter - node.subtreeTotalHeight / 2;
+                    node.children.forEach(child => {
+                        const childGroupCenterY = currentChildY + child.subtreeTotalHeight / 2;
+                        child.y = childGroupCenterY;
+                        positionNodes(child, nextLevelXOffset, childGroupCenterY);
+                        currentChildY += child.subtreeTotalHeight + nodeVertSpacing;
+                    });
+                }
+            }
+            const initialRootX = -width / 2 + (isMobile ? 10 : 30) + hierarchy.width / 2; // Adjust for root width
+            positionNodes(hierarchy, initialRootX - hierarchy.width / 2, 0); // Pass root's left edge
+            addLog('組織圖佈局計算完成', 'success');
+        }
+
+        function layoutRadial(hierarchy, width, height, isMobile) {
+            addLog('開始放射佈局計算 V4', 'info');
+            const rootNode = hierarchy;
+            const mainBranches = hierarchy.children || [];
+
+            // 修正：根節點也需要一個有效的 halfMetric 用於計算與第一環的間隙
+            const rootHalfMetric = Math.max(rootNode.width, rootNode.height) / 2 + (isMobile ? 5 : 10); // 根節點的有效半徑 + 小間隙
+
+            let maxMainBranchHalfMetric = 0;
+            if (mainBranches.length > 0) {
+                maxMainBranchHalfMetric = d3.max(mainBranches, d => Math.max(d.width, d.height) / 2) || (isMobile ? 35 : 45);
+            }
+
+            const desiredGapBase = isMobile ? 25 : 35; // 主分支與根節點，以及層級間的基礎間隙
+
+            // 關鍵修正：確保 firstRingMinRadius 遠大於根節點的 "佔地"
+            let firstRingMinRadius = rootHalfMetric + maxMainBranchHalfMetric + desiredGapBase;
+
+            if (mainBranches.length > 0) {
+                const minSpacingBetweenBranchesOnRing = isMobile ? 30 : 40; // 增加第一環節點間的圓周間距
+                const avgMainBranchWidth = d3.mean(mainBranches, d => d.width) || (isMobile ? 80 : 100);
+                const requiredCircumference = mainBranches.length * (avgMainBranchWidth + minSpacingBetweenBranchesOnRing);
+                const radiusFromCircumference = requiredCircumference / (2 * Math.PI);
+                firstRingMinRadius = Math.max(firstRingMinRadius, radiusFromCircumference * 1.25); // 增加餘量
+            }
+            // 如果只有一個主分支，確保它不會太近
+            if (mainBranches.length === 1 && mainBranches[0]) {
+                firstRingMinRadius = Math.max(firstRingMinRadius, rootHalfMetric + (Math.max(mainBranches[0].width, mainBranches[0].height) / 2) + desiredGapBase * 1.5);
+            }
+            // 確保 firstRingMinRadius 有一個絕對最小值，防止其因計算變得過小
+            firstRingMinRadius = Math.max(firstRingMinRadius, (isMobile ? 70 : 100));
+
+
+            const radiusIncrementFactor = isMobile ? 1.3 : 1.4;
+            let avgNodeMetricAtDepth = [rootHalfMetric * 2]; // depth 0 的平均尺寸是根節點尺寸
+
+            for (let i = 1; i <= hierarchy.height; i++) {
+                let nodesAtDepth = hierarchy.descendants().filter(n => n.depth === i);
+                avgNodeMetricAtDepth[i] = d3.mean(nodesAtDepth, n => (n.width + n.height) / 2) || (isMobile ? 40 : 55);
+            }
+
+            const treeLayout = d3.tree()
+                .size([2 * Math.PI, 1]) // angle range, relative radius (0-1)
+                .separation((a, b) => {
+                    const estimateRadius = (depthNode) => { // 傳入節點以獲取其預估半徑
+                        if (depthNode.depth === 0) return 0; // 根節點半徑為0
+                        if (depthNode.depth === 1) return firstRingMinRadius;
+                        let r = firstRingMinRadius;
+                        for (let i = 2; i <= depthNode.depth; i++) {
+                            const parentMetric = avgNodeMetricAtDepth[i - 2] || (isMobile ? 40 : 55); // 前前一層的平均尺寸作為父節點尺寸參考
+                            const currentRingMetric = avgNodeMetricAtDepth[i - 1] || (isMobile ? 40 : 55); // 前一層的平均尺寸
+                            r += (parentMetric / 2 + currentRingMetric / 2 + desiredGapBase) * radiusIncrementFactor;
+                        }
+                        return r;
+                    };
+
+                    const rA = Math.max(1, estimateRadius(a));
+                    const rB = Math.max(1, estimateRadius(b));
+
+                    const effectiveSizeA = Math.max(a.width, a.height) / 2 * 1.2; // 使用節點最大尺寸的一半再加點餘量
+                    const effectiveSizeB = Math.max(b.width, b.height) / 2 * 1.2;
+
+                    const angleForA = effectiveSizeA / rA;
+                    const angleForB = effectiveSizeB / rB;
+                    const minAngleGap = (isMobile ? 0.12 : 0.08); // 增加最小角度間隙
+
+                    let separationValue = (angleForA + angleForB) / 2 + minAngleGap;
+                    return (a.parent === b.parent ? 1.3 : 1.6) * separationValue; // 再增加分離
+                });
+
+            treeLayout(hierarchy);
+
+            hierarchy.each(node => {
+                const angle = node.x;
+                let r;
+                if (node.depth === 0) {
+                    r = 0;
+                } else if (node.depth === 1) {
+                    r = firstRingMinRadius;
+                } else {
+                    let currentR = firstRingMinRadius;
+                    for (let d = 2; d <= node.depth; d++) {
+                        const parentOfPrevRing = node.ancestors().find(a => a.depth === d - 2); // 父節點的父節點
+                        const nodesInPrevRing = node.ancestors().find(a => a.depth === d - 1)?.parent?.children || []; // 前一個環上的兄弟節點
+
+                        const prevRingParentHalfHeight = (parentOfPrevRing ? parentOfPrevRing.height / 2 : avgNodeMetricAtDepth[d - 2] / 2);
+                        const currentRingMaxHalfHeight = (d3.max(nodesInPrevRing, n => n.height) || avgNodeMetricAtDepth[d - 1]) / 2;
+
+                        currentR += prevRingParentHalfHeight + currentRingMaxHalfHeight + desiredGapBase;
+                    }
+                    r = currentR;
+                }
+                node.r = r;
+                node.angle = angle;
+                node.targetX = r * Math.cos(angle - Math.PI / 2);
+                node.targetY = r * Math.sin(angle - Math.PI / 2);
+                node.x = node.targetX;
+                node.y = node.targetY;
+            });
+
+            // --- 重疊解決 V4 ---
+            const nodesForOverlapCheck = hierarchy.descendants();
+            const overlapIterations = 120;
+            const pushStrengthBase = 0.75;
+            const minVisualGap = isMobile ? 12 : 18; // 再次增加視覺縫隙
+
+            for (let iter = 0; iter < overlapIterations; iter++) {
+                let overlapsFoundThisIteration = 0;
+                for (let i = 0; i < nodesForOverlapCheck.length; i++) {
+                    for (let j = i + 1; j < nodesForOverlapCheck.length; j++) {
+                        const n1 = nodesForOverlapCheck[i];
+                        const n2 = nodesForOverlapCheck[j];
+
+                        if (n1.parent === n2 || n2.parent === n1) continue;
+                        if (n1.depth === 0 || n2.depth === 0) continue; // 根節點不參與被推
+
+                        const dx = n2.x - n1.x;
+                        const dy = n2.y - n1.y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 0.01) distance = 0.01;
+
+                        const requiredDistX = (n1.width + n2.width) / 2 + minVisualGap;
+                        const requiredDistY = (n1.height + n2.height) / 2 + minVisualGap;
+
+                        const overlapX = requiredDistX - Math.abs(dx);
+                        const overlapY = requiredDistY - Math.abs(dy);
+
+                        if (overlapX > 0 && overlapY > 0) {
+                            overlapsFoundThisIteration++;
+                            const overlapAmount = Math.sqrt(overlapX * overlapX + overlapY * overlapY) * 1.1; // 稍微增加重疊量的影響
+                            const pushFactor = (overlapAmount / distance) * pushStrengthBase;
+                            let pushXVal = dx * pushFactor;
+                            let pushYVal = dy * pushFactor;
+
+                            // 質量效應，但主分支 (depth 1) 應該比更深層的節點更難被推動
+                            const getMass = (node) => {
+                                if (node.depth === 0) return Infinity;
+                                if (node.depth === 1) return 5; // 主分支質量較大
+                                return 1 / Math.pow(node.depth, 0.6); // 深度越深，質量越小
+                            };
+                            const mass1 = getMass(n1);
+                            const mass2 = getMass(n2);
+                            const totalMass = mass1 + mass2;
+
+                            if (totalMass > 0 && mass1 !== Infinity) {
+                                n1.x -= pushXVal * (mass2 / totalMass);
+                                n1.y -= pushYVal * (mass2 / totalMass);
+                            }
+                            if (totalMass > 0 && mass2 !== Infinity) {
+                                n2.x += pushXVal * (mass1 / totalMass);
+                                n2.y += pushYVal * (mass1 / totalMass);
+                            }
+                        }
+                    }
+                }
+                // 拉回理想半徑和角度扇區
+                const pullToIdealStrength = 0.1; // 增加拉回強度
+                nodesForOverlapCheck.forEach(node => {
+                    if (node.depth > 0) { // 根節點位置固定
+                        // 拉回理想半徑
+                        const currentDistToCenter = Math.sqrt(node.x * node.x + node.y * node.y);
+                        if (currentDistToCenter > 0.01 && Math.abs(currentDistToCenter - node.r) > 2) {
+                            const ratio = node.r / currentDistToCenter;
+                            node.x = node.x * ratio * (1 - pullToIdealStrength) + node.targetX * pullToIdealStrength; // 加權平均拉向 targetX/Y
+                            node.y = node.y * ratio * (1 - pullToIdealStrength) + node.targetY * pullToIdealStrength;
+                        }
+
+                        // 限制在原始角度扇區附近 (可選，如果角度偏離過大)
+                        // let currentAngle = Math.atan2(node.y, node.x);
+                        // let angleDiff = node.angle - currentAngle;
+                        // // Normalize angleDiff to be between -PI and PI
+                        // while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                        // while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+                        // if (Math.abs(angleDiff) > 0.2) { // Max deviation of ~11 degrees
+                        //     const targetAngle = node.angle - Math.sign(angleDiff) * 0.2;
+                        //     const r = Math.sqrt(node.x*node.x + node.y*node.y);
+                        //     node.x = r * Math.cos(targetAngle);
+                        //     node.y = r * Math.sin(targetAngle);
+                        // }
+                    }
+                });
+
+                if (overlapsFoundThisIteration < 5 && iter > 20) { // 如果重疊數量很少且已迭代多次，提前結束
+                    addLog(`放射佈局V4 重疊解決在 ${iter + 1} 次迭代後趨於穩定`, 'info');
+                    break;
+                }
+                if (iter === overlapIterations - 1) {
+                    addLog(`放射佈局V4 重疊解決達到最大迭代次數 ${overlapIterations}`, 'warn');
+                }
+            }
+            addLog('放射佈局V4 計算完成', 'success');
+        }
+
+        function layoutCloud(data, svg, g, width, height, isMobile) { // Pass g here
+            svg.attr("class", "wordcloud-svg");
+            const words = [];
+            function extractWords(node, depth) {
+                if (node.name) {
+                    let size = isMobile ? 20 : 35;
+                    if (depth === 0) size *= 1.7; else if (depth === 1) size *= 1.3; else if (depth === 2) size *= 1.1;
+                    size = Math.max(isMobile ? 8 : 12, size - depth * (isMobile ? 2 : 3));
+                    words.push({ text: node.name, size: size, id: node.id, depth: depth, originalNode: node });
+                }
+                if (node.children) node.children.forEach(child => extractWords(child, depth + 1));
+            }
+            extractWords(data, 0);
+            const cloudColorScale = d3.scaleOrdinal(d3.schemeTableau10);
+
+            d3.layout.cloud().size([width * (isMobile ? 0.98 : 0.92), height * (isMobile ? 0.98 : 0.92)])
+                .words(words).padding(isMobile ? 2 : 4).rotate(() => Math.random() > 0.8 ? 0 : (Math.random() > 0.6 ? (Math.random() > 0.5 ? 90 : -90) : 0))
+                .font("'Noto Sans TC', sans-serif").fontSize(d => d.size).on("end", drawCloud).start();
+
+            function drawCloud(calculatedWords) {
+                g.selectAll("*").remove(); // Clear previous content in g
+                const textToBlackCheckbox = document.getElementById('textToBlackCheckbox');
+                const allTextBlack = textToBlackCheckbox && textToBlackCheckbox.checked;
+
+                g.selectAll("text").data(calculatedWords).enter().append("text")
+                    .attr("class", "wordcloud-text")
+                    .style("font-size", d => d.size + "px").style("font-family", "'Noto Sans TC', sans-serif")
+                    .style("font-weight", d => d.depth === 0 ? "900" : (d.depth === 1 ? "700" : "500"))
+                    .style("fill", d => allTextBlack ? "#1a1a1a" : cloudColorScale(d.text.length % 10 + d.depth)) // More color variation
+                    .attr("text-anchor", "middle")
+                    .attr("transform", d => `translate(${d.x}, ${d.y})rotate(${d.rotate})`)
+                    .text(d => d.text).style("opacity", 0).transition().duration(500).delay((d, i) => i * 10).style("opacity", 1);
+
+                // Set transform on the g element itself, not the SVG, for cloud centering.
+                // D3 Cloud positions words relative to 0,0.
+                g.attr("transform", `translate(${width / 2}, ${height / 2})`);
+                svg.call(d3.zoom().transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(1));
+                storeOriginalTextColors();
+            }
+        }
+
+        function showLoading(show) {
+            const loadingDiv = document.getElementById('loading');
+            if (loadingDiv) { // 確保元素存在
+                loadingDiv.classList.toggle('active', show);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        function backToSetup() { document.getElementById('resultPage').style.display = 'none'; document.getElementById('setupPage').style.display = 'flex'; currentLayout = 'auto'; setLayout('auto'); addLog('返回設定頁面', 'info'); }
+
+        // 高分辨率導出功能
+        function createHighResolutionSVG(scale = 2) {
+            const originalSvg = document.getElementById('mindmap');
+            if (!originalSvg) {
+                console.error("Original SVG not found for export.");
+                return null;
+            }
+            const originalG = originalSvg.querySelector('g');
+            if (!originalG) {
+                console.error("Original G element not found in SVG for export.");
+                // For cloud layout, SVG itself might be the target if g is empty or cloud draws directly to SVG
+                if (currentLayout === 'cloud') {
+                    const clonedCloudSvg = originalSvg.cloneNode(true);
+                    clonedCloudSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                    const w = parseFloat(originalSvg.getAttribute('width')) || 300;
+                    const h = parseFloat(originalSvg.getAttribute('height')) || 200;
+                    clonedCloudSvg.setAttribute('width', w * scale);
+                    clonedCloudSvg.setAttribute('height', h * scale);
+                    // For cloud, usually content is centered around (width/2, height/2) of the original SVG
+                    // The <g> element for cloud is transformed to this center.
+                    // We want the viewBox to be around the cloud content.
+                    const cloudG = clonedCloudSvg.querySelector('g');
+                    if (cloudG) {
+                        // The d3.cloud positions words relative to 0,0 then the <g> is translated.
+                        // So the bbox of <g> is what we need, but after its transform is applied.
+                        // This is tricky. A simpler approach for cloud:
+                        clonedCloudSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                        cloudG.setAttribute('transform', `translate(${w * scale / 2}, ${h * scale / 2}) scale(${scale})`);
+                    }
+                    return clonedCloudSvg;
+                }
+                return null;
+            }
+
+            const clonedSvgNode = originalSvg.cloneNode(true); // 克隆整個 SVG
+            clonedSvgNode.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            const clonedG = clonedSvgNode.querySelector('g');
+
+            // 獲取原始 <g> 元素的 transform CTM (Current Transformation Matrix)
+            // CTM 包含了所有父級的 transform，以及它自身的 transform
+            const ctm = originalG.getCTM();
+            if (!ctm) {
+                console.error("Could not get CTM of G element.");
+                return null;
+            }
+
+            // 獲取 <g> 內部內容的邊界框 (在其自身坐標系中)
+            let contentBBox;
+            try {
+                contentBBox = originalG.getBBox();
+            } catch (e) {
+                console.error("Error getting BBox of G element:", e);
+                // Fallback if getBBox fails (e.g., if g is empty or has display:none)
+                contentBBox = { x: 0, y: 0, width: 100, height: 100 };
+            }
+
+            if (contentBBox.width === 0 || contentBBox.height === 0) {
+                console.warn("G element BBox has zero width or height. Export might be small/empty.", contentBBox);
+                // Fallback to SVG dimensions if bbox is invalid
+                contentBBox.width = parseFloat(originalSvg.getAttribute('width')) || 300;
+                contentBBox.height = parseFloat(originalSvg.getAttribute('height')) || 200;
+                contentBBox.x = -contentBBox.width / 2; // Assume centered if bbox is zero
+                contentBBox.y = -contentBBox.height / 2;
+            }
+
+
+            // 計算內容在 SVG 視窗中的四個角點座標
+            // (SVGPoint is a DOM interface)
+            const pt = originalSvg.createSVGPoint();
+
+            pt.x = contentBBox.x;
+            pt.y = contentBBox.y;
+            const topLeft = pt.matrixTransform(ctm);
+
+            pt.x = contentBBox.x + contentBBox.width;
+            pt.y = contentBBox.y;
+            const topRight = pt.matrixTransform(ctm);
+
+            pt.x = contentBBox.x + contentBBox.width;
+            pt.y = contentBBox.y + contentBBox.height;
+            const bottomRight = pt.matrixTransform(ctm);
+
+            pt.x = contentBBox.x;
+            pt.y = contentBBox.y + contentBBox.height;
+            const bottomLeft = pt.matrixTransform(ctm);
+
+            // 找到變換後內容的實際邊界
+            const minX = Math.min(topLeft.x, topRight.x, bottomRight.x, bottomLeft.x);
+            const minY = Math.min(topLeft.y, topRight.y, bottomRight.y, bottomLeft.y);
+            const maxX = Math.max(topLeft.x, topRight.x, bottomRight.x, bottomLeft.x);
+            const maxY = Math.max(topLeft.y, topRight.y, bottomRight.y, bottomLeft.y);
+
+            const transformedContentWidth = maxX - minX;
+            const transformedContentHeight = maxY - minY;
+
+            const padding = 30; // Padding in unscaled units
+
+            // 導出 SVG 的 viewBox 應該是變換後的內容邊界加上 padding
+            const viewBoxX = minX - padding;
+            const viewBoxY = minY - padding;
+            const viewBoxWidth = transformedContentWidth + padding * 2;
+            const viewBoxHeight = transformedContentHeight + padding * 2;
+
+            // 導出 SVG 的 width 和 height 應該是 viewBox 的尺寸乘以期望的 scale
+            clonedSvgNode.setAttribute('width', viewBoxWidth * scale);
+            clonedSvgNode.setAttribute('height', viewBoxHeight * scale);
+            clonedSvgNode.setAttribute('viewBox', `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`);
+
+            // clonedG 的 transform 應該被保留，因為 viewBox 已經根據它的 CTM 和 BBox 計算好了
+            // 不需要再對 clonedG 進行額外的 scale 或 translate，除非是為了抵消 viewBox 的影響，
+            // 但我們的目標是讓 viewBox 包含所有已變換的內容。
+
+            // --- 內聯樣式 ---
+            let cssText = "";
+            for (const sheet of document.styleSheets) {
+                try {
+                    if (sheet.cssRules) {
+                        for (const rule of sheet.cssRules) { cssText += rule.cssText + "\n"; }
+                    }
+                } catch (e) { console.warn("Cannot access stylesheet: " + sheet.href, e); }
+            }
+            cssText += `
+                .node-group text, .node-text-content text, .wordcloud-text { font-family: 'Noto Sans TC', sans-serif !important; }
+                .link-path { fill: none; stroke-linecap: round; }
+                /* .node-shape { filter: none !important; } */ /* 嘗試移除濾鏡看看是否有幫助 */
+            `;
+            const styleElement = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            styleElement.textContent = cssText;
+            // 確保 <style> 是 <svg> 的第一個子元素，或者至少在 <g> 之前
+            if (clonedSvgNode.firstChild) {
+                clonedSvgNode.insertBefore(styleElement, clonedSvgNode.firstChild);
+            } else {
+                clonedSvgNode.appendChild(styleElement);
+            }
+
+            return clonedSvgNode;
+        }
+
+        function exportSVG() {
+            addLog('開始導出 SVG', 'info');
+            const svgElement = createHighResolutionSVG(1); // Scale 1 for SVG as it's vector
+            if (!svgElement) {
+                showError("無法生成SVG：圖表內容為空。");
+                addLog('SVG 導出失敗: 圖表內容為空', 'error');
+                return;
+            }
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `思維導圖_${document.getElementById('resultTitle').textContent || 'export'}.svg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            addLog('SVG 導出完成', 'success');
+        }
+
+        function exportPNG() {
+            addLog('開始導出 PNG', 'info');
+            showLoading(true);
+
+            setTimeout(() => {
+                const exportScale = 2;
+                const svgElement = createHighResolutionSVG(exportScale);
+                if (!svgElement) {
+                    showError("無法生成PNG：圖表內容為空。");
+                    addLog('PNG 導出失敗: createHighResolutionSVG 返回 null', 'error');
+                    showLoading(false);
+                    return;
+                }
+
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+
+                const canvas = document.createElement('canvas');
+                // 直接使用 svgElement 計算出的 width 和 height
+                canvas.width = parseFloat(svgElement.getAttribute('width'));
+                canvas.height = parseFloat(svgElement.getAttribute('height'));
+
+                if (isNaN(canvas.width) || isNaN(canvas.height) || canvas.width <= 0 || canvas.height <= 0) {
+                    showError("無法導出PNG：計算出的圖像尺寸無效。");
+                    addLog(`PNG 導出失敗: 無效尺寸 ${canvas.width}x${canvas.height}`, 'error');
+                    showLoading(false);
+                    return;
+                }
+
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const img = new Image();
+                img.onload = function () {
+                    try {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob(function (blob) {
+                            if (blob) {
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.download = `思維導圖_${document.getElementById('resultTitle').textContent || 'export'}.png`;
+                                link.href = url;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                URL.revokeObjectURL(url);
+                                addLog('PNG 導出完成', 'success');
+                            } else {
+                                showError("無法導出PNG：生成 blob 失敗。");
+                                addLog('PNG 導出失敗: toBlob 返回 null', 'error');
+                            }
+                        }, 'image/png', 0.95); // 提高質量參數
+                    } catch (e) {
+                        showError("無法導出PNG：繪製圖像到 canvas 時出錯。");
+                        addLog(`PNG 導出錯誤 (drawImage/toBlob): ${e.message}`, 'error');
+                    } finally {
+                        showLoading(false);
+                    }
+                };
+                img.onerror = function (e) {
+                    showError("無法加載SVG到圖片進行PNG導出。SVG可能無效或包含錯誤。");
+                    addLog('PNG 導出錯誤: SVG加載失敗 (img.onerror)', 'error');
+                    console.error("Image load error for SVG data:", e);
+                    showLoading(false);
+                };
+
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+                img.src = url; // 賦值給 src 後，清除 blob URL
+                // URL.revokeObjectURL(url); // 不要立即 revoke，等 img.onload/onerror 執行完畢
+
+            }, 500);
+        }
+        // 對 exportPDF 做類似的調整
+
+        // 導出 Markdown 文件
+        function exportMarkdown() {
+            addLog('開始導出 Markdown', 'info');
+            if (!currentData) {
+                showError("沒有可導出的數據。");
+                addLog('Markdown 導出失敗: 無數據', 'error');
+                return;
+            }
+
+            function nodeToMarkdown(node, depth = 0) {
+                let result = '';
+                const indent = '  '.repeat(Math.max(0, depth - 1));
+                const prefix = depth === 0 ? `# ` : (depth === 1 ? `## ` : `${indent}- `);
+                result = `${prefix}${node.name}\n`;
+
+                if (node.children && node.children.length > 0) {
+                    if (depth <= 1) result += "\n"; // Add extra newline after H1/H2
+                    node.children.forEach(child => {
+                        result += nodeToMarkdown(child, depth + 1);
+                    });
+                }
+                return result;
+            }
+
+            const timestamp = new Date().toLocaleString();
+            const header = `<!-- 思維導圖 - ${document.getElementById('resultTitle').textContent || 'Untitled'} -->\n<!-- 生成時間: ${timestamp} -->\n<!-- 總節點數: ${totalNodeCount} -->\n\n`;
+
+            const markdownContent = header + nodeToMarkdown(currentData);
+
+            const BOM = '\ufeff';
+            const blob = new Blob([BOM + markdownContent], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `思維導圖_${document.getElementById('resultTitle').textContent || 'export'}.md`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            addLog('Markdown 導出完成', 'success');
+            showMessage(currentLang === 'zh-TW' ? 'Markdown 文件已導出' : 'Markdown 文件已导出', 'success');
+        }
+
+        // 導出 TXT 文件
+        function exportTXT() {
+            addLog('開始導出 TXT', 'info');
+            if (!currentData) {
+                showError("沒有可導出的數據。");
+                addLog('TXT 導出失敗: 無數據', 'error');
+                return;
+            }
+
+            function nodeToText(node, depth = 0, prefix = "") {
+                let result = `${prefix}${node.name}\n`;
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach((child, index) => {
+                        const isLast = index === node.children.length - 1;
+                        const newPrefix = prefix + (isLast ? "    " : "│   ");
+                        const childPrefix = prefix + (isLast ? "└── " : "├── ");
+                        result += nodeToText(child, depth + 1, childPrefix);
+                    });
+                }
+                return result;
+            }
+
+            const timestamp = new Date().toLocaleString();
+            const title = document.getElementById('resultTitle').textContent || 'Untitled';
+            const header = `思維導圖: ${title}\n生成時間: ${timestamp}\n總節點數: ${totalNodeCount}\n內容風格: ${contentStyle === 'concise' ? (currentLang === 'zh-TW' ? '精簡詞語' : '精简词语') : (currentLang === 'zh-TW' ? '完整句子' : '完整句子')}\n\n${'─'.repeat(50)}\n\n`;
+
+            const textContent = header + nodeToText(currentData, 0, "");
+
+            const BOM = '\ufeff';
+            const blob = new Blob([BOM + textContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `思維導圖_${title}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            addLog('TXT 導出完成', 'success');
+            showMessage(currentLang === 'zh-TW' ? 'TXT 文件已導出' : 'TXT 文件已导出', 'success');
+        }
+
+        function exportPDF() {
+            addLog('開始導出 PDF', 'info');
+            const exportScale = 1.5; // Slightly lower scale for PDF to manage size, but still good quality
+            const svgElement = createHighResolutionSVG(exportScale);
+            if (!svgElement) {
+                showError("無法生成PDF：圖表內容為空。");
+                addLog('PDF 導出失敗: 圖表內容為空', 'error');
+                return;
+            }
+
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+
+            const canvas = document.createElement('canvas');
+            const svgWidth = parseFloat(svgElement.getAttribute('width'));
+            const svgHeight = parseFloat(svgElement.getAttribute('height'));
+
+            canvas.width = svgWidth;
+            canvas.height = svgHeight;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF'; // Ensure white background
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const img = new Image();
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const imgData = canvas.toDataURL('image/jpeg', 0.9); // Use JPEG for smaller PDF
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: canvas.width > canvas.height ? 'l' : 'p',
+                    unit: 'pt', // Use points for easier scaling with canvas
+                    format: [canvas.width, canvas.height] // Custom format based on image size
+                });
+
+                pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+                pdf.save(`思維導圖_${document.getElementById('resultTitle').textContent || 'export'}.pdf`);
+                addLog('PDF 導出完成', 'success');
+            };
+            img.onerror = function () {
+                showError("無法加載SVG到圖片進行PDF導出。");
+                addLog('PDF 導出錯誤: SVG加載失敗', 'error');
+            };
+
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            img.src = URL.createObjectURL(svgBlob);
+        }
+
+    </script>
+</body>
+
+</html>

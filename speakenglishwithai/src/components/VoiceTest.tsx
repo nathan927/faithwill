@@ -1,0 +1,565 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Mic, MicOff, ArrowLeft, Volume2, Play, Pause, RotateCcw, CheckCircle, AlertCircle, Headphones } from 'lucide-react';
+import { getRandomQuestionSet, Question } from '@/data/questionBank';
+import { logger } from '@/services/logService';
+
+interface VoiceTestProps {
+  grade: string;
+  speechRate: number;
+  voiceId: string;
+  showQuestions: boolean;
+  onComplete: (results: any) => void;
+  onBack: () => void;
+  onShowQuestionsChange: (checked: boolean) => void;
+}
+
+const VoiceTest: React.FC<VoiceTestProps> = ({ 
+  grade, 
+  speechRate, 
+  voiceId,
+  showQuestions, 
+  onComplete, 
+  onBack, 
+  onShowQuestionsChange 
+}) => {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [responses, setResponses] = useState<{ [key: number]: Blob }>({});
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [speechInitialized, setSpeechInitialized] = useState(false);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
+  const [playingRecordingId, setPlayingRecordingId] = useState<number | null>(null);
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Load questions on component mount
+  useEffect(() => {
+    const loadQuestions = () => {
+      try {
+        setIsLoadingQuestions(true);
+        const questionSet = getRandomQuestionSet(grade);
+        if (questionSet.length === 0) {
+          logger.warn(`No questions available for grade ${grade}`);
+        } else {
+          logger.info(`Loaded ${questionSet.length} questions for grade ${grade}`);
+        }
+        setQuestions(questionSet);
+      } catch (error) {
+        logger.error('Error loading questions', { error, grade });
+        setQuestions([]);
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    };
+
+    loadQuestions();
+  }, [grade]);
+
+  // Initialize speech synthesis
+  useEffect(() => {
+    const initializeSpeech = () => {
+      if ('speechSynthesis' in window) {
+        logger.info('Speech synthesis is supported');
+        setSpeechInitialized(true);
+      } else {
+        logger.warn('Speech synthesis is not supported');
+        alert('Text-to-speech is not supported in your browser. Please try a different browser.');
+      }
+    };
+
+    initializeSpeech();
+  }, []);
+
+  // Helper function to get short section name
+  const getShortSectionName = (section: string) => {
+    switch (section.toLowerCase()) {
+      case 'picture description':
+        return 'A. Spontaneous Talk';
+      case 'reading aloud':
+        return 'B. 朗讀';
+      case 'expression of personal experiences':
+        return 'C. Personal Expression';
+      case 'short conversation':
+        return 'A. 對話';
+      case 'picture-based response':
+        return 'B. 圖片';
+      case 'role play':
+        return 'C. 角色';
+      default:
+        return section;
+    }
+  };
+
+  // Function to get the selected voice by voiceId (now uses voice.name as ID)
+  const getVoiceBySelection = (): SpeechSynthesisVoice | null => {
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+    
+    logger.info('Looking for voice', { voiceId, availableVoices: englishVoices.map(v => v.name) });
+    
+    // Enhanced preferred voice lists for fallback
+    const preferredFemale = [
+      'Samantha', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Victoria', 'Allison',
+      'Google UK English Female', 'Google US English Female',
+      'Microsoft Zira', 'Microsoft Hazel', 'Microsoft Susan', 'Microsoft Catherine',
+      'Siri Female', 'Ellen', 'Serena', 'Nicky', 'Veena', 'Ava'
+    ];
+    
+    const findPreferredFemaleVoice = (): SpeechSynthesisVoice | null => {
+      for (const name of preferredFemale) {
+        const found = englishVoices.find(v => v.name.includes(name));
+        if (found) return found;
+      }
+      return englishVoices.find(v => v.name.toLowerCase().includes('female')) || null;
+    };
+
+    // Primary lookup: voiceId is the full voice.name
+    // Try exact match first
+    const exactMatch = voices.find(v => v.name === voiceId);
+    if (exactMatch) {
+      logger.info('Found exact voice match', { voiceName: exactMatch.name });
+      return exactMatch;
+    }
+    
+    // Try partial match (in case voiceId contains the voice name)
+    const partialMatch = voices.find(v => voiceId.includes(v.name) || v.name.includes(voiceId));
+    if (partialMatch) {
+      logger.info('Found partial voice match', { voiceName: partialMatch.name, voiceId });
+      return partialMatch;
+    }
+    
+    // Fallback for 'default' - use best female voice
+    if (voiceId === 'default') {
+      const defaultVoice = findPreferredFemaleVoice() || englishVoices[0] || null;
+      logger.info('Using default voice', { voiceName: defaultVoice?.name });
+      return defaultVoice;
+    }
+    
+    // Final fallback - use any English voice
+    logger.warn('Voice not found, using fallback', { voiceId });
+    return findPreferredFemaleVoice() || englishVoices[0] || null;
+  };
+
+  // Function to speak the current question
+  const speakQuestion = (text: string) => {
+    if (!speechInitialized) {
+      logger.warn('Speech synthesis not initialized');
+      return;
+    }
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Get voice based on user selection
+    const voice = getVoiceBySelection();
+    if (voice) {
+      utterance.voice = voice;
+      logger.info('Using selected voice', { voiceId, voiceName: voice.name });
+    }
+    
+    // Natural speech settings
+    utterance.rate = speechRate; // User-controlled rate (default 0.9 for natural pace)
+    utterance.pitch = 1.0; // Natural pitch
+    utterance.volume = 1.0; // Full volume
+    utterance.lang = 'en-US'; // Set language
+
+    utterance.onstart = () => {
+      setIsPlaying(true);
+      setIsPaused(false);
+      logger.info('Speech started', { voice: voice?.name || 'default' });
+    };
+
+    utterance.onend = () => {
+      setIsPlaying(false);
+      setIsPaused(false);
+      logger.info('Speech ended');
+    };
+
+    utterance.onpause = () => {
+      setIsPaused(true);
+      logger.info('Speech paused');
+    };
+
+    utterance.onresume = () => {
+      setIsPaused(false);
+      logger.info('Speech resumed');
+    };
+
+    utterance.onerror = (event) => {
+      logger.error('Speech error', { error: event.error });
+      setIsPlaying(false);
+      setIsPaused(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Handle play question
+  const handlePlayQuestion = () => {
+    if (currentQuestion) {
+      speakQuestion(currentQuestion.text);
+    }
+  };
+
+  // New function to play recorded audio
+  const handlePlayRecording = (questionId: number) => {
+    const audioBlob = responses[questionId];
+    if (!audioBlob) {
+      logger.warn('No recording found for question', { questionId });
+      return;
+    }
+
+    // Stop any currently playing recording
+    if (recordingAudioRef.current) {
+      recordingAudioRef.current.pause();
+      recordingAudioRef.current = null;
+      setPlayingRecordingId(null);
+    }
+
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    recordingAudioRef.current = audio;
+
+    audio.onplay = () => {
+      setPlayingRecordingId(questionId);
+      logger.info('Recording playback started', { questionId });
+    };
+
+    audio.onended = () => {
+      setPlayingRecordingId(null);
+      URL.revokeObjectURL(audioUrl);
+      recordingAudioRef.current = null;
+      logger.info('Recording playback ended', { questionId });
+    };
+
+    audio.onerror = (error) => {
+      logger.error('Recording playback error', { error, questionId });
+      setPlayingRecordingId(null);
+      URL.revokeObjectURL(audioUrl);
+      recordingAudioRef.current = null;
+    };
+
+    audio.play().catch(error => {
+      logger.error('Failed to play recording', { error, questionId });
+      setPlayingRecordingId(null);
+    });
+  };
+
+  // Handle start recording
+  const handleStartRecording = async () => {
+    logger.info('Start recording');
+    setIsRecording(true);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = handleDataAvailable;
+      mediaRecorderRef.current.onstop = handleStopRecording;
+      mediaRecorderRef.current.start();
+
+      // Set a timeout to automatically stop recording after a certain duration (e.g., 10 seconds)
+      speechTimeoutRef.current = setTimeout(() => {
+        logger.info('Stopping recording automatically after timeout');
+        stopRecording();
+      }, 10000); // 10 seconds
+    } catch (error) {
+      logger.error('Error starting recording', { error });
+      setIsRecording(false);
+      alert('Failed to start recording. Please make sure you have a microphone and it is enabled.');
+    }
+  };
+
+  // Handle data available during recording
+  const handleDataAvailable = (event: BlobEvent) => {
+    logger.info('Data available during recording');
+    if (event.data.size > 0) {
+      setResponses(prevResponses => ({
+        ...prevResponses,
+        [currentQuestion.id]: event.data,
+      }));
+    }
+  };
+
+  // Handle stop recording (user initiated)
+  const handleStopRecording = () => {
+    logger.info('User stopped recording');
+    stopRecording();
+  };
+
+  // Stop recording function
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current);
+      speechTimeoutRef.current = null;
+    }
+    setIsRecording(false);
+    logger.info('Recording stopped and state reset');
+  };
+
+  // Reset recording state - helper function
+  const resetRecordingState = () => {
+    stopRecording();
+    // Cancel any ongoing speech
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsPlaying(false);
+    setIsPaused(false);
+    logger.info('Recording state reset for question navigation');
+  };
+
+  // Updated handleNextQuestion to properly format data for AI evaluation
+  const handleNextQuestion = () => {
+    logger.info('Next question');
+    resetRecordingState();
+
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // Test is complete - format results for AI evaluation
+      const results = Object.entries(responses).map(([questionId, audioBlob]) => {
+        const question = questions.find(q => q.id === parseInt(questionId));
+        return {
+          questionId: parseInt(questionId),
+          section: question?.section || 'Unknown',
+          question: question?.text || 'Unknown',
+          audioBlob,
+          timestamp: new Date().toISOString(),
+          duration: 0, // This would need to be calculated if needed
+          wordCount: 0, // This would need to be calculated if needed
+          responseTime: 0 // This would need to be calculated if needed
+        };
+      });
+      
+      logger.info('Test completed, sending results for AI evaluation', { 
+        totalRecordings: results.length,
+        questionsAttempted: questions.length 
+      });
+      
+      onComplete(results);
+    }
+  };
+
+  // Handle previous question
+  const handlePreviousQuestion = () => {
+    logger.info('Previous question');
+    resetRecordingState();
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const currentQuestion = questions[currentQuestionIndex];
+  const progress = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
+
+  if (isLoadingQuestions) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600 dark:text-gray-300">Loading questions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <Card className="w-full max-w-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-center text-gray-900 dark:text-white">No Questions Available</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              No questions are available for grade {grade}.
+            </p>
+            <Button onClick={onBack} variant="outline" className="dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go Back
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <Button 
+            variant="outline" 
+            onClick={onBack}
+            className="flex items-center gap-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+          
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="show-questions"
+                checked={showQuestions}
+                onCheckedChange={onShowQuestionsChange}
+              />
+              <Label htmlFor="show-questions" className="text-gray-700 dark:text-gray-200">Show The Questions</Label>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {grade} English Assessment
+            </h1>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
+              {Math.round(progress)}%
+            </span>
+          </div>
+          <Progress value={progress} className="h-2" />
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            Question {currentQuestionIndex + 1} / {questions.length}
+          </p>
+        </div>
+
+        {/* Question Card */}
+        <Card className="mb-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg text-gray-900 dark:text-white">Question {currentQuestionIndex + 1}</CardTitle>
+              <Badge variant="secondary" className="dark:bg-gray-700 dark:text-gray-200">{getShortSectionName(currentQuestion.section)}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Question Text - Show only if showQuestions is true */}
+            {showQuestions && (
+              <div className="text-lg font-medium text-gray-900 dark:text-white">
+                {currentQuestion.text}
+              </div>
+            )}
+
+            {/* Reading Passage - Always show for reading type questions */}
+            {currentQuestion.type === 'reading' && currentQuestion.readingPassage && (
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Reading Passage:</h4>
+                <div className="text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-line">
+                  {currentQuestion.readingPassage}
+                </div>
+              </div>
+            )}
+
+            {/* Audio Controls */}
+            <div className="flex justify-center space-x-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePlayQuestion}
+                disabled={isPlaying && !isPaused}
+                className="flex items-center space-x-2 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200"
+              >
+                {isPlaying && !isPaused ? (
+                  <>
+                    <Pause className="w-4 h-4" />
+                    <span>Playing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4" />
+                    <span>Play Question</span>
+                  </>
+                )}
+              </Button>
+
+              {!isRecording ? (
+                <Button
+                  size="sm"
+                  onClick={handleStartRecording}
+                  className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  <Mic className="w-4 h-4" />
+                  <span>Start Recording</span>
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={handleStopRecording}
+                  className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <MicOff className="w-4 h-4" />
+                  <span>Stop Recording</span>
+                </Button>
+              )}
+
+              {/* Listen to Recording Button */}
+              {responses[currentQuestion.id] && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePlayRecording(currentQuestion.id)}
+                  disabled={playingRecordingId === currentQuestion.id}
+                  className="flex items-center space-x-2 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200"
+                >
+                  <Headphones className="w-4 h-4" />
+                  <span>
+                    {playingRecordingId === currentQuestion.id ? 'Playing...' : 'Listen to Recording'}
+                  </span>
+                </Button>
+              )}
+            </div>
+
+            {/* Response indicator */}
+            {responses[currentQuestion.id] && (
+              <div className="flex items-center justify-center space-x-2 text-green-600">
+                <CheckCircle className="w-5 h-5" />
+                <span>Response recorded</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Navigation */}
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handlePreviousQuestion}
+            disabled={currentQuestionIndex === 0}
+            className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            Previous
+          </Button>
+          
+          <Button
+            onClick={handleNextQuestion}
+            disabled={currentQuestionIndex < questions.length - 1 ? false : !responses[currentQuestion.id]}
+            className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700"
+          >
+            {currentQuestionIndex === questions.length - 1 ? 'Complete Test' : 'Next'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default VoiceTest;
