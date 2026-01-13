@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,7 +14,7 @@
             box-sizing: border-box;
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
             color: #333;
@@ -21,18 +22,18 @@
             padding: 15px;
             line-height: 1.6;
         }
-        
+
         .container {
             max-width: 1000px;
             margin: 0 auto;
         }
-        
+
         header {
             text-align: center;
             padding: 10px 0;
             margin-bottom: 15px;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
@@ -40,19 +41,27 @@
             gap: 12px;
             margin-bottom: 10px;
         }
-        
+
         .logo i {
             font-size: 2.8rem;
             color: #1e88e5;
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
-        
+
         h1 {
             font-size: 3.0rem;
             color: #0d47a1;
@@ -61,46 +70,48 @@
             background: linear-gradient(135deg, #0d47a1, #42a5f5, #0d47a1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(33, 150, 243, 0.3), 
-                         0 0 30px rgba(33, 150, 243, 0.2),
-                         0 0 45px rgba(33, 150, 243, 0.1);
+            text-shadow: 0 0 15px rgba(33, 150, 243, 0.3),
+                0 0 30px rgba(33, 150, 243, 0.2),
+                0 0 45px rgba(33, 150, 243, 0.1);
             letter-spacing: 1px;
             position: relative;
             animation: titleAnimation 6s infinite alternate;
         }
-        
+
         @keyframes titleAnimation {
             0% {
                 background-position: 0% 50%;
-                text-shadow: 0 0 15px rgba(33, 150, 243, 0.3), 
-                             0 0 30px rgba(33, 150, 243, 0.2),
-                             0 0 45px rgba(33, 150, 243, 0.1);
+                text-shadow: 0 0 15px rgba(33, 150, 243, 0.3),
+                    0 0 30px rgba(33, 150, 243, 0.2),
+                    0 0 45px rgba(33, 150, 243, 0.1);
             }
+
             50% {
                 background-position: 50% 50%;
-                text-shadow: 0 0 20px rgba(33, 150, 243, 0.4), 
-                             0 0 40px rgba(33, 150, 243, 0.3),
-                             0 0 60px rgba(33, 150, 243, 0.2);
+                text-shadow: 0 0 20px rgba(33, 150, 243, 0.4),
+                    0 0 40px rgba(33, 150, 243, 0.3),
+                    0 0 60px rgba(33, 150, 243, 0.2);
             }
+
             100% {
                 background-position: 100% 50%;
-                text-shadow: 0 0 15px rgba(33, 150, 243, 0.3), 
-                             0 0 30px rgba(33, 150, 243, 0.2),
-                             0 0 45px rgba(33, 150, 243, 0.1);
+                text-shadow: 0 0 15px rgba(33, 150, 243, 0.3),
+                    0 0 30px rgba(33, 150, 243, 0.2),
+                    0 0 45px rgba(33, 150, 243, 0.1);
             }
         }
-        
+
         /* 选项卡样式 */
         .tabs {
             display: flex;
             background: white;
             border-radius: 16px 16px 0 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: -1px;
             position: relative;
             z-index: 10;
         }
-        
+
         .tab {
             flex: 1;
             padding: 15px;
@@ -115,28 +126,31 @@
             justify-content: center;
             gap: 8px;
         }
-        
+
         .tab.active {
             color: #0d47a1;
             border-bottom: 3px solid #1e88e5;
             background: rgba(30, 136, 229, 0.05);
-            font-size: 1.1rem; /* 加大字体 */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 添加阴影 */
-            transform: translateY(-2px); /* 上浮效果 */
+            font-size: 1.1rem;
+            /* 加大字体 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* 添加阴影 */
+            transform: translateY(-2px);
+            /* 上浮效果 */
         }
-        
+
         .tab:hover:not(.active) {
             background: rgba(30, 136, 229, 0.1);
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         .card {
             background: white;
             border-radius: 0 16px 16px 16px;
@@ -147,7 +161,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .card:before {
             content: '';
             position: absolute;
@@ -157,12 +171,12 @@
             height: 4px;
             background: linear-gradient(90deg, #1e88e5, #0d47a1);
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
         }
-        
+
         .card-title {
             display: flex;
             align-items: center;
@@ -173,18 +187,18 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #e3f2fd;
         }
-        
+
         .card-title i {
             font-size: 1.6rem;
         }
-        
+
         .upload-options {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 18px;
         }
-        
+
         .upload-option {
             flex: 1;
             min-width: 180px;
@@ -198,7 +212,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .upload-option:after {
             content: '';
             position: absolute;
@@ -211,17 +225,17 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        
+
         .upload-option:hover:after {
             opacity: 1;
         }
-        
+
         .upload-option:hover {
             background: #bbdefb;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
-        
+
         .upload-option h3 {
             color: #0d47a1;
             margin-bottom: 5px;
@@ -229,14 +243,14 @@
             position: relative;
             z-index: 2;
         }
-        
+
         .upload-option p {
             color: #546e7a;
             font-size: 0.85rem;
             position: relative;
             z-index: 2;
         }
-        
+
         .upload-area {
             border: 3px dashed #42a5f5;
             border-radius: 16px;
@@ -248,12 +262,12 @@
             display: none;
             position: relative;
         }
-        
+
         .upload-area.active {
             background: rgba(66, 165, 245, 0.18);
             border-color: #1e88e5;
         }
-        
+
         .btn {
             display: block;
             width: 100%;
@@ -271,7 +285,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .btn:after {
             content: '';
             position: absolute;
@@ -279,67 +293,67 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transform: rotate(45deg);
             transition: transform 0.6s;
         }
-        
+
         .btn:hover:after {
             transform: translateX(100%) rotate(45deg);
         }
-        
+
         .btn:hover {
             background: #1565c0;
             transform: translateY(-2px);
         }
-        
+
         .btn:active {
             transform: translateY(1px);
             box-shadow: 0 2px 6px rgba(30, 136, 229, 0.25);
         }
-        
+
         .btn:disabled {
             background: #90caf9;
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
         }
-        
+
         .btn-success {
             background: #43a047;
             box-shadow: 0 3px 10px rgba(67, 160, 71, 0.25);
         }
-        
+
         .btn-success:hover {
             background: #388e3c;
         }
-        
+
         .btn-warning {
             background: #f57c00;
             box-shadow: 0 3px 10px rgba(245, 124, 0, 0.25);
         }
-        
+
         .btn-warning:hover {
             background: #ef6c00;
         }
-        
+
         /* 新增紫色按钮样式 */
         .btn-purple {
             background: #9c27b0;
             box-shadow: 0 3px 10px rgba(156, 39, 176, 0.25);
         }
-        
+
         .btn-purple:hover {
             background: #7b1fa2;
         }
-        
+
         .btn-sm {
             padding: 8px 12px;
             font-size: 0.9rem;
             width: auto;
             display: inline-block;
         }
-        
+
         .btn-log {
             display: inline-flex;
             align-items: center;
@@ -355,21 +369,21 @@
             box-shadow: 0 3px 10px rgba(30, 136, 229, 0.25);
             margin: 10px 0;
         }
-        
+
         .btn-log:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .loading {
             text-align: center;
             padding: 20px;
             display: none;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 12px;
             margin: 15px 0;
         }
-        
+
         .spinner {
             border: 5px solid rgba(30, 136, 229, 0.2);
             border-top: 5px solid #1e88e5;
@@ -379,12 +393,17 @@
             animation: spin 1.2s linear infinite;
             margin: 0 auto 20px;
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        
+
         .feedback-content {
             background: #f5f9ff;
             border-radius: 16px;
@@ -394,12 +413,12 @@
             font-size: 0.95rem;
             border: 1px solid #e3f2fd;
         }
-        
+
         .highlight-bold {
             font-weight: 700;
             text-decoration: underline;
         }
-        
+
         .highlight-blue {
             color: #0d47a1;
             font-weight: 600;
@@ -407,7 +426,7 @@
             padding: 2px 4px;
             border-radius: 4px;
         }
-        
+
         .highlight-red {
             color: #b71c1c;
             font-weight: 600;
@@ -415,7 +434,7 @@
             padding: 2px 4px;
             border-radius: 4px;
         }
-        
+
         .highlight-green {
             color: #1b5e20;
             font-weight: 600;
@@ -423,7 +442,7 @@
             padding: 2px 4px;
             border-radius: 4px;
         }
-        
+
         .error {
             color: #d32f2f;
             background: #ffebee;
@@ -432,14 +451,14 @@
             font-weight: 500;
             margin: 12px 0;
         }
-        
+
         .error-title {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 8px;
         }
-        
+
         .progress-bar {
             height: 6px;
             background: #e0e0e0;
@@ -447,34 +466,42 @@
             margin: 8px 0;
             overflow: hidden;
         }
-        
+
         .progress {
             height: 100%;
             background: linear-gradient(to right, #4caf50, #8bc34a);
             border-radius: 4px;
             animation: progress-animation 2s infinite;
         }
-        
+
         @keyframes progress-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
-        
+
         .feedback-section-simple {
             margin-bottom: 12px;
             background: #ffffff;
             border-radius: 10px;
             padding: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
             transition: transform 0.3s ease;
         }
-        
+
         .feedback-section-simple:hover {
             transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        
+
         .feedback-section-simple h3 {
             color: #0d47a1;
             font-size: 1.1rem;
@@ -485,18 +512,18 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .feedback-section-simple p {
             margin-bottom: 8px;
             font-size: 0.92rem;
         }
-        
+
         .feedback-text {
             line-height: 1.7;
             font-size: 0.95rem;
             white-space: pre-line;
         }
-        
+
         .feedback-header {
             display: flex;
             justify-content: space-between;
@@ -504,7 +531,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        
+
         .feedback-title {
             display: flex;
             align-items: center;
@@ -513,24 +540,24 @@
             color: #1e88e5;
             margin-right: 15px;
         }
-        
+
         .feedback-title i {
             font-size: 1.5rem;
         }
-        
+
         .grade-selector {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 12px;
         }
-        
+
         .grade-selector label {
             font-weight: 600;
             color: #0d47a1;
             font-size: 1.0rem;
         }
-        
+
         .grade-selector select {
             padding: 7px 12px;
             border-radius: 8px;
@@ -540,31 +567,31 @@
             color: #333;
             transition: all 0.3s;
         }
-        
+
         .grade-selector select:hover {
             border-color: #1e88e5;
             box-shadow: 0 0 8px rgba(30, 136, 229, 0.2);
         }
-        
+
         .feedback-actions {
             display: flex;
             gap: 10px;
             margin-bottom: 12px;
         }
-        
+
         .tts-controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
-        
+
         .control-group {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
-        
+
         .control-group label {
             display: flex;
             align-items: center;
@@ -572,8 +599,9 @@
             font-weight: 600;
             color: #0d47a1;
         }
-        
-        .control-group select, .control-group input {
+
+        .control-group select,
+        .control-group input {
             padding: 8px;
             border-radius: 8px;
             border: 2px solid #bbdefb;
@@ -582,25 +610,26 @@
             color: #333;
             transition: all 0.3s;
         }
-        
-        .control-group select:hover, .control-group input:hover {
+
+        .control-group select:hover,
+        .control-group input:hover {
             border-color: #1e88e5;
             box-shadow: 0 0 8px rgba(30, 136, 229, 0.2);
         }
-        
+
         .voice-controls {
             display: flex;
             gap: 10px;
             margin-top: 10px;
         }
-        
+
         .feedback-summary {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 15px;
         }
-        
+
         .feedback-summary-item {
             flex: 1;
             min-width: 200px;
@@ -610,12 +639,12 @@
             border: 1px solid #bbdefb;
             transition: all 0.3s;
         }
-        
+
         .feedback-summary-item:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .feedback-summary-item h4 {
             color: #0d47a1;
             font-size: 1.05rem;
@@ -624,12 +653,12 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .feedback-summary-item p {
             font-size: 0.92rem;
             color: #333;
         }
-        
+
         #preview {
             max-width: 100%;
             max-height: 300px;
@@ -637,15 +666,15 @@
             display: block;
             margin: 15px auto;
             display: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border: 2px solid #e3f2fd;
         }
-        
+
         .preview-container {
             text-align: center;
             margin: 15px 0;
         }
-        
+
         /* 日誌彈窗樣式 - 白色背景 */
         .log-modal {
             display: none;
@@ -654,15 +683,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
             align-items: center;
             justify-content: center;
         }
-        
+
         .log-modal-content {
-            background: #ffffff; /* 白色背景 */
-            color: #333; /* 深色文字 */
+            background: #ffffff;
+            /* 白色背景 */
+            color: #333;
+            /* 深色文字 */
             border-radius: 16px;
             width: 90%;
             max-width: 800px;
@@ -670,26 +701,28 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-        
+
         .log-modal-header {
-            background: #f5f5f5; /* 浅灰色背景 */
+            background: #f5f5f5;
+            /* 浅灰色背景 */
             padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         .log-modal-title {
-            color: #1e88e5; /* 蓝色标题 */
+            color: #1e88e5;
+            /* 蓝色标题 */
             font-size: 1.3rem;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .log-close-btn {
             background: transparent;
             border: none;
@@ -699,45 +732,45 @@
             padding: 5px 10px;
             transition: all 0.2s;
         }
-        
+
         .log-close-btn:hover {
             color: #e74c3c;
             transform: scale(1.1);
         }
-        
+
         .log-modal-body {
             padding: 20px;
             overflow-y: auto;
             flex-grow: 1;
             background: #fff;
         }
-        
+
         .log-entry {
             padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
             font-size: 0.9rem;
         }
-        
+
         .log-info {
             color: #1e88e5;
         }
-        
+
         .log-error {
             color: #d32f2f;
         }
-        
+
         .log-timestamp {
             color: #78909c;
             margin-right: 8px;
         }
-        
+
         .log-modal-footer {
             padding: 15px 20px;
             background: #f5f5f5;
             text-align: right;
             border-top: 1px solid #e0e0e0;
         }
-        
+
         /* 寫文思路頁面樣式 */
         .writing-controls {
             display: grid;
@@ -745,13 +778,13 @@
             gap: 15px;
             margin-bottom: 20px;
         }
-        
+
         .control-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-        
+
         .control-group label {
             font-weight: 600;
             color: #0d47a1;
@@ -759,8 +792,9 @@
             align-items: center;
             gap: 8px;
         }
-        
-        .control-group input, .control-group select {
+
+        .control-group input,
+        .control-group select {
             padding: 10px;
             border-radius: 10px;
             border: 2px solid #bbdefb;
@@ -768,33 +802,34 @@
             font-size: 1rem;
             transition: all 0.3s;
         }
-        
-        .control-group input:focus, .control-group select:focus {
+
+        .control-group input:focus,
+        .control-group select:focus {
             border-color: #1e88e5;
             outline: none;
             box-shadow: 0 0 8px rgba(30, 136, 229, 0.3);
         }
-        
+
         .word-count-controls {
             display: flex;
             gap: 10px;
             align-items: center;
         }
-        
+
         .word-count-select {
             flex: 1;
         }
-        
+
         .word-count-input {
             flex: 2;
         }
-        
+
         .writing-actions {
             display: flex;
             gap: 15px;
             margin: 20px 0;
         }
-        
+
         .writing-result {
             background: #f5f9ff;
             border-radius: 16px;
@@ -806,104 +841,106 @@
             margin-top: 20px;
             display: none;
         }
-        
+
         .writing-result h3 {
             color: #0d47a1;
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #bbdefb;
         }
-        
+
         .writing-result-content {
             white-space: pre-line;
         }
-        
+
         /* 移動優化 */
         @media (max-width: 768px) {
             .card {
                 padding: 16px 12px;
             }
-            
+
             .upload-area {
                 padding: 14px;
             }
-            
+
             .btn {
                 padding: 12px;
                 font-size: 1.05rem;
             }
-            
+
             .feedback-content {
                 padding: 16px;
                 font-size: 0.92rem;
                 min-height: 200px;
             }
-            
+
             h1 {
                 font-size: 2.2rem;
             }
-            
+
             .card-title {
                 font-size: 1.3rem;
             }
-            
+
             .upload-options {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .upload-option {
                 min-width: auto;
                 padding: 10px;
             }
-            
+
             .feedback-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
             }
-            
+
             .feedback-actions {
                 width: 100%;
                 justify-content: space-between;
             }
-            
+
             .tts-controls {
                 grid-template-columns: 1fr;
             }
-            
+
             .voice-controls {
                 flex-wrap: wrap;
             }
-            
+
             .voice-controls .btn {
                 flex: 1;
                 min-width: 120px;
             }
-            
+
             .log-modal-content {
                 width: 95%;
                 max-height: 85vh;
             }
-            
+
             .writing-controls {
                 grid-template-columns: 1fr;
             }
-            
+
             .word-count-controls {
                 flex-direction: column;
             }
-            
+
             .writing-actions {
                 flex-direction: column;
             }
         }
-        
+
         /* 觸摸優化 */
-        button, .upload-area, .upload-option {
+        button,
+        .upload-area,
+        .upload-option {
             min-height: 40px;
         }
-        
+
         footer {
             text-align: center;
             margin-top: 20px;
@@ -911,14 +948,14 @@
             color: #546e7a;
             font-size: 0.9rem;
         }
-        
+
         .designer-credit {
             font-style: italic;
             margin-top: 5px;
             font-size: 0.85rem;
             color: #78909c;
         }
-        
+
         /* 多頁作文管理樣式 */
         .pages-container {
             display: flex;
@@ -926,21 +963,21 @@
             gap: 15px;
             margin-top: 15px;
         }
-        
+
         .page-item {
             position: relative;
             width: 120px;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
-        
+
         .page-item:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
+
         .page-img {
             width: 100%;
             height: 150px;
@@ -948,24 +985,24 @@
             display: block;
             cursor: move;
         }
-        
+
         .page-number {
             position: absolute;
             top: 5px;
             left: 5px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 2px 8px;
             border-radius: 20px;
             font-size: 0.8rem;
         }
-        
+
         .page-actions {
             display: flex;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             padding: 5px;
         }
-        
+
         .page-action-btn {
             flex: 1;
             text-align: center;
@@ -974,19 +1011,19 @@
             color: #0d47a1;
             transition: all 0.2s;
         }
-        
+
         .page-action-btn:hover {
             color: #f57c00;
             transform: scale(1.1);
         }
-        
+
         .pages-controls {
             display: flex;
             gap: 10px;
             margin-top: 15px;
             flex-wrap: wrap;
         }
-        
+
         .pages-info {
             background: #e3f2fd;
             padding: 8px 15px;
@@ -996,7 +1033,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .info-box {
             background: #e3f2fd;
             padding: 10px 15px;
@@ -1004,7 +1041,7 @@
             margin: 10px 0;
             border: 1px solid #bbdefb;
         }
-        
+
         .info-box h4 {
             color: #0d47a1;
             margin-bottom: 8px;
@@ -1012,7 +1049,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .info-box p {
             font-size: 0.9rem;
         }
@@ -1028,14 +1065,14 @@
             margin-left: 10px;
             vertical-align: middle;
         }
-        
+
         /* 新增样式 */
         .writing-section {
             margin-top: 20px;
             padding-top: 15px;
             border-top: 1px solid #e3f2fd;
         }
-        
+
         .writing-section h3 {
             color: #0d47a1;
             font-size: 1.2rem;
@@ -1044,7 +1081,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .four-character-phrases {
             font-weight: bold;
             line-height: 1.8;
@@ -1053,7 +1090,7 @@
             border-radius: 8px;
             border: 1px solid #bbdefb;
         }
-        
+
         .learning-points {
             line-height: 1.7;
             background: #f5f9ff;
@@ -1061,7 +1098,7 @@
             border-radius: 8px;
             border: 1px solid #bbdefb;
         }
-        
+
         /* 导出按钮样式 */
         .export-writing-btn {
             background: linear-gradient(135deg, #4caf50, #2e7d32);
@@ -1078,19 +1115,19 @@
             margin-top: 15px;
             box-shadow: 0 3px 10px rgba(76, 175, 80, 0.25);
         }
-        
+
         .export-writing-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             background: linear-gradient(135deg, #43a047, #1b5e20);
         }
-        
+
         /* PDF分页优化 */
         .page-break {
             page-break-inside: avoid;
             break-inside: avoid;
         }
-        
+
         /* 新增样式 - 文章标题行 */
         .writing-result-header {
             display: flex;
@@ -1099,7 +1136,7 @@
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
-        
+
         .writing-title {
             display: flex;
             align-items: center;
@@ -1108,17 +1145,17 @@
             color: #1e88e5;
             margin-right: 15px;
         }
-        
+
         .writing-title i {
             font-size: 1.5rem;
         }
-        
+
         /* 新增：PDF导出样式 */
         .pdf-container {
             padding: 20px;
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
         }
-        
+
         .pdf-title {
             text-align: center;
             color: #0d47a1;
@@ -1127,11 +1164,11 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #1e88e5;
         }
-        
+
         .pdf-section {
             margin-bottom: 25px;
         }
-        
+
         .pdf-section-title {
             color: #1e88e5;
             font-size: 1.4rem;
@@ -1139,12 +1176,12 @@
             padding-bottom: 5px;
             border-bottom: 1px solid #bbdefb;
         }
-        
+
         .pdf-content {
             font-size: 1.1rem;
             line-height: 1.8;
         }
-        
+
         .pdf-params {
             background: #e3f2fd;
             padding: 15px;
@@ -1153,6 +1190,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -1161,7 +1199,7 @@
                 <h1>AI作文老師</h1>
             </div>
         </header>
-        
+
         <!-- 选项卡导航 -->
         <div class="tabs">
             <div class="tab active" data-tab="ai-correction">
@@ -1171,12 +1209,12 @@
                 <i class="fas fa-lightbulb"></i> 寫文思路
             </div>
         </div>
-        
+
         <!-- AI改文页面 -->
         <div id="ai-correction" class="tab-content active">
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-upload"></i> 作文上載</h2>
-                
+
                 <div class="grade-selector">
                     <label for="gradeSelect"><i class="fas fa-user-graduate"></i> 學生就讀年級：</label>
                     <select id="gradeSelect">
@@ -1188,26 +1226,26 @@
                         <option value="小六">小六</option>
                     </select>
                 </div>
-                
+
                 <div class="info-box">
                     <h4><i class="fas fa-info-circle"></i> 使用提示</h4>
                     <p>1. 支持多頁作文上傳（最多5頁）</p>
                     <p>2. 上傳後可拖動圖片調整順序</p>
                     <p>4. 如上傳題目無作答，將自動生成範文</p>
                 </div>
-                
+
                 <div class="upload-options">
                     <div class="upload-option" id="cameraOption">
                         <h3>即時拍照</h3>
                         <p>使用相機拍攝您的作文</p>
                     </div>
-                    
+
                     <div class="upload-option" id="galleryOption">
                         <h3>從手機上傳</h3>
                         <p>從相冊選擇作文照片</p>
                     </div>
                 </div>
-                
+
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">
                         <i class="fas fa-images fa-2x" style="color: #1e88e5;"></i>
@@ -1215,11 +1253,11 @@
                     <p class="upload-text">點擊或拖放圖片到這裡 (支持多張圖片)</p>
                     <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
                 </div>
-                
+
                 <div class="preview-container">
                     <div id="pagesContainer" class="pages-container"></div>
                 </div>
-                
+
                 <div class="pages-controls">
                     <div class="pages-info">
                         <i class="fas fa-images"></i>
@@ -1232,7 +1270,7 @@
                         <i class="fas fa-trash"></i> 清除所有
                     </button>
                 </div>
-                
+
                 <div class="upload-controls">
                     <button class="btn" id="processBtn" disabled>
                         <i class="fas fa-magic"></i> AI評改作文
@@ -1241,7 +1279,7 @@
                         <i class="fas fa-redo"></i> 重新開始
                     </button>
                 </div>
-                
+
                 <div class="loading" id="loadingIndicator">
                     <div class="spinner"></div>
                     <p>AI老師正在認真評改作文...</p>
@@ -1251,7 +1289,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="feedback-header">
                     <h2 class="feedback-title"><i class="fas fa-star"></i> 評改結果</h2>
@@ -1267,31 +1305,31 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="feedback-content" id="feedbackContent">
                     <div class="feedback-summary">
                         <div class="feedback-summary-item">
                             <h4><i class="fas fa-search"></i> 解題分析</h4>
                             <p>這裡將顯示題目分析及老師預期</p>
                         </div>
-                        
+
                         <div class="feedback-summary-item">
                             <h4><i class="fas fa-comment"></i> 整體評價</h4>
                             <p>這裡將顯示作文的整體評價</p>
                         </div>
                     </div>
-                    
+
                     <div class="feedback-section-simple">
                         <h3><i class="fas fa-edit"></i> 改善建議</h3>
                         <p>這裡將顯示具體改進建議及範例</p>
                     </div>
-                    
+
                     <div class="feedback-section-simple">
                         <h3><i class="fas fa-heart"></i> 總結</h3>
                         <p>這裡將顯示總結及鼓勵的話語</p>
                     </div>
                 </div>
-                
+
                 <div class="feedback-section">
                     <h2 class="card-title"><i class="fas fa-volume-up"></i> 語音回饋</h2>
                     <div class="tts-controls">
@@ -1303,21 +1341,23 @@
                                 <option value="en-US">英語</option>
                             </select>
                         </div>
-                        
+
                         <div class="control-group">
                             <label><i class="fas fa-tachometer-alt"></i> 語速控制</label>
                             <input type="range" id="speedControl" min="0.7" max="3" step="0.1" value="1.4">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 5px;">
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 5px;">
                                 <span>慢</span>
                                 <span id="speedValue">1.4x</span>
                                 <span>快</span>
                             </div>
                         </div>
-                        
+
                         <div class="control-group">
                             <label><i class="fas fa-volume-up"></i> 音量控制</label>
                             <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.8">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 5px;">
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 5px;">
                                 <span>小</span>
                                 <span id="volumeValue">80%</span>
                                 <span>大</span>
@@ -1327,12 +1367,12 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- 寫文思路页面 -->
         <div id="writing-idea" class="tab-content">
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-lightbulb"></i> 寫文思路</h2>
-                
+
                 <div class="grade-selector">
                     <label for="writing-grade"><i class="fas fa-user-graduate"></i> 學生年級：</label>
                     <select id="writing-grade">
@@ -1344,13 +1384,13 @@
                         <option value="小六">小六</option>
                     </select>
                 </div>
-                
+
                 <div class="writing-controls">
                     <div class="control-group">
                         <label for="keywords"><i class="fas fa-key"></i> 關鍵字詞</label>
                         <input type="text" id="keywords" placeholder="輸入作文關鍵字詞（如：海灘、夏日）">
                     </div>
-                    
+
                     <div class="control-group">
                         <label for="writing-style"><i class="fas fa-pen"></i> 文體選擇</label>
                         <select id="writing-style">
@@ -1360,7 +1400,7 @@
                             <option value="議論文">議論文</option>
                         </select>
                     </div>
-                    
+
                     <div class="control-group">
                         <label><i class="fas fa-font"></i> 字數要求</label>
                         <div class="word-count-controls">
@@ -1368,11 +1408,12 @@
                                 <option value="至少">至少</option>
                                 <option value="不超過" selected>不超過</option>
                             </select>
-                            <input type="number" id="word-count" class="word-count-input" min="50" max="1000" value="250">
+                            <input type="number" id="word-count" class="word-count-input" min="50" max="1000"
+                                value="250">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="info-box">
                     <h4><i class="fas fa-info-circle"></i> 寫文思路說明</h4>
                     <p>1. 只需輸入幾個關鍵字詞，系統會自動生成完整文章</p>
@@ -1380,7 +1421,7 @@
                     <p>3. 其他文體將根據年級水平自動調整</p>
                     <p>4. 議論文將結合時事話題，更具批判性</p>
                 </div>
-                
+
                 <div class="writing-actions">
                     <button class="btn btn-success" id="generateBtn">
                         <i class="fas fa-play"></i> 開始生成
@@ -1389,7 +1430,7 @@
                         <i class="fas fa-redo"></i> 重置
                     </button>
                 </div>
-                
+
                 <div class="loading" id="writingLoading">
                     <div class="spinner"></div>
                     <p>AI正在構思寫作思路...</p>
@@ -1398,7 +1439,7 @@
                         <div class="progress" style="width: 70%"></div>
                     </div>
                 </div>
-                
+
                 <div class="writing-result" id="writingResult">
                     <div class="writing-result-header">
                         <h3 class="writing-title"><i class="fas fa-file-alt"></i> 生成的文章</h3>
@@ -1408,13 +1449,13 @@
                         </button>
                     </div>
                     <div class="writing-result-content" id="writingContent"></div>
-                    
+
                     <!-- 四字词语区域 -->
                     <div class="writing-section">
                         <h3><i class="fas fa-book"></i> 四字詞語</h3>
                         <div id="fourCharacterPhrases" class="four-character-phrases"></div>
                     </div>
-                    
+
                     <!-- 学习重点区域 -->
                     <div class="writing-section">
                         <h3><i class="fas fa-graduation-cap"></i> 學習重點</h3>
@@ -1423,13 +1464,13 @@
                 </div>
             </div>
         </div>
-        
+
         <div style="text-align: center;">
             <button class="btn-log" id="logToggle">
                 <i class="fas fa-terminal"></i> 運行日誌
             </button>
         </div>
-        
+
         <div class="log-modal" id="logModal">
             <div class="log-modal-content">
                 <div class="log-modal-header">
@@ -1446,7 +1487,7 @@
                 </div>
             </div>
         </div>
-        
+
         <footer>
             <p>© 2025 AI作文老師</p>
             <p class="designer-credit">Designed by Nathan Yuen | thisai.org | </p>
@@ -1455,7 +1496,7 @@
 
     <script>
         // 全局變量
-        const OPENROUTER_API_KEY = "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";
+        const OPENROUTER_API_KEY = "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";
         let uploadedImages = []; // 改為數組支持多圖
         let feedbackText = "";
         let currentSpeech = null;
@@ -1469,7 +1510,7 @@
         let generatedEssay = ""; // 儲存生成的作文內容
         let generatedPhrases = ""; // 儲存生成的四字詞語
         let generatedLearningPoints = ""; // 儲存生成的學習重點
-        
+
         // DOM元素
         const uploadArea = document.getElementById('uploadArea');
         const cameraOption = document.getElementById('cameraOption');
@@ -1497,7 +1538,7 @@
         const addMoreBtn = document.getElementById('addMoreBtn');
         const clearAllBtn = document.getElementById('clearAllBtn');
         let draggedItem = null;
-        
+
         // 寫文思路元素
         const generateBtn = document.getElementById('generateBtn');
         const writingResetBtn = document.getElementById('writingResetBtn');
@@ -1507,43 +1548,43 @@
         const exportWritingBtn = document.getElementById('exportWritingBtn');
         const fourCharacterPhrases = document.getElementById('fourCharacterPhrases');
         const learningPoints = document.getElementById('learningPoints');
-        
+
         // 更新速度显示
         function updateSpeedValue() {
             speedValue.textContent = `${speedControl.value}x`;
         }
-        
+
         // 更新音量显示
         function updateVolumeValue() {
             volumeValue.textContent = `${Math.round(volumeControl.value * 100)}%`;
         }
-        
+
         // 更新頁數顯示
         function updatePagesCount() {
             pagesCount.textContent = `已上傳 ${uploadedImages.length} 頁作文`;
         }
-        
+
         // 切换标签页
         function setupTabs() {
             const tabs = document.querySelectorAll('.tab');
             const tabContents = document.querySelectorAll('.tab-content');
-            
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     // 移除所有标签的active类
                     tabs.forEach(t => t.classList.remove('active'));
                     tabContents.forEach(c => c.classList.remove('active'));
-                    
+
                     // 添加当前标签的active类
                     tab.classList.add('active');
-                    
+
                     // 显示对应的内容
                     const tabId = tab.getAttribute('data-tab');
                     document.getElementById(tabId).classList.add('active');
                 });
             });
         }
-        
+
         // 日志记录功能
         function log(message, type = 'info') {
             const timestamp = new Date().toLocaleTimeString();
@@ -1552,16 +1593,16 @@
                 message,
                 type
             };
-            
+
             logData.push(logEntry);
-            
+
             const entryElement = document.createElement('div');
             entryElement.className = `log-entry log-${type}`;
             entryElement.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
             logEntries.appendChild(entryElement);
             logEntries.scrollTop = logEntries.scrollHeight;
         }
-        
+
         // 初始化事件監聽
         function init() {
             // 上載選項點擊
@@ -1570,26 +1611,26 @@
                 imageUpload.setAttribute('capture', 'environment');
                 imageUpload.click();
             });
-            
+
             galleryOption.addEventListener('click', () => {
                 log('用户选择了从相册上传', 'info');
                 imageUpload.removeAttribute('capture');
                 imageUpload.click();
             });
-            
+
             // 文件選擇變化
             imageUpload.addEventListener('change', handleImageUpload);
-            
+
             // 拖放功能
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('active');
             });
-            
+
             uploadArea.addEventListener('dragleave', () => {
                 uploadArea.classList.remove('active');
             });
-            
+
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.classList.remove('active');
@@ -1598,82 +1639,82 @@
                     handleImageFiles(files);
                 }
             });
-            
+
             // 按鈕事件
             processBtn.addEventListener('click', processEssay);
             resetBtn.addEventListener('click', resetApp);
             exportTextBtn.addEventListener('click', exportFeedbackText);
             exportPDFBtn.addEventListener('click', exportFeedbackPDF);
-            
+
             playStopBtn.addEventListener('click', toggleFeedback);
-            
+
             // 寫文思路按鈕
             generateBtn.addEventListener('click', generateEssay);
             writingResetBtn.addEventListener('click', resetWriting);
             exportWritingBtn.addEventListener('click', exportWritingPDF);
-            
+
             // 日志切换
-            logToggle.addEventListener('click', function() {
+            logToggle.addEventListener('click', function () {
                 logModal.style.display = 'flex';
             });
-            
-            logCloseBtn.addEventListener('click', function() {
+
+            logCloseBtn.addEventListener('click', function () {
                 logModal.style.display = 'none';
             });
-            
+
             // 導出日誌
             exportLogBtn.addEventListener('click', exportLog);
-            
+
             // 點擊模態框外部關閉
-            logModal.addEventListener('click', function(e) {
+            logModal.addEventListener('click', function (e) {
                 if (e.target === logModal) {
                     logModal.style.display = 'none';
                 }
             });
-            
+
             // 語速控制事件
             speedControl.addEventListener('input', updateSpeedValue);
             volumeControl.addEventListener('input', updateVolumeValue);
-            
+
             // 多頁管理按鈕
             addMoreBtn.addEventListener('click', () => {
                 imageUpload.click();
             });
-            
+
             clearAllBtn.addEventListener('click', () => {
                 uploadedImages = [];
                 renderPages();
                 processBtn.disabled = true;
                 log('已清除所有上傳的作文頁面', 'info');
             });
-            
+
             // 設置選項卡
             setupTabs();
-            
+
             // 初始化日志
             log('應用程式已啟動', 'info');
             log('支持多頁作文上傳功能', 'info');
             log('新增寫文思路功能', 'info');
             log('等待用戶操作', 'info');
         }
-        
+
         // 導出評語（純文字）
         function exportFeedbackText() {
             if (!feedbackText) {
                 alert('沒有可導出的評語內容');
                 return;
             }
-            
+
             // 創建純文本內容
             let plainText = "";
-            
+
             // 添加作文題目和內容
             if (essayTitle) {
                 plainText += `作文題目：\n${essayTitle}\n\n`;
             }
-            
+
             plainText += `作文內容：\n${essayContent}\n\n`;
-            
+
             // 處理評語內容
             let cleanText = feedbackText
                 // 移除特定段落
@@ -1685,12 +1726,12 @@
                 .replace(/\[b\]|\[\/b\]|\[g\]|\[\/g\]|\[red\]|\[\/red\]|\[blue\]|\[\/blue\]|\[green\]|\[\/green\]/g, '')
                 // 合併多餘空行
                 .replace(/\n{3,}/g, '\n\n');
-            
+
             plainText += cleanText;
-            
+
             const blob = new Blob([plainText], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
-            
+
             const a = document.createElement('a');
             a.href = url;
             a.download = `作文評語_${new Date().toISOString().slice(0, 10)}.txt`;
@@ -1698,17 +1739,17 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             log('評語已導出為純文字', 'info');
         }
-        
+
         // 導出評語（PDF）
         function exportFeedbackPDF() {
             if (!feedbackText) {
                 alert('沒有可導出的評語內容');
                 return;
             }
-            
+
             // 克隆元素並移除背景色
             const clone = feedbackContent.cloneNode(true);
             clone.querySelectorAll('.highlight-blue, .highlight-red, .highlight-green, .highlight-bold').forEach(el => {
@@ -1716,23 +1757,23 @@
                 el.style.backgroundColor = 'transparent';
                 el.style.color = 'inherit';
             });
-            
+
             // 添加分页控制类
             const sections = clone.querySelectorAll('.feedback-section-simple');
             sections.forEach(section => {
                 section.classList.add('page-break');
             });
-            
+
             // 創建評語PDF
             const opt = {
                 margin: 10,
                 filename: `作文評語_${new Date().toISOString().slice(0, 10)}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
+                html2canvas: {
                     scale: 2,
                     scrollY: 0,
                     // 添加分页控制
-                    onclone: function(clonedDoc) {
+                    onclone: function (clonedDoc) {
                         // 添加分页避免类
                         const sections = clonedDoc.querySelectorAll('.feedback-section-simple');
                         sections.forEach(section => {
@@ -1744,27 +1785,27 @@
                 // 添加分页控制
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
-            
+
             html2pdf().set(opt).from(clone).save();
             log('評語已導出為PDF', 'info');
         }
-        
+
         // 導出日誌
         function exportLog() {
             if (logData.length === 0) {
                 alert('日誌內容為空');
                 return;
             }
-            
+
             let logText = "";
-            
+
             logData.forEach(entry => {
                 logText += `[${entry.timestamp}] ${entry.message}\n`;
             });
-            
+
             const blob = new Blob([logText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
-            
+
             const a = document.createElement('a');
             a.href = url;
             a.download = `作文評改日誌_${new Date().toISOString().slice(0, 10)}.txt`;
@@ -1772,10 +1813,10 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             log('日誌已導出', 'info');
         }
-        
+
         // 處理圖片上載（多圖）
         function handleImageUpload(e) {
             const files = e.target.files;
@@ -1783,19 +1824,19 @@
                 handleImageFiles(files);
             }
         }
-        
+
         function handleImageFiles(files) {
             // 限制最大上傳頁數
             if (uploadedImages.length + files.length > 5) {
                 alert('最多只能上傳5頁作文');
                 return;
             }
-            
+
             let processed = 0;
-            
+
             Array.from(files).forEach(file => {
                 if (!file.type.match('image.*')) return;
-                
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     uploadedImages.push({
@@ -1804,9 +1845,9 @@
                         name: file.name,
                         size: file.size
                     });
-                    
+
                     processed++;
-                    
+
                     if (processed === files.length) {
                         renderPages();
                         processBtn.disabled = false;
@@ -1817,22 +1858,22 @@
                 reader.readAsDataURL(file);
             });
         }
-        
+
         // 渲染所有頁面
         function renderPages() {
             pagesContainer.innerHTML = '';
-            
+
             if (uploadedImages.length === 0) {
                 uploadArea.style.display = 'block';
                 return;
             }
-            
+
             uploadedImages.forEach((image, index) => {
                 const pageItem = document.createElement('div');
                 pageItem.className = 'page-item';
                 pageItem.draggable = true;
                 pageItem.dataset.id = image.id;
-                
+
                 pageItem.innerHTML = `
                     <img src="${image.data}" class="page-img" alt="作文頁面 ${index + 1}">
                     <div class="page-number">頁 ${index + 1}</div>
@@ -1845,9 +1886,9 @@
                         </div>
                     </div>
                 `;
-                
+
                 pagesContainer.appendChild(pageItem);
-                
+
                 // 添加刪除事件
                 const deleteBtn = pageItem.querySelector('.delete-btn');
                 deleteBtn.addEventListener('click', (e) => {
@@ -1857,24 +1898,24 @@
                     renderPages();
                     log(`已刪除作文頁面 ${index + 1}`, 'info');
                 });
-                
+
                 // 添加查看事件
                 const viewBtn = pageItem.querySelector('.view-btn');
                 viewBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     showImageModal(image.data);
                 });
-                
+
                 // 添加拖拽事件
                 pageItem.addEventListener('dragstart', handleDragStart);
                 pageItem.addEventListener('dragover', handleDragOver);
                 pageItem.addEventListener('drop', handleDrop);
                 pageItem.addEventListener('dragend', handleDragEnd);
             });
-            
+
             updatePagesCount();
         }
-        
+
         // 拖拽排序功能
         function handleDragStart(e) {
             draggedItem = this;
@@ -1882,36 +1923,36 @@
             e.dataTransfer.setData('text/plain', this.dataset.id);
             this.classList.add('dragging');
         }
-        
+
         function handleDragOver(e) {
             e.preventDefault();
             return false;
         }
-        
+
         function handleDrop(e) {
             e.stopPropagation();
             if (draggedItem !== this) {
                 const draggedId = draggedItem.dataset.id;
                 const targetId = this.dataset.id;
-                
+
                 // 獲取索引
                 const draggedIndex = uploadedImages.findIndex(img => img.id === draggedId);
                 const targetIndex = uploadedImages.findIndex(img => img.id === targetId);
-                
+
                 // 交換位置
-                [uploadedImages[draggedIndex], uploadedImages[targetIndex]] = 
-                [uploadedImages[targetIndex], uploadedImages[draggedIndex]];
-                
+                [uploadedImages[draggedIndex], uploadedImages[targetIndex]] =
+                    [uploadedImages[targetIndex], uploadedImages[draggedIndex]];
+
                 renderPages();
                 log('已重新排序作文頁面', 'info');
             }
             return false;
         }
-        
+
         function handleDragEnd() {
             this.classList.remove('dragging');
         }
-        
+
         // 顯示圖片彈窗
         function showImageModal(imageData) {
             const modal = document.createElement('div');
@@ -1926,45 +1967,45 @@
             modal.style.justifyContent = 'center';
             modal.style.alignItems = 'center';
             modal.style.cursor = 'pointer';
-            
+
             const img = document.createElement('img');
             img.src = imageData;
             img.style.maxWidth = '90%';
             img.style.maxHeight = '90%';
             img.style.borderRadius = '10px';
             img.style.boxShadow = '0 0 30px rgba(255,255,255,0.2)';
-            
+
             modal.appendChild(img);
-            
+
             modal.addEventListener('click', () => {
                 document.body.removeChild(modal);
             });
-            
+
             document.body.appendChild(modal);
         }
-        
+
         // 處理作文分析
         async function processEssay() {
             if (uploadedImages.length === 0) return;
-            
+
             // 顯示加載狀態
             loadingIndicator.style.display = 'block';
             feedbackContent.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> AI老師正在仔細閱讀您的作文...</p>';
             processBtn.disabled = true;
-            
+
             try {
                 // 獲取學生年級
                 const grade = gradeSelect.value;
-                
+
                 // 步驟1: 使用AI進行OCR和題目檢測
                 let combinedOCRResult = "";
                 let titleFound = false;
                 let contentFound = false;
-                
+
                 // 處理每一頁作文
                 for (let i = 0; i < uploadedImages.length; i++) {
                     const base64Image = uploadedImages[i].data.split(',')[1];
-                    
+
                     // 構建提示詞
                     const ocrPrompt = `你是一位專業的中文老師，請仔細分析上載的作文圖片：
                     
@@ -1978,11 +2019,11 @@
                     [內容]
                     
                     注意：使用香港繁體中文，不要添加任何其他解釋或文字，僅返回題目和內容。`;
-                    
+
                     log(`開始處理第 ${i + 1} 頁作文...`, 'info');
                     const ocrResult = await callGeminiFlash(ocrPrompt, base64Image);
                     log(`第 ${i + 1} 頁處理完成`, 'info');
-                    
+
                     // 解析題目和內容
                     if (ocrResult.includes('[題目]')) {
                         titleFound = true;
@@ -1990,16 +2031,16 @@
                         if (parts.length > 1) {
                             const titlePart = parts[1].split('[內容]')[0].trim();
                             const contentPart = parts[1].split('[內容]')[1] || parts[1].substring(parts[1].indexOf('[內容]') + 4);
-                            
+
                             // 只取第一頁的題目
                             if (i === 0) {
                                 essayTitle = titlePart;
                             }
-                            
+
                             if (contentPart.trim().length > 10) {
                                 contentFound = true;
                             }
-                            
+
                             combinedOCRResult += contentPart.trim() + "\n\n";
                         } else {
                             combinedOCRResult += ocrResult.replace('[內容]', '').trim() + "\n\n";
@@ -2017,13 +2058,13 @@
                         combinedOCRResult += ocrResult.trim() + "\n\n";
                     }
                 }
-                
+
                 essayContent = combinedOCRResult.trim();
-                
+
                 // 記錄OCR結果
                 log(`已提取題目: ${essayTitle ? essayTitle : '無題目'}`, 'info');
                 log(`已提取內容: ${essayContent.substring(0, 100)}...`, 'info');
-                
+
                 // 新增：檢查是否只有題目沒有內容
                 if (titleFound && !contentFound) {
                     log('檢測到只有題目沒有作答，將生成範文', 'info');
@@ -2033,7 +2074,7 @@
                 } else {
                     isModelEssay = false;
                 }
-                
+
                 // 步驟2: 生成作文評價（根據是否有題目）
                 let feedback;
                 if (essayTitle) {
@@ -2044,14 +2085,14 @@
                     feedback = await generateFeedbackWithoutTitle(essayContent, grade);
                 }
                 log('作文評價生成完成', 'info');
-                
+
                 // 顯示結果
                 displayFeedback(essayTitle, essayContent, feedback, isModelEssay);
                 feedbackText = feedback;
                 playStopBtn.disabled = false;
                 exportTextBtn.disabled = false;
                 exportPDFBtn.disabled = false;
-                
+
                 log('評改結果已顯示', 'info');
             } catch (error) {
                 console.error('處理作文時出錯:', error);
@@ -2061,18 +2102,18 @@
                 loadingIndicator.style.display = 'none';
             }
         }
-        
+
         // 處理API錯誤
         function handleApiError(error) {
             let errorMessage = "處理作文時發生錯誤";
             let solution = "請稍後再試或聯繫技術支持";
-            
-            if (error.message.includes("RESOURCE_EXHAUSTED") || 
+
+            if (error.message.includes("RESOURCE_EXHAUSTED") ||
                 error.message.includes("requires more credits")) {
                 errorMessage = "Token額度不足";
                 solution = "請升級您的OpenRouter賬戶以獲得更多額度";
-            } else if (error.message.includes("invalid model ID") || 
-                      error.message.includes("not a valid model ID")) {
+            } else if (error.message.includes("invalid model ID") ||
+                error.message.includes("not a valid model ID")) {
                 errorMessage = "模型ID配置錯誤";
                 solution = "請聯繫技術支持更新模型配置";
             } else if (error.message.includes("401")) {
@@ -2088,7 +2129,7 @@
                 errorMessage = "伺服器內部錯誤";
                 solution = "請稍後重試";
             }
-            
+
             feedbackContent.innerHTML = `
                 <div class="error">
                     <div class="error-title">
@@ -2099,8 +2140,8 @@
                     <p style="margin-top: 15px;">
                         <i class="fas fa-lightbulb"></i> 解決方案: ${solution}
                     </p>
-                    ${errorMessage.includes("額度") ? 
-                      `<p style="margin-top: 10px;">
+                    ${errorMessage.includes("額度") ?
+                    `<p style="margin-top: 10px;">
                          <a href="https://openrouter.ai/settings/credits" target="_blank" 
                             style="color: #1e88e5; text-decoration: none; font-weight: 600;">
                             <i class="fas fa-external-link-alt"></i> 立即升級賬戶
@@ -2109,7 +2150,7 @@
                 </div>
             `;
         }
-        
+
         // 調用Gemini Pro 2.0 Flash API (OpenRouter)
         async function callGeminiFlash(prompt, base64Image = null) {
             const payload = {
@@ -2124,7 +2165,7 @@
                 ],
                 max_tokens: 16384
             };
-            
+
             // 添加圖片數據 (多模態輸入)
             if (base64Image) {
                 payload.messages[0].content.push({
@@ -2134,10 +2175,10 @@
                     }
                 });
             }
-            
+
             log(`發送API請求: ${prompt.substring(0, 100)}...`, 'info');
             const startTime = Date.now();
-            
+
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -2146,25 +2187,25 @@
                 },
                 body: JSON.stringify(payload)
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json();
                 let errorMsg = errorData.error?.message || `API請求失敗 (${response.status})`;
-                
+
                 // 添加更詳細的錯誤信息
                 if (errorData.error?.type === "insufficient_credits") {
                     errorMsg += ` | 可用額度: ${errorData.error.available}`;
                 }
-                
+
                 throw new Error(errorMsg);
             }
-            
+
             const data = await response.json();
             const duration = Date.now() - startTime;
             log(`API響應成功 (${duration}ms): ${data.choices[0].message.content.substring(0, 100)}...`, 'info');
             return data.choices[0].message.content;
         }
-        
+
         // 有題目的評價生成（香港繁體中文）
         async function generateFeedbackWithTitle(title, content, grade) {
             const prompt = `你是一位專業的小學中文補習老師，請用香港繁體中文對以下作文進行評價，並嚴格按照以下結構撰寫評語：
@@ -2214,10 +2255,10 @@
             總結：
                 - 以頂尖老師身份綜合總結作文的優點和不足
                 - 給予學生鼓勵和改進建議`;
-            
+
             return callGeminiFlash(prompt);
         }
-        
+
         // 無題目的評價生成（香港繁體中文）
         async function generateFeedbackWithoutTitle(content, grade) {
             const prompt = `你是一位專業的小學中文補習老師，請用香港繁體中文對以下作文進行評價，並嚴格按照以下結構撰寫評語：
@@ -2264,10 +2305,10 @@
             總結：
                 - 以頂尖老師身份綜合總結作文的優點和不足
                 - 給予學生鼓勵和改進建議`;
-            
+
             return callGeminiFlash(prompt);
         }
-        
+
         // 新增：生成範文
         async function generateModelEssay(title, grade) {
             const prompt = `你是一位專業的小學中文老師，請為以下作文題目撰寫一篇範文：
@@ -2283,24 +2324,24 @@
             5. 使用恰當的詞語和修辭手法
             
             請直接輸出範文內容，不需要任何額外說明或標記。`;
-            
+
             log('開始生成範文...', 'info');
             const essay = await callGeminiFlash(prompt);
             return essay;
         }
-        
+
         // 新增：提取四字词语
         function extractFourCharacterPhrases(text) {
             // 匹配四字词语（包括成语）
             const phraseRegex = /[\u4e00-\u9fa5]{4}/g;
             const phrases = text.match(phraseRegex) || [];
-            
+
             // 去重
             const uniquePhrases = [...new Set(phrases)];
-            
+
             return uniquePhrases;
         }
-        
+
         // 生成文章
         async function generateEssay() {
             const keywords = document.getElementById('keywords').value.trim();
@@ -2308,17 +2349,17 @@
             const wordCountType = document.getElementById('word-count-type').value;
             const wordCount = document.getElementById('word-count').value;
             const grade = document.getElementById('writing-grade').value;
-            
+
             if (!keywords) {
                 alert('請輸入關鍵字詞');
                 return;
             }
-            
+
             writingLoading.style.display = 'block';
             writingResult.style.display = 'none';
             document.getElementById('fourCharacterPhrases').innerHTML = '';
             document.getElementById('learningPoints').innerHTML = '';
-            
+
             try {
                 // 修改后的提示词，严格禁止额外说明
                 let prompt = `你是一位專業的小學中文老師，請根據以下要求撰寫一篇作文：
@@ -2345,7 +2386,7 @@
                 7. 在文章結束後另起一行寫上【四字詞語】，然後列出文章中實際使用的四字成語或固定四字詞語（如：烈日當空、汗流浹背）
                 8. 禁止添加任何說明文字，直接輸出作文內容和四字詞語部分
                 `;
-                
+
                 // 添加文體特定要求
                 if (writingStyle === '描寫文') {
                     prompt += `
@@ -2380,38 +2421,38 @@
                      * 教育制度的改革方向
                 `;
                 }
-                
+
                 log(`開始生成${writingStyle}...`, 'info');
                 const essay = await callGeminiFlash(prompt);
                 log(`${writingStyle}生成完成`, 'info');
-                
+
                 // 解析四字詞語部分
                 let cleanEssay = essay;
                 let fourCharacterPhrases = [];
-                
+
                 // 查找【四字詞語】標記
                 const markerIndex = essay.lastIndexOf('【四字詞語】');
                 if (markerIndex !== -1) {
                     // 分離文章內容和四字詞語
                     cleanEssay = essay.substring(0, markerIndex).trim();
                     const phrasesPart = essay.substring(markerIndex + 6); // 6是【四字詞語】的長度
-                    
+
                     // 提取四字詞語（支持用頓號、逗號分隔）
                     const phraseRegex = /([\u4e00-\u9fa5]{4})/g;
                     const extractedPhrases = phrasesPart.match(phraseRegex) || [];
-                    
+
                     // 去重並過濾空值
                     fourCharacterPhrases = [...new Set(extractedPhrases)].filter(p => p.trim());
                 }
-                
+
                 // 保存生成的内容
                 generatedEssay = cleanEssay;
                 generatedPhrases = fourCharacterPhrases.join('、');
-                
+
                 // 显示文章内容
                 cleanEssay = cleanEssay.replace(/\*\*/g, '');
                 writingContent.textContent = cleanEssay;
-                
+
                 // 顯示四字詞語
                 const phrasesContainer = document.getElementById('fourCharacterPhrases');
                 if (fourCharacterPhrases.length > 0) {
@@ -2419,16 +2460,16 @@
                 } else {
                     phrasesContainer.textContent = '本文中未使用四字詞語';
                 }
-                
+
                 // 生成学习重点
                 log('開始生成學習重點...', 'info');
                 const learningPoints = await generateLearningPoints(cleanEssay, grade);
                 log('學習重點生成完成', 'info');
-                
+
                 // 保存并显示学习重点
                 generatedLearningPoints = learningPoints.replace('學習重點：', '').trim();
                 document.getElementById('learningPoints').textContent = generatedLearningPoints;
-                
+
                 writingResult.style.display = 'block';
             } catch (error) {
                 console.error('生成文章時出錯:', error);
@@ -2447,7 +2488,7 @@
                 writingLoading.style.display = 'none';
             }
         }
-        
+
         // 生成学习重点
         async function generateLearningPoints(essay, grade) {
             const prompt = `你是一位專業的中文老師，請分析以下文章並撰寫學習重點：
@@ -2461,10 +2502,10 @@
             3. 字數控制在80字以內
             4. 使用香港繁體中文
             5. 直接輸出學習重點內容，不要包含任何標題或額外文字（不要包含"學習重點："字樣）`;
-            
+
             return callGeminiFlash(prompt);
         }
-        
+
         // 新增：重置寫文思路頁面
         function resetWriting() {
             document.getElementById('keywords').value = '';
@@ -2477,7 +2518,7 @@
             document.getElementById('learningPoints').textContent = '';
             log('寫文思路頁面已重置', 'info');
         }
-        
+
         // 處理評語中的標記
         function processFeedbackMarkers(text) {
             // 替換重點標記
@@ -2490,12 +2531,12 @@
             text = text.replace(/\[green\](.*?)\[\/green\]/g, '<span class="highlight-green">$1</span>');
             return text;
         }
-        
+
         // 顯示評價結果（改進版）
         function displayFeedback(title, content, feedback, isModelEssay = false) {
             // 處理標記
             feedback = processFeedbackMarkers(feedback);
-            
+
             // 核心修改：使用更稳健的段落分割方法
             const sections = {};
             const sectionKeywords = [
@@ -2504,15 +2545,15 @@
                 { key: 'suggestions', keywords: ['改善建議'] },
                 { key: 'conclusion', keywords: ['總結'] }
             ];
-            
+
             let currentSection = null;
             let contentBuffer = [];
-            
+
             // 按行处理评语内容
             const lines = feedback.split('\n');
             for (const line of lines) {
                 const trimmedLine = line.trim();
-                
+
                 // 检查是否是新的章节标题
                 let isSectionHeader = false;
                 for (const section of sectionKeywords) {
@@ -2530,27 +2571,27 @@
                     }
                     if (isSectionHeader) break;
                 }
-                
+
                 if (!isSectionHeader && trimmedLine && currentSection) {
                     // 避免重复添加标题行
-                    if (!sectionKeywords.some(section => 
+                    if (!sectionKeywords.some(section =>
                         section.keywords.some(kw => trimmedLine.includes(kw)))) {
                         contentBuffer.push(trimmedLine);
                     }
                 }
             }
-            
+
             // 保存最后一个章节
             if (currentSection && contentBuffer.length > 0) {
                 sections[currentSection] = contentBuffer.join('\n').trim();
             }
-            
+
             // 保存分節內容供語音使用
             feedbackSections = sections;
-            
+
             // 构建HTML显示结构
             let html = '';
-            
+
             // 显示题目（如果有）
             if (title) {
                 html += `<div class="feedback-section-simple">
@@ -2558,18 +2599,18 @@
                     <p>${title}</p>
                 </div>`;
             }
-            
+
             // 显示作文内容 - 如果是範文則添加標記
             let contentTitle = '作文內容';
             if (isModelEssay) {
                 contentTitle = '作文內容（AI範文）<span class="model-essay-badge">範文</span>';
             }
-            
+
             html += `<div class="feedback-section-simple">
                 <h3><i class="fas fa-file-alt"></i> ${contentTitle}</h3>
                 <p>${content}</p>
             </div>`;
-            
+
             // 显示解析后的评语部分
             if (sections.analysis) {
                 html += `<div class="feedback-section-simple">
@@ -2577,102 +2618,102 @@
                     <div class="feedback-text">${sections.analysis}</div>
                 </div>`;
             }
-            
+
             if (sections.evaluation) {
                 html += `<div class="feedback-section-simple">
                     <h3><i class="fas fa-comment"></i> 整體評價</h3>
                     <div class="feedback-text">${sections.evaluation}</div>
                 </div>`;
             }
-            
+
             if (sections.suggestions) {
                 html += `<div class="feedback-section-simple">
                     <h3><i class="fas fa-edit"></i> 改善建議</h3>
                     <div class="feedback-text">${sections.suggestions}</div>
                 </div>`;
             }
-            
+
             if (sections.conclusion) {
                 html += `<div class="feedback-section-simple">
                     <h3><i class="fas fa-heart"></i> 總結</h3>
                     <div class="feedback-text">${sections.conclusion}</div>
                 </div>`;
             }
-            
+
             feedbackContent.innerHTML = html;
-            
+
             // 添加滚动动画
             feedbackContent.scrollTop = 0;
         }
-        
+
         // 語音反饋功能 - 已完全过滤标记
         function playFeedback() {
             if (!feedbackSections || Object.keys(feedbackSections).length === 0) return;
-            
+
             const language = document.getElementById('languageSelect').value;
             const speed = parseFloat(document.getElementById('speedControl').value);
             const volume = parseFloat(document.getElementById('volumeControl').value);
-            
+
             // 提取語音合成內容 - 完全过滤大部分标记
             let speechText = "";
-            
+
             if (feedbackSections.evaluation) {
-                speechText += "整體評價：\n" + 
+                speechText += "整體評價：\n" +
                     feedbackSections.evaluation
                         .replace(/<[^>]+>/g, '') // 移除HTML标签
                         .replace(/\[.*\]/g, '')  // 移除所有方括号标记
                         .replace(/[\/#$%\^&\*:{}=\-_`~()]/g, '') // 移除标点符号
                         .replace(/\s{2,}/g, ' ') + "\n\n";
             }
-            
+
             if (feedbackSections.suggestions) {
-                speechText += "改善建議：\n" + 
+                speechText += "改善建議：\n" +
                     feedbackSections.suggestions
                         .replace(/<[^>]+>/g, '')
                         .replace(/\[.*\]/g, '')  // 移除所有方括号标记
                         .replace(/[\/#$%\^&\*:{}=\-_`~()]/g, '') // 移除标点符号
                         .replace(/\s{2,}/g, ' ') + "\n\n";
             }
-            
+
             if (feedbackSections.conclusion) {
-                speechText += "總結：\n" + 
+                speechText += "總結：\n" +
                     feedbackSections.conclusion
                         .replace(/<[^>]+>/g, '')
                         .replace(/\[.*\]/g, '')  // 移除所有方括号标记
                         .replace(/[\/#$%\^&\*:{}=\-_`~()]/g, '') // 移除标点符号
                         .replace(/\s{2,}/g, ' ');
             }
-            
+
             if (!speechText) return;
-            
+
             // 使用Web Speech API
             if ('speechSynthesis' in window) {
                 // 停止當前語音
                 stopFeedback();
-                
+
                 const utterance = new SpeechSynthesisUtterance(speechText);
                 utterance.lang = language;
                 utterance.rate = speed;
                 utterance.volume = volume;
-                
+
                 // 選擇語音
                 const voices = speechSynthesis.getVoices();
                 if (voices.length > 0) {
                     // 根據選擇的語音類型過濾
                     let filteredVoices = [];
-                    
+
                     // 特殊處理廣東話
                     if (language === 'zh-HK') {
-                        filteredVoices = voices.filter(v => 
-                            v.lang === 'zh-HK' || 
+                        filteredVoices = voices.filter(v =>
+                            v.lang === 'zh-HK' ||
                             v.name.toLowerCase().includes('cantonese') ||
                             v.name.includes('粤語') ||
                             v.name.includes('廣東話'));
-                    } 
+                    }
                     // 普通話
                     else if (language === 'zh-CN') {
-                        filteredVoices = voices.filter(v => 
-                            v.lang === 'zh-CN' || 
+                        filteredVoices = voices.filter(v =>
+                            v.lang === 'zh-CN' ||
                             v.name.toLowerCase().includes('mandarin') ||
                             v.name.includes('普通話'));
                     }
@@ -2680,7 +2721,7 @@
                     else {
                         filteredVoices = voices.filter(v => v.lang.startsWith(language));
                     }
-                    
+
                     // 如果找不到合適語音，使用默認
                     if (filteredVoices.length > 0) {
                         utterance.voice = filteredVoices[0];
@@ -2689,37 +2730,37 @@
                         utterance.voice = voices.find(v => v.lang.startsWith(language)) || voices[0];
                     }
                 }
-                
+
                 speechSynthesis.speak(utterance);
                 currentSpeech = utterance;
                 isPlaying = true;
-                
+
                 // 更新按鈕狀態
                 playStopBtn.innerHTML = '<i class="fas fa-stop"></i> 停止播放';
                 playStopBtn.classList.add('btn-warning');
-                
+
                 utterance.onend = () => {
                     isPlaying = false;
                     playStopBtn.innerHTML = '<i class="fas fa-play"></i> 播放語音';
                 };
-                
+
                 log('開始播放語音反饋', 'info');
             } else {
                 alert('您的瀏覽器不支援語音合成功能，請使用最新版本的Chrome瀏覽器');
                 log('瀏覽器不支援語音合成', 'warning');
             }
         }
-        
+
         function toggleFeedback() {
             if (!feedbackText) return;
-            
+
             if (isPlaying) {
                 stopFeedback();
             } else {
                 playFeedback();
             }
         }
-        
+
         function stopFeedback() {
             if (speechSynthesis.speaking || speechSynthesis.paused) {
                 speechSynthesis.cancel();
@@ -2730,7 +2771,7 @@
                 log('語音反饋已停止', 'info');
             }
         }
-        
+
         // 重置應用
         function resetApp() {
             imageUpload.value = '';
@@ -2746,7 +2787,7 @@
             exportPDFBtn.disabled = true;
             uploadArea.style.display = 'block';
             renderPages();
-            
+
             // 重置評語展示
             feedbackContent.innerHTML = `
                 <div class="feedback-summary">
@@ -2771,113 +2812,113 @@
                     <p>這裡將顯示總結及鼓勵的話語</p>
                 </div>
             `;
-            
+
             stopFeedback();
             log('應用已重置', 'info');
         }
-        
+
         // 新增：导出写作思路PDF（修复版）
         function exportWritingPDF() {
-    // 检查是否有生成的内容
-    if (!generatedEssay) {
-        alert('請先生成作文內容');
-        return;
-    }
-    
-    // 创建一个容器用于PDF导出
-    const pdfContainer = document.createElement('div');
-    pdfContainer.className = 'pdf-container';
-    
-    // 添加标题
-    const title = document.createElement('h1');
-    title.className = 'pdf-title';
-    title.textContent = '智能作文助手 - 作文範本';
-    title.style.color = '#ffffff'; // 设置为白色
-    title.style.backgroundColor = '#0d47a1'; // 添加深蓝色背景提高对比度
-    title.style.padding = '10px';
-    title.style.borderRadius = '8px';
-    pdfContainer.appendChild(title);
-    
-    // 添加参数信息
-    const params = document.createElement('div');
-    params.className = 'pdf-params';
-    params.innerHTML = `
+            // 检查是否有生成的内容
+            if (!generatedEssay) {
+                alert('請先生成作文內容');
+                return;
+            }
+
+            // 创建一个容器用于PDF导出
+            const pdfContainer = document.createElement('div');
+            pdfContainer.className = 'pdf-container';
+
+            // 添加标题
+            const title = document.createElement('h1');
+            title.className = 'pdf-title';
+            title.textContent = '智能作文助手 - 作文範本';
+            title.style.color = '#ffffff'; // 设置为白色
+            title.style.backgroundColor = '#0d47a1'; // 添加深蓝色背景提高对比度
+            title.style.padding = '10px';
+            title.style.borderRadius = '8px';
+            pdfContainer.appendChild(title);
+
+            // 添加参数信息
+            const params = document.createElement('div');
+            params.className = 'pdf-params';
+            params.innerHTML = `
         <h2 class="pdf-section-title">作文要求</h2>
         <p><strong>年級：</strong>${document.getElementById('writing-grade').value}</p>
         <p><strong>文體：</strong>${document.getElementById('writing-style').value}</p>
         <p><strong>關鍵字詞：</strong>${document.getElementById('keywords').value}</p>
         <p><strong>字數要求：</strong>${document.getElementById('word-count-type').value} ${document.getElementById('word-count').value} 字</p>
     `;
-    pdfContainer.appendChild(params);
-    
-    // 处理作文内容 - 去掉**标记并确保题目和正文之间有分隔
-    let processedEssay = generatedEssay
-        .replace(/\*\*/g, '') // 去掉所有**
-        .replace(/【(.*?)】/g, '<h3 style="color:#000000;margin-top:20px;">$1</h3>'); // 将【题目】转换为黑色标题
-    
-    // 添加作文内容
-    const essaySection = document.createElement('div');
-    essaySection.className = 'pdf-section';
-    essaySection.innerHTML = `
+            pdfContainer.appendChild(params);
+
+            // 处理作文内容 - 去掉**标记并确保题目和正文之间有分隔
+            let processedEssay = generatedEssay
+                .replace(/\*\*/g, '') // 去掉所有**
+                .replace(/【(.*?)】/g, '<h3 style="color:#000000;margin-top:20px;">$1</h3>'); // 将【题目】转换为黑色标题
+
+            // 添加作文内容
+            const essaySection = document.createElement('div');
+            essaySection.className = 'pdf-section';
+            essaySection.innerHTML = `
         <h2 class="pdf-section-title">作文內容</h2>
         <div class="pdf-content">${processedEssay}</div>
     `;
-    pdfContainer.appendChild(essaySection);
-    
-    // 添加四字词语
-    const phrasesSection = document.createElement('div');
-    phrasesSection.className = 'pdf-section';
-    phrasesSection.innerHTML = `
+            pdfContainer.appendChild(essaySection);
+
+            // 添加四字词语
+            const phrasesSection = document.createElement('div');
+            phrasesSection.className = 'pdf-section';
+            phrasesSection.innerHTML = `
         <h2 class="pdf-section-title">四字詞語</h2>
         <div class="pdf-content">${generatedPhrases}</div>
     `;
-    pdfContainer.appendChild(phrasesSection);
-    
-    // 添加学习重点
-    const learningSection = document.createElement('div');
-    learningSection.className = 'pdf-section';
-    learningSection.innerHTML = `
+            pdfContainer.appendChild(phrasesSection);
+
+            // 添加学习重点
+            const learningSection = document.createElement('div');
+            learningSection.className = 'pdf-section';
+            learningSection.innerHTML = `
         <h2 class="pdf-section-title">學習重點</h2>
         <div class="pdf-content">${generatedLearningPoints}</div>
     `;
-    pdfContainer.appendChild(learningSection);
-    
-    // 添加页脚
-    const footer = document.createElement('div');
-    footer.style.marginTop = '30px';
-    footer.style.textAlign = 'center';
-    footer.style.color = '#78909c';
-    footer.style.fontSize = '0.9rem';
-    footer.innerHTML = `
+            pdfContainer.appendChild(learningSection);
+
+            // 添加页脚
+            const footer = document.createElement('div');
+            footer.style.marginTop = '30px';
+            footer.style.textAlign = 'center';
+            footer.style.color = '#78909c';
+            footer.style.fontSize = '0.9rem';
+            footer.innerHTML = `
         <p>© 2025 智能作文助手 - 雙功能版</p>
         <p>Designed by Nathan Yuen | AI改文 | 寫文思路</p>
     `;
-    pdfContainer.appendChild(footer);
-    
-    // 设置导出选项
-    const opt = {
-        margin: 15,
-        filename: `作文範本_${new Date().toISOString().slice(0, 10)}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2,
-            useCORS: true,
-            scrollY: 0
-        },
-        jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait',
-            putOnlyUsedFonts: true
-        },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-    
-    // 导出PDF
-    html2pdf().set(opt).from(pdfContainer).save();
-    log('作文範本已導出為PDF', 'info');
-}
-        
+            pdfContainer.appendChild(footer);
+
+            // 设置导出选项
+            const opt = {
+                margin: 15,
+                filename: `作文範本_${new Date().toISOString().slice(0, 10)}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    putOnlyUsedFonts: true
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            // 导出PDF
+            html2pdf().set(opt).from(pdfContainer).save();
+            log('作文範本已導出為PDF', 'info');
+        }
+
         // 初始化語音合成
         function initSpeech() {
             if ('speechSynthesis' in window) {
@@ -2885,23 +2926,24 @@
                 speechSynthesis.getVoices();
             }
         }
-        
+
         // 初始化應用
-        window.onload = function() {
+        window.onload = function () {
             init();
             initSpeech();
-            
+
             // 設置默認語言為粵語
             document.getElementById('languageSelect').value = 'zh-HK';
-            
+
             // 初始化速度显示
             updateSpeedValue();
             updateVolumeValue();
             updatePagesCount();
-            
+
             // 设置默认文体为描写文
             document.getElementById('writing-style').value = '描寫文';
         };
     </script>
 </body>
+
 </html>
