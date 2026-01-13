@@ -1102,7 +1102,7 @@
                     <div class="form-group">
                         <label class="form-label" for="apiProvider" data-i18n="apiProviderLabel">AI 服務</label>
                         <select id="apiProvider" class="form-select" onchange="updateApiInfo()">
-                            <option value="openrouter-gemini" selected>OpenRouter(Gemini 2.5)</option>
+                            <option value="openrouter-mimo" selected>OpenRouter(Xiaomi MIMO)</option>
                             <option value="openrouter">OpenRouter(DeepSeek)</option>
                             <option value="moonshot">Moonshot</option>
                             <option value="deepseek">DeepSeek</option>
@@ -1431,7 +1431,7 @@
             glm: 'b85a05c320c0036cb33e501b9235a28e.MA7MO25YLE5Q6fIX',
             gemini: 'AIzaSyCx6mMV1AKHtppRoCduDyZoVS-mmyiZOFw',
             openrouter: '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',
-            'openrouter-gemini': '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'
+            'openrouter-mimo': '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'
         };
 
         // API 配置
@@ -1593,8 +1593,8 @@
                     }
                 }
             },
-            'openrouter-gemini': {
-                name: 'OpenRouter (Gemini 2.5)',
+            'openrouter-mimo': {
+                name: 'OpenRouter (Xiaomi MIMO)',
                 endpoint: 'https://openrouter.ai/api/v1/chat/completions',
                 helpUrl: 'https://openrouter.ai/keys',
                 headers: (apiKey) => ({
@@ -1603,7 +1603,7 @@
                 }),
                 buildUrl: (endpoint, apiKey) => endpoint,
                 buildBody: (prompt) => ({
-                    model: 'google/gemini-2.5-flash-preview-05-20',
+                    model: 'xiaomi/mimo-vl-7b-flash:free',
                     messages: [{
                         role: 'user',
                         content: prompt
