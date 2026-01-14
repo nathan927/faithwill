@@ -1,10 +1,11 @@
 ```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airplane Bullet Dodging Game</title>
+    <title>Bullet Storm</title>
     <style>
         body {
             margin: 0;
@@ -117,8 +118,15 @@
         }
 
         @keyframes flash {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         #difficultySelect {
@@ -299,9 +307,20 @@
         }
 
         @keyframes victoryPulse {
-            0% { transform: scale(1); text-shadow: 0 0 20px #ff8800; }
-            50% { transform: scale(1.05); text-shadow: 0 0 30px #ff8800, 0 0 50px #ff4400; }
-            100% { transform: scale(1); text-shadow: 0 0 20px #ff8800; }
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 20px #ff8800;
+            }
+
+            50% {
+                transform: scale(1.05);
+                text-shadow: 0 0 30px #ff8800, 0 0 50px #ff4400;
+            }
+
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 20px #ff8800;
+            }
         }
 
         #trophyIcon {
@@ -313,8 +332,13 @@
         }
 
         @keyframes trophySpin {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(360deg); }
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            100% {
+                transform: rotateY(360deg);
+            }
         }
 
         #victoryMessage {
@@ -355,9 +379,17 @@
         }
 
         @keyframes medalSpin {
-            0% { transform: rotateY(0deg); }
-            50% { transform: rotateY(180deg); }
-            100% { transform: rotateY(360deg); }
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            50% {
+                transform: rotateY(180deg);
+            }
+
+            100% {
+                transform: rotateY(360deg);
+            }
         }
 
         .medal::before {
@@ -406,8 +438,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
         }
 
         #levelDisplay {
@@ -428,8 +469,15 @@
         }
 
         @keyframes fadeUp {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-50px); }
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
         }
 
         .bulletAlert {
@@ -442,8 +490,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         #helpButton {
@@ -567,8 +622,15 @@
         }
 
         @keyframes demoPulse {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
@@ -585,7 +647,8 @@
                 gap: 15px;
             }
 
-            #timer, #score {
+            #timer,
+            #score {
                 font-size: 20px;
             }
 
@@ -636,6 +699,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
@@ -652,13 +716,13 @@
             <div id="levelDisplay"></div>
 
             <div id="startScreen">
-                <div id="startTitle">飛機避子彈遊戲 - BULLET STORM</div>
+                <div id="startTitle">BULLET STORM</div>
                 <div id="pressStart">PRESS START</div>
                 <div id="helpButton">?</div>
             </div>
 
             <div id="colorSelect">
-                <div id="colorSelectTitle">選擇飛機顏色</div>
+                <div id="colorSelectTitle">Select Plane Color</div>
                 <div class="colorOptions">
                     <div class="colorOption" data-color="blue" style="background-color: rgba(64, 128, 255, 0.3);">
                         <div class="planePreview" id="bluePlane"></div>
@@ -682,96 +746,100 @@
             </div>
 
             <div id="difficultySelect">
-                <div class="difficultyBtn" data-difficulty="easy">簡單: 子彈速度慢，數量少</div>
-                <div class="difficultyBtn" data-difficulty="medium">中等: 子彈速度和數量適中</div>
-                <div class="difficultyBtn" data-difficulty="hard">困難: 子彈速度快，數量多</div>
-                <div class="difficultyBtn" data-difficulty="insane">瘋狂: 子彈速度非常快，數量非常多</div>
-                <div class="difficultyBtn" data-difficulty="ultimate">終極: 極限挑戰，各種彈幕襲來</div>
-                <div class="difficultyBtn aiDemoBtn" data-difficulty="aiDemo" style="background-color: #4080C0; margin-top: 20px;">AI示範模式 (終極難度)</div>
+                <div class="difficultyBtn" data-difficulty="easy">Easy: Slow bullets, fewer enemies</div>
+                <div class="difficultyBtn" data-difficulty="medium">Medium: Moderate speed and quantity</div>
+                <div class="difficultyBtn" data-difficulty="hard">Hard: Fast bullets, more enemies</div>
+                <div class="difficultyBtn" data-difficulty="insane">Insane: Very fast bullets, many enemies</div>
+                <div class="difficultyBtn" data-difficulty="ultimate">Ultimate: Extreme challenge, bullet hell</div>
+                <div class="difficultyBtn aiDemoBtn" data-difficulty="aiDemo"
+                    style="background-color: #4080C0; margin-top: 20px;">AI Demo Mode (Ultimate)</div>
             </div>
 
             <div id="countdownOverlay">3</div>
 
             <div id="resultOverlay">
-                <div id="resultText">過關！</div>
+                <div id="resultText">Level Complete!</div>
                 <div class="resultBtns">
-                    <div id="resultBtn" class="gameButton">挑戰下一關 !</div>
-                    <div id="restartFromFailBtn" class="gameButton">重新開始</div>
+                    <div id="resultBtn" class="gameButton">Next Level!</div>
+                    <div id="restartFromFailBtn" class="gameButton">Restart</div>
                 </div>
             </div>
 
             <div id="victoryScreen">
-                <div id="victoryTitle">恭喜通關全部難度!</div>
+                <div id="victoryTitle">CONGRATULATIONS!</div>
                 <div class="medal"></div>
-                <div id="victoryMessage">你成功征服了所有難度，成為了頂尖的飛行員！</div>
-                <div id="finalScore">最終得分: 0</div>
+                <div id="victoryMessage">You conquered all difficulties and became a top pilot!</div>
+                <div id="finalScore">Final Score: 0</div>
                 <div class="victoryStats">
-                    <div class="statItem">完成難度: <span id="completedLevelsStats">5/5</span></div>
-                    <div class="statItem">生存時間: <span id="survivalTimeStats">0</span> 秒</div>
-                    <div class="statItem">躲避子彈: <span id="bulletsDodgedStats">0</span></div>
+                    <div class="statItem">Completed: <span id="completedLevelsStats">5/5</span></div>
+                    <div class="statItem">Survival Time: <span id="survivalTimeStats">0</span> sec</div>
+                    <div class="statItem">Bullets Dodged: <span id="bulletsDodgedStats">0</span></div>
                 </div>
-                <div id="restartBtn" class="gameButton">重新挑戰</div>
+                <div id="restartBtn" class="gameButton">Play Again</div>
             </div>
 
             <div id="instructionsModal">
-                <div id="instructionsTitle">遊戲說明</div>
+                <div id="instructionsTitle">How to Play</div>
 
                 <div class="instructionSection">
-                    <div class="instructionHeading">遊戲目標</div>
+                    <div class="instructionHeading">Game Objective</div>
                     <div class="instructionText">
-                        在每個關卡中生存 30 秒，躲避不同類型的子彈。通過所有難度級別以贏得遊戲！
+                        Survive 30 seconds in each level by dodging different types of bullets. Complete all difficulty
+                        levels to win!
                     </div>
                 </div>
 
                 <div class="instructionSection">
-                    <div class="instructionHeading">生命系統</div>
+                    <div class="instructionHeading">Lives System</div>
                     <div class="instructionText">
-                        你有 2 條生命。每次被子彈擊中會失去一條生命。當你失去所有生命時，遊戲將結束，你需要重新嘗試當前難度。
+                        You have 2 lives. Each bullet hit costs one life. When all lives are lost, you must retry the
+                        current level.
                     </div>
                 </div>
 
                 <div class="instructionSection">
-                    <div class="instructionHeading">時間規則</div>
+                    <div class="instructionHeading">Time Rules</div>
                     <div class="instructionText">
-                        每個關卡持續 30 秒。屏幕左上角的計時器會顯示剩餘時間。堅持到計時器歸零以通過當前難度！
+                        Each level lasts 30 seconds. The timer in the top-left shows remaining time. Survive until it
+                        reaches zero!
                     </div>
                 </div>
 
                 <div class="instructionSection">
-                    <div class="instructionHeading">獎勵道具</div>
+                    <div class="instructionHeading">Power-ups</div>
                     <div class="instructionText">
-                        遊戲中會隨機出現道具。迅速移動到它們的位置以獲得特殊能力：
+                        Power-ups appear randomly. Collect them for special abilities:
                     </div>
 
                     <div class="powerupDescription">
                         <div class="powerupIcon" style="background-color: #4080ff;"></div>
-                        <div>無敵護盾：短時間內無敵，可以免疫子彈傷害</div>
+                        <div>Shield: Temporary invincibility from bullets</div>
                     </div>
 
                     <div class="powerupDescription">
                         <div class="powerupIcon" style="background-color: #ff4040;"></div>
-                        <div>額外生命：增加一條生命（最多 3 條）</div>
+                        <div>Extra Life: Adds one life (max 3)</div>
                     </div>
 
                     <div class="powerupDescription">
                         <div class="powerupIcon" style="background-color: #40ff40;"></div>
-                        <div>時間減速：減慢所有子彈的速度</div>
+                        <div>Slow Motion: Slows all bullets</div>
                     </div>
 
                     <div class="powerupDescription">
                         <div class="powerupIcon" style="background-color: #ffff40;"></div>
-                        <div>清場：移除所有子彈並獲得額外分數</div>
+                        <div>Clear Screen: Removes all bullets + bonus points</div>
                     </div>
                 </div>
 
                 <div class="instructionSection">
-                    <div class="instructionHeading">控制方式</div>
+                    <div class="instructionHeading">Controls</div>
                     <div class="instructionText">
-                        使用鼠標或觸摸屏移動飛機。保持移動以避開子彈！
+                        Use mouse or touch to move your plane. Keep moving to avoid bullets!
                     </div>
                 </div>
 
-                <button id="closeInstructions">關閉</button>
+                <button id="closeInstructions">Close</button>
             </div>
 
             <div id="demoModeText">DEMO MODE</div>
@@ -930,7 +998,7 @@
         let invincibleDuration = 2; // seconds
         let difficultyOrder = ['easy', 'medium', 'hard', 'insane', 'ultimate'];
         let bulletPatterns = {
-            simple: function(x, y, angle, speed) {
+            simple: function (x, y, angle, speed) {
                 return [{
                     x: x,
                     y: y,
@@ -941,7 +1009,7 @@
                     type: 'simple'
                 }];
             },
-            spread: function(x, y, angle, speed) {
+            spread: function (x, y, angle, speed) {
                 const bullets = [];
                 const count = 3;
                 const spread = Math.PI / 8;
@@ -961,7 +1029,7 @@
 
                 return bullets;
             },
-            wave: function(x, y, angle, speed) {
+            wave: function (x, y, angle, speed) {
                 return [{
                     x: x,
                     y: y,
@@ -975,7 +1043,7 @@
                     type: 'wave'
                 }];
             },
-            circle: function(x, y, angle, speed) {
+            circle: function (x, y, angle, speed) {
                 const bullets = [];
                 const count = 8;
 
@@ -994,7 +1062,7 @@
 
                 return bullets;
             },
-            spiral: function(x, y, angle, speed) {
+            spiral: function (x, y, angle, speed) {
                 const bullets = [];
                 const count = 5;
 
@@ -1019,7 +1087,7 @@
 
                 return bullets;
             },
-            homing: function(x, y, angle, speed) {
+            homing: function (x, y, angle, speed) {
                 return [{
                     x: x,
                     y: y,
@@ -1033,7 +1101,7 @@
                     timeAlive: 0
                 }];
             },
-            zigzag: function(x, y, angle, speed) {
+            zigzag: function (x, y, angle, speed) {
                 return [{
                     x: x,
                     y: y,
@@ -1047,7 +1115,7 @@
                     zigzagAngle: Math.PI / 3 // angle of zigzag
                 }];
             },
-            bouncer: function(x, y, angle, speed) {
+            bouncer: function (x, y, angle, speed) {
                 return [{
                     x: x,
                     y: y,
@@ -1066,7 +1134,7 @@
             {
                 type: 'shield',
                 color: '#4080ff',
-                effect: function() {
+                effect: function () {
                     playerInvincible = true;
                     invincibleTime = 5; // 5 seconds shield
                     pulseInvincibilityEffect('#4080ff');
@@ -1076,7 +1144,7 @@
             {
                 type: 'extraLife',
                 color: '#ff4040',
-                effect: function() {
+                effect: function () {
                     if (lives < 3) {
                         lives++;
                         updateLivesDisplay();
@@ -1090,7 +1158,7 @@
             {
                 type: 'slowTime',
                 color: '#40ff40',
-                effect: function() {
+                effect: function () {
                     // Slow down all bullets
                     for (let bullet of bullets) {
                         bullet.speed *= 0.6;
@@ -1101,7 +1169,7 @@
             {
                 type: 'clearScreen',
                 color: '#ffff40',
-                effect: function() {
+                effect: function () {
                     // Remove all bullets and award points
                     const pointsPerBullet = 200;
                     const totalPoints = bullets.length * pointsPerBullet;
@@ -1307,7 +1375,7 @@
             const alert = document.createElement('div');
             alert.className = 'bulletAlert';
 
-            switch(edge) {
+            switch (edge) {
                 case 0: // Top
                     alert.style.top = '5px';
                     alert.style.left = `${position}px`;
@@ -1365,7 +1433,7 @@
             // Color selection
             const colorOptions = document.querySelectorAll('.colorOption');
             colorOptions.forEach(option => {
-                option.addEventListener('click', function() {
+                option.addEventListener('click', function () {
                     playerColor = this.getAttribute('data-color');
                     colorSelect.style.display = 'none';
                     difficultySelect.style.display = 'flex';
@@ -1375,7 +1443,7 @@
             // Difficulty selection
             const difficultyBtns = document.querySelectorAll('.difficultyBtn');
             difficultyBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const difficulty = this.getAttribute('data-difficulty');
 
                     if (difficulty === 'aiDemo') {
@@ -1414,9 +1482,9 @@
 
             // Restart from fail screen
             restartFromFailBtn.addEventListener('click', () => {
-                 // --- MODIFICATION START ---
-                 window.location.reload();
-                 // --- MODIFICATION END ---
+                // --- MODIFICATION START ---
+                window.location.reload();
+                // --- MODIFICATION END ---
             });
 
             // Restart button after victory
@@ -1834,12 +1902,12 @@
 
                 // Remove any old onclick handler if it exists
                 resultBtn.onclick = null;
-                 // Add the listener again to ensure it uses the new attribute
-                 resultBtn.addEventListener('click', () => {
+                // Add the listener again to ensure it uses the new attribute
+                resultBtn.addEventListener('click', () => {
                     if (resultBtn.hasAttribute('data-action') && resultBtn.getAttribute('data-action') === 'reload') {
                         window.location.reload();
                     }
-                 });
+                });
 
 
                 setTimeout(() => {
@@ -1849,7 +1917,7 @@
             }
 
             // Handle normal player success/failure
-             if (success) {
+            if (success) {
                 resultText.textContent = "過關！";
 
                 // If at the ultimate level, change the button text
@@ -2200,13 +2268,13 @@
                 timeRemaining -= deltaTime;
                 timerDisplay.textContent = Math.max(0, timeRemaining).toFixed(1); // Ensure timer doesn't go below 0
 
-                 // --- MODIFICATION START ---
+                // --- MODIFICATION START ---
                 // Award points rapidly based on milliseconds survived
                 // Base points per millisecond, scaled by difficulty level
                 const pointsPerMillisecond = 1.0; // Adjust this value for desired speed
                 score += Math.floor(deltaTime * 1000 * pointsPerMillisecond * (currentLevel + 1));
                 scoreDisplay.textContent = 'SCORE: ' + score;
-                 // --- MODIFICATION END ---
+                // --- MODIFICATION END ---
 
 
                 if (timeRemaining <= 0) {
@@ -2420,7 +2488,7 @@
 
                             // Remove after max bounces
                             if (bullet.bounceCount >= bullet.maxBounces) {
-                                 // Let it fly off screen instead of removing immediately after last bounce
+                                // Let it fly off screen instead of removing immediately after last bounce
                                 // bullets.splice(i, 1);
                                 // continue;
                             }
@@ -2670,7 +2738,7 @@
 
                         for (let i = 0; i < points * 2; i++) {
                             const radius = i % 2 === 0 ? outerRadius : innerRadius;
-                            const angle = (i * Math.PI) / points - Math.PI/2; // Adjust starting angle
+                            const angle = (i * Math.PI) / points - Math.PI / 2; // Adjust starting angle
                             if (i === 0) {
                                 ctx.moveTo(radius * Math.cos(angle), radius * Math.sin(angle));
                             } else {
@@ -2700,7 +2768,7 @@
                         if (bullet.timeAlive > bullet.homingDelay) {
                             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                             ctx.beginPath();
-                             ctx.arc(-bullet.size * 1.2, 0, bullet.size * 0.4, 0, Math.PI * 2);
+                            ctx.arc(-bullet.size * 1.2, 0, bullet.size * 0.4, 0, Math.PI * 2);
                             ctx.fill();
                         }
 
@@ -2722,7 +2790,7 @@
                         ctx.translate(bullet.x, bullet.y);
 
                         // Rotate based on overall direction
-                         ctx.rotate(bullet.angle);
+                        ctx.rotate(bullet.angle);
 
                         // Draw triangle
                         ctx.beginPath();
@@ -2733,16 +2801,16 @@
                         ctx.fill();
 
                         // Lightning effect (subtle flicker)
-                         if(Math.random() > 0.7) {
+                        if (Math.random() > 0.7) {
                             ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
                             ctx.lineWidth = 2;
                             ctx.beginPath();
                             ctx.moveTo(-bullet.size * 0.8, -bullet.size * 0.5);
                             ctx.lineTo(bullet.size * 0.8, bullet.size * 0.5);
-                             ctx.moveTo(-bullet.size * 0.8, bullet.size * 0.5);
+                            ctx.moveTo(-bullet.size * 0.8, bullet.size * 0.5);
                             ctx.lineTo(bullet.size * 0.8, -bullet.size * 0.5);
                             ctx.stroke();
-                         }
+                        }
 
 
                         ctx.restore();
@@ -2758,7 +2826,7 @@
                         ctx.strokeStyle = 'rgba(255, 200, 0, 0.7)';
                         ctx.lineWidth = 2;
                         ctx.beginPath();
-                        ctx.arc(bullet.x, bullet.y, bullet.size * (1.2 + Math.sin(Date.now()/100 + bullet.x) * 0.2), 0, Math.PI * 2);
+                        ctx.arc(bullet.x, bullet.y, bullet.size * (1.2 + Math.sin(Date.now() / 100 + bullet.x) * 0.2), 0, Math.PI * 2);
                         ctx.stroke();
 
                         break;
@@ -2792,10 +2860,10 @@
                 ctx.fill();
 
                 // Draw icon based on type (simpler icons)
-                 ctx.fillStyle = powerup.color; // Use solid color for icon
-                 ctx.font = `${pulseSize * 0.7}px Arial Black`;
-                 ctx.textAlign = 'center';
-                 ctx.textBaseline = 'middle';
+                ctx.fillStyle = powerup.color; // Use solid color for icon
+                ctx.font = `${pulseSize * 0.7}px Arial Black`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
 
 
                 switch (powerup.type) {
@@ -2804,28 +2872,28 @@
                         break;
 
                     case 'extraLife':
-                         ctx.fillText('♥', powerup.x, powerup.y + pulseSize * 0.1); // Heart symbol
+                        ctx.fillText('♥', powerup.x, powerup.y + pulseSize * 0.1); // Heart symbol
                         break;
 
                     case 'slowTime':
-                         ctx.fillText('T', powerup.x, powerup.y);
+                        ctx.fillText('T', powerup.x, powerup.y);
                         break;
 
                     case 'clearScreen':
-                         ctx.fillText('!', powerup.x, powerup.y);
+                        ctx.fillText('!', powerup.x, powerup.y);
                         break;
                 }
 
                 // Add blinking effect for expiring powerups
-                 let alpha = 1;
+                let alpha = 1;
                 if (powerup.lifetime < 2) {
                     alpha = 0.5 + Math.sin(Date.now() / 100) * 0.5; // Faster blink
                 }
-                 ctx.globalAlpha = alpha;
+                ctx.globalAlpha = alpha;
 
 
                 // Reset global alpha after drawing this powerup
-                 ctx.globalAlpha = 1;
+                ctx.globalAlpha = 1;
             }
         }
 
@@ -3007,10 +3075,10 @@
             // Draw shield effect if invincible (different visualization)
             if (playerInvincible) {
                 const pulseSize = playerSize * (1.2 + Math.sin(Date.now() / 100) * 0.1);
-                 const shieldGradient = ctx.createRadialGradient(0, 0, pulseSize * 0.8, 0, 0, pulseSize * 1.1);
-                 shieldGradient.addColorStop(0, 'rgba(64, 128, 255, 0)'); // Transparent center
-                 shieldGradient.addColorStop(0.8, 'rgba(64, 128, 255, 0.5)'); // Blue shield color
-                 shieldGradient.addColorStop(1, 'rgba(200, 220, 255, 0.7)'); // Bright edge
+                const shieldGradient = ctx.createRadialGradient(0, 0, pulseSize * 0.8, 0, 0, pulseSize * 1.1);
+                shieldGradient.addColorStop(0, 'rgba(64, 128, 255, 0)'); // Transparent center
+                shieldGradient.addColorStop(0.8, 'rgba(64, 128, 255, 0.5)'); // Blue shield color
+                shieldGradient.addColorStop(1, 'rgba(200, 220, 255, 0.7)'); // Bright edge
 
                 ctx.fillStyle = shieldGradient;
                 ctx.beginPath();
@@ -3025,7 +3093,7 @@
         // Draw particles
         function drawParticles() {
             for (let particle of particles) {
-                 // Fade out based on life
+                // Fade out based on life
                 ctx.globalAlpha = Math.max(0, particle.life / 60); // Use original life max if explosion/small explosion use different life values
                 ctx.fillStyle = particle.color;
                 ctx.beginPath();
@@ -3052,5 +3120,6 @@
         window.onload = init;
     </script>
 </body>
+
 </html>
 ```
