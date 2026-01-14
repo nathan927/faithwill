@@ -13,18 +13,17 @@
         rel="stylesheet">
     <style>
         /* ========================================
-       THEME VARIABLES - 堅決風格
+       THEME VARIABLES - 簡潔風格
     ======================================== */
         :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #111111;
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
             --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --accent-color: #ff4444;
-            --accent-gradient: linear-gradient(135deg, #ff4444 0%, #ff8800 100%);
-            --warning-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-            --border-color: rgba(255, 68, 68, 0.3);
-            --glow-color: rgba(255, 68, 68, 0.4);
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --accent-color: #667eea;
+            --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --border-color: rgba(102, 126, 234, 0.2);
+            --glow-color: rgba(102, 126, 234, 0.15);
             --transition-fast: 0.3s;
             --transition-medium: 0.5s;
         }
@@ -59,7 +58,7 @@
             height: 100%;
             z-index: -1;
             overflow: hidden;
-            opacity: 0.15;
+            opacity: 0.12;
         }
 
         .mesh-background::before {
@@ -70,10 +69,10 @@
             width: 200%;
             height: 200%;
             background:
-                radial-gradient(circle at 20% 80%, #ff4444 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, #ff8800 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, #cc3300 0%, transparent 40%);
-            animation: meshFloat 25s ease-in-out infinite;
+                radial-gradient(circle at 20% 80%, #667eea 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, #764ba2 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, #4facfe 0%, transparent 40%);
+            animation: meshFloat 30s ease-in-out infinite;
         }
 
         @keyframes meshFloat {
@@ -124,14 +123,12 @@
             font-size: 1.5rem;
             font-weight: 700;
             text-decoration: none;
-            background: linear-gradient(135deg, #ff4444 0%, #ff8800 50%, #ffcc00 100%);
+            background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             position: relative;
             transition: all var(--transition-fast) ease;
-            text-shadow: 0 0 30px rgba(255, 68, 68, 0.5);
-            animation: logoGlow 3s ease-in-out infinite;
         }
 
         .logo::after {
@@ -141,25 +138,13 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background: linear-gradient(90deg, #ff4444, #ff8800, #ffcc00);
+            background: var(--accent-gradient);
             transform: scaleX(0);
             transition: transform var(--transition-fast) ease;
         }
 
         .logo:hover::after {
             transform: scaleX(1);
-        }
-
-        @keyframes logoGlow {
-
-            0%,
-            100% {
-                filter: drop-shadow(0 0 8px rgba(255, 68, 68, 0.4));
-            }
-
-            50% {
-                filter: drop-shadow(0 0 20px rgba(255, 136, 0, 0.6));
-            }
         }
 
         .back-link {
@@ -193,15 +178,14 @@
         }
 
         .quote-title {
-            font-size: clamp(1.8rem, 5vw, 3rem);
-            font-weight: 900;
-            line-height: 1.3;
+            font-size: clamp(1.6rem, 4vw, 2.5rem);
+            font-weight: 700;
+            line-height: 1.4;
             margin-bottom: 1rem;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 60px var(--glow-color);
         }
 
         .quote-subtitle {
@@ -234,9 +218,9 @@
             position: absolute;
             top: -20px;
             left: 20px;
-            font-size: 10rem;
+            font-size: 8rem;
             font-family: Georgia, serif;
-            color: rgba(255, 68, 68, 0.1);
+            color: rgba(102, 126, 234, 0.08);
             line-height: 1;
         }
 
@@ -246,7 +230,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
             background: var(--accent-gradient);
         }
 
@@ -259,25 +243,18 @@
         }
 
         .comparison-block {
-            margin: 2.5rem 0;
-            padding: 1.5rem;
-            border-left: 4px solid var(--accent-color);
-            background: rgba(255, 68, 68, 0.05);
-            border-radius: 0 12px 12px 0;
+            margin: 2rem 0;
+            padding: 1.25rem;
+            border-left: 3px solid var(--accent-color);
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 0 8px 8px 0;
         }
 
         .comparison-block h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 600;
             color: var(--accent-color);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .comparison-block h3::before {
-            content: '⚡';
+            margin-bottom: 0.75rem;
         }
 
         .comparison-block p,
@@ -305,25 +282,18 @@
         }
 
         .weak-block {
-            margin: 2.5rem 0;
-            padding: 1.5rem;
-            border-left: 4px solid #666;
-            background: rgba(100, 100, 100, 0.1);
-            border-radius: 0 12px 12px 0;
+            margin: 2rem 0;
+            padding: 1.25rem;
+            border-left: 3px solid #555;
+            background: rgba(80, 80, 80, 0.08);
+            border-radius: 0 8px 8px 0;
         }
 
         .weak-block h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #888;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .weak-block h3::before {
-            content: '❓';
+            font-size: 1rem;
+            font-weight: 600;
+            color: #999;
+            margin-bottom: 0.75rem;
         }
 
         .weak-block p {
@@ -350,22 +320,15 @@
         }
 
         .quote-emphasis {
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-weight: 600;
             color: var(--text-primary);
             text-align: center;
-            margin: 3rem 0;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(255, 68, 68, 0.15) 0%, rgba(255, 136, 0, 0.1) 100%);
-            border-radius: 16px;
+            margin: 2.5rem 0;
+            padding: 1.5rem;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-            position: relative;
-        }
-
-        .quote-emphasis::before,
-        .quote-emphasis::after {
-            content: '🔥';
-            font-size: 1.5rem;
         }
 
         .self-reflection {
@@ -406,13 +369,13 @@
         }
 
         .mindset-card.strong {
-            background: linear-gradient(135deg, rgba(255, 68, 68, 0.2) 0%, rgba(255, 136, 0, 0.15) 100%);
-            border: 1px solid var(--accent-color);
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
         }
 
         .mindset-card.weak {
-            background: rgba(80, 80, 80, 0.2);
-            border: 1px solid #555;
+            background: rgba(80, 80, 80, 0.1);
+            border: 1px solid rgba(100, 100, 100, 0.3);
         }
 
         .mindset-card h4 {
@@ -438,11 +401,11 @@
         }
 
         .quote-conclusion {
-            margin-top: 3rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(255, 68, 68, 0.2) 0%, rgba(255, 136, 0, 0.15) 100%);
-            border-radius: 16px;
-            border: 2px solid var(--accent-color);
+            margin-top: 2.5rem;
+            padding: 1.75rem;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             text-align: center;
         }
 
