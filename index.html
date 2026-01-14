@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Raleway:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <style>
     /* ========================================
@@ -254,15 +254,33 @@
     }
 
     .logo {
-      font-family: 'Raleway', sans-serif;
-      font-size: 1.6rem;
+      font-family: 'Orbitron', 'Raleway', sans-serif;
+      font-size: 1.5rem;
       font-weight: 700;
-      letter-spacing: 0.01em;
-      background: var(--primary-gradient);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+      background-size: 300% 100%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       position: relative;
+      animation: logoShine 4s ease-in-out infinite;
+      text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+    }
+
+    @keyframes logoShine {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     .logo::after {
@@ -272,13 +290,18 @@
       left: 0;
       width: 100%;
       height: 2px;
-      background: var(--primary-gradient);
+      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
       transform: scaleX(0);
       transition: transform var(--transition-fast) ease;
     }
 
     .logo:hover::after {
       transform: scaleX(1);
+    }
+
+    .logo:hover {
+      animation: logoShine 1s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.6));
     }
 
     .nav-right {
@@ -1004,10 +1027,6 @@
         <a href="#projects" class="btn-primary">
           <span>探索作品</span>
           <span>↓</span>
-        </a>
-        <a href="mailto:contact@nathanyuen.org" class="btn-secondary">
-          <span>聯絡我</span>
-          <span>✉</span>
         </a>
       </div>
       <div class="scroll-indicator">
