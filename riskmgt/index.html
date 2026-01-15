@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="銀行貸後管理知識庫及自我Drilling特訓平台 - 專業的授信貸後管理學習系統">
+    <title>貸後智庫 | 專業貸後管理學習平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- 頂部導航 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-icon">📊</div>
+                <span class="brand-text">貸後智庫</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#" class="nav-link active" data-page="home">
+                    <span class="nav-icon">🏠</span>
+                    <span>首頁</span>
+                </a>
+                <a href="#" class="nav-link" data-page="knowledge">
+                    <span class="nav-icon">📚</span>
+                    <span>知識庫</span>
+                </a>
+                <a href="#" class="nav-link" data-page="drilling">
+                    <span class="nav-icon">🎯</span>
+                    <span>特訓</span>
+                </a>
+                <a href="#" class="nav-link" data-page="checklist">
+                    <span class="nav-icon">✅</span>
+                    <span>清單</span>
+                </a>
+                <a href="#" class="nav-link" data-page="progress">
+                    <span class="nav-icon">📈</span>
+                    <span>進度</span>
+                </a>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="切換主題">
+                <span class="theme-icon">🌙</span>
+            </button>
+            <button class="nav-toggle" id="navToggle" aria-label="切換選單">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 主內容區域 -->
+    <main class="main-content">
+        <!-- 首頁 -->
+        <section class="page active" id="page-home">
+            <div class="hero-section">
+                <div class="hero-background">
+                    <div class="hero-glow"></div>
+                </div>
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <span class="title-line">貸後管理</span>
+                        <span class="title-highlight">知識庫及特訓平台</span>
+                    </h1>
+                    <p class="hero-subtitle">讓每一位貸後人員，都能擁有20年資深專家的判斷力</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalKnowledge">104</span>
+                            <span class="stat-label">知識點</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalQuestions">100+</span>
+                            <span class="stat-label">練習題</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalChecklists">10</span>
+                            <span class="stat-label">檢查清單</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" data-goto="drilling">
+                            <span>開始特訓</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                        <button class="btn btn-secondary btn-lg" data-goto="knowledge">
+                            <span>瀏覽知識庫</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 四大功能區塊 -->
+            <div class="features-section">
+                <h2 class="section-title">核心功能</h2>
+                <div class="features-grid">
+                    <div class="feature-card" data-goto="knowledge">
+                        <div class="feature-icon">📚</div>
+                        <h3 class="feature-title">結構化知識庫</h3>
+                        <p class="feature-desc">七大領域、104個知識點，按4級重要性分類，隨時查閱</p>
+                        <div class="feature-tags">
+                            <span class="tag">實地走訪</span>
+                            <span class="tag">財務分析</span>
+                            <span class="tag">風險識別</span>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-goto="drilling">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">Drilling 特訓</h3>
+                        <p class="feature-desc">四種題型、智能推送，基於遺忘曲線的間隔重複學習</p>
+                        <div class="feature-tags">
+                            <span class="tag">情境判斷</span>
+                            <span class="tag">紅旗識別</span>
+                            <span class="tag">案例分析</span>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-goto="checklist">
+                        <div class="feature-icon">✅</div>
+                        <h3 class="feature-title">實戰檢查清單</h3>
+                        <p class="feature-desc">10大類、104項檢查項目，現場可用的數字化清單</p>
+                        <div class="feature-tags">
+                            <span class="tag">走訪準備</span>
+                            <span class="tag">財務核查</span>
+                            <span class="tag">證據留存</span>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-goto="progress">
+                        <div class="feature-icon">📈</div>
+                        <h3 class="feature-title">能力評估追蹤</h3>
+                        <p class="feature-desc">能力雷達圖、弱項定位、個性化學習建議</p>
+                        <div class="feature-tags">
+                            <span class="tag">正確率</span>
+                            <span class="tag">學習時長</span>
+                            <span class="tag">進步趨勢</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 學習路徑 -->
+            <div class="learning-path-section">
+                <h2 class="section-title">建議學習路徑</h2>
+                <div class="path-timeline">
+                    <div class="path-item">
+                        <div class="path-step">1</div>
+                        <div class="path-content">
+                            <h4>基礎認知</h4>
+                            <p>先瀏覽「貸後管理基礎」知識領域</p>
+                        </div>
+                    </div>
+                    <div class="path-item">
+                        <div class="path-step">2</div>
+                        <div class="path-content">
+                            <h4>實務學習</h4>
+                            <p>學習「實地走訪」及「財務分析」技術</p>
+                        </div>
+                    </div>
+                    <div class="path-item">
+                        <div class="path-step">3</div>
+                        <div class="path-content">
+                            <h4>特訓練習</h4>
+                            <p>完成每日10題特訓，鞏固知識</p>
+                        </div>
+                    </div>
+                    <div class="path-item">
+                        <div class="path-step">4</div>
+                        <div class="path-content">
+                            <h4>實戰應用</h4>
+                            <p>使用檢查清單，在走訪中實踐</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 知識庫頁面 -->
+        <section class="page" id="page-knowledge">
+            <div class="page-header">
+                <h1 class="page-title">📚 知識庫</h1>
+                <p class="page-desc">結構化貸後管理專業知識，隨時查閱</p>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" id="knowledgeSearch" placeholder="搜索知識點..." class="search-input">
+                <button class="search-btn">🔍</button>
+            </div>
+
+            <div class="knowledge-container">
+                <div class="knowledge-sidebar" id="knowledgeSidebar">
+                    <!-- 知識領域列表 -->
+                </div>
+                <div class="knowledge-content" id="knowledgeContent">
+                    <div class="knowledge-welcome">
+                        <div class="welcome-icon">📖</div>
+                        <h3>選擇一個知識領域開始學習</h3>
+                        <p>左側選擇領域，右側查看詳細內容</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 特訓頁面 -->
+        <section class="page" id="page-drilling">
+            <div class="page-header">
+                <h1 class="page-title">🎯 Drilling 特訓</h1>
+                <p class="page-desc">情境式練習，培養實戰判斷力</p>
+            </div>
+
+            <!-- 特訓模式選擇 -->
+            <div class="drilling-modes" id="drillingModes">
+                <div class="mode-card" data-mode="quick">
+                    <div class="mode-icon">⚡</div>
+                    <h3>快速練習</h3>
+                    <p>隨機10題，測試綜合能力</p>
+                    <span class="mode-time">約 5 分鐘</span>
+                </div>
+                <div class="mode-card" data-mode="scenario">
+                    <div class="mode-icon">🎭</div>
+                    <h3>情境判斷</h3>
+                    <p>模擬實際工作場景決策</p>
+                    <span class="mode-time">約 10 分鐘</span>
+                </div>
+                <div class="mode-card" data-mode="redFlag">
+                    <div class="mode-icon">🚩</div>
+                    <h3>紅旗識別</h3>
+                    <p>訓練風險敏感度</p>
+                    <span class="mode-time">約 8 分鐘</span>
+                </div>
+                <div class="mode-card" data-mode="case">
+                    <div class="mode-icon">📋</div>
+                    <h3>案例分析</h3>
+                    <p>深度分析真實案例</p>
+                    <span class="mode-time">約 15 分鐘</span>
+                </div>
+                <div class="mode-card" data-mode="weakness">
+                    <div class="mode-icon">💪</div>
+                    <h3>弱項強化</h3>
+                    <p>針對錯題集中訓練</p>
+                    <span class="mode-time">依弱項數量</span>
+                </div>
+                <div class="mode-card" data-mode="review">
+                    <div class="mode-icon">🔄</div>
+                    <h3>間隔複習</h3>
+                    <p>基於遺忘曲線推送</p>
+                    <span class="mode-time">智能推薦</span>
+                </div>
+            </div>
+
+            <!-- 練習區域 -->
+            <div class="drilling-area hidden" id="drillingArea">
+                <div class="drilling-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="drillingProgress"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0/10</span>
+                </div>
+
+                <div class="question-card" id="questionCard">
+                    <div class="question-header">
+                        <span class="question-type" id="questionType">情境判斷</span>
+                        <span class="question-difficulty" id="questionDifficulty">⭐⭐⭐</span>
+                    </div>
+                    <div class="question-content" id="questionContent">
+                        <!-- 題目內容動態載入 -->
+                    </div>
+                    <div class="question-options" id="questionOptions">
+                        <!-- 選項動態載入 -->
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn btn-outline" id="skipBtn">跳過</button>
+                        <button class="btn btn-primary" id="submitBtn" disabled>確認答案</button>
+                    </div>
+                </div>
+
+                <!-- 答案解析 -->
+                <div class="answer-reveal hidden" id="answerReveal">
+                    <div class="answer-header" id="answerHeader">
+                        <!-- 正確/錯誤標示 -->
+                    </div>
+                    <div class="answer-explanation" id="answerExplanation">
+                        <!-- 解析內容 -->
+                    </div>
+                    <button class="btn btn-primary" id="nextBtn">下一題 →</button>
+                </div>
+            </div>
+
+            <!-- 練習結果 -->
+            <div class="drilling-result hidden" id="drillingResult">
+                <div class="result-card">
+                    <div class="result-icon" id="resultIcon">🎉</div>
+                    <h2 class="result-title" id="resultTitle">練習完成！</h2>
+                    <div class="result-stats">
+                        <div class="result-stat">
+                            <span class="stat-value" id="correctCount">0</span>
+                            <span class="stat-label">正確</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="stat-value" id="wrongCount">0</span>
+                            <span class="stat-label">錯誤</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="stat-value" id="accuracyRate">0%</span>
+                            <span class="stat-label">正確率</span>
+                        </div>
+                    </div>
+                    <div class="result-actions">
+                        <button class="btn btn-outline" id="reviewWrongBtn">查看錯題</button>
+                        <button class="btn btn-primary" id="continueBtn">繼續練習</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 檢查清單頁面 -->
+        <section class="page" id="page-checklist">
+            <div class="page-header">
+                <h1 class="page-title">✅ 實戰檢查清單</h1>
+                <p class="page-desc">現場可用的數字化走訪清單</p>
+            </div>
+
+            <div class="checklist-container">
+                <div class="checklist-sidebar" id="checklistSidebar">
+                    <!-- 清單類型列表 -->
+                </div>
+                <div class="checklist-main" id="checklistMain">
+                    <div class="checklist-welcome">
+                        <div class="welcome-icon">📋</div>
+                        <h3>選擇一個檢查清單</h3>
+                        <p>左側選擇清單類型，右側執行檢查</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 進度追蹤頁面 -->
+        <section class="page" id="page-progress">
+            <div class="page-header">
+                <h1 class="page-title">📈 學習進度</h1>
+                <p class="page-desc">追蹤你的專業成長</p>
+            </div>
+
+            <div class="progress-dashboard">
+                <div class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <div class="card-icon">📖</div>
+                        <div class="card-content">
+                            <span class="card-value" id="knowledgeProgress">0%</span>
+                            <span class="card-label">知識覆蓋率</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">🎯</div>
+                        <div class="card-content">
+                            <span class="card-value" id="totalAnswered">0</span>
+                            <span class="card-label">已答題數</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">✅</div>
+                        <div class="card-content">
+                            <span class="card-value" id="overallAccuracy">0%</span>
+                            <span class="card-label">整體正確率</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">⏱️</div>
+                        <div class="card-content">
+                            <span class="card-value" id="totalTime">0h</span>
+                            <span class="card-label">學習時長</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 能力雷達圖 -->
+                <div class="radar-section">
+                    <h3 class="section-subtitle">能力圖譜</h3>
+                    <div class="radar-container">
+                        <canvas id="radarChart" width="400" height="400"></canvas>
+                    </div>
+                </div>
+
+                <!-- 弱項分析 -->
+                <div class="weakness-section">
+                    <h3 class="section-subtitle">弱項分析</h3>
+                    <div class="weakness-list" id="weaknessList">
+                        <!-- 動態載入弱項列表 -->
+                    </div>
+                </div>
+        </section>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>貸後智庫 © 2026 | 專業貸後管理學習平台</p>
+            <p class="footer-note">本系統僅供學習訓練用途，不構成任何業務指引</p>
+        </div>
+    </footer>
+
+    <!-- 載入腳本 -->
+    <script src="js/theme.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/knowledge.js"></script>
+    <script src="js/drilling.js"></script>
+    <script src="js/checklist.js"></script>
+    <script src="js/progress.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
