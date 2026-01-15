@@ -122,8 +122,8 @@ const ProgressModule = {
 
         // 繪製數據區域
         ctx.beginPath();
-        ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
-        ctx.strokeStyle = 'rgba(212, 175, 55, 0.8)';
+        ctx.fillStyle = 'rgba(59, 89, 152, 0.3)';
+        ctx.strokeStyle = 'rgba(59, 89, 152, 0.8)';
         ctx.lineWidth = 2;
 
         scores.forEach((score, i) => {
@@ -152,7 +152,7 @@ const ProgressModule = {
 
             ctx.beginPath();
             ctx.arc(x, y, 5, 0, Math.PI * 2);
-            ctx.fillStyle = '#d4af37';
+            ctx.fillStyle = '#3b5998';
             ctx.fill();
         });
 
