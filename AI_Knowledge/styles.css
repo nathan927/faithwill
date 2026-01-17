@@ -2314,13 +2314,17 @@ a.logo:hover .logo-text {
     margin-bottom: var(--spacing-sm);
 }
 
-.note-answer ul {
-    margin-left: var(--spacing-lg);
-    margin-top: var(--spacing-xs);
+.note-answer ul,
+.note-answer-list {
+    margin: 0;
+    padding-left: var(--spacing-md);
+    list-style-type: disc;
 }
 
 .note-answer li {
     color: var(--text-primary);
+    padding: 1px 0;
+    line-height: 1.4;
 }
 
 .note-explanation {
@@ -2330,4 +2334,5 @@ a.logo:hover .logo-text {
     background: rgba(251, 191, 36, 0.1);
     border-radius: var(--radius-sm);
     line-height: 1.5;
+    white-space: pre-line;
 }

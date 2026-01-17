@@ -139,6 +139,12 @@ function showCustomModeSelector() {
         return;
     }
 
+    // 先移除任何現有的模態框，避免重複
+    const existingModal = document.getElementById('customCourseModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
     // 創建課程選擇彈窗
     const courseOptions = courses.map(c =>
         `<option value="${c.id}">${c.name} (${c.questionCount || 0} 題)</option>`
@@ -146,11 +152,12 @@ function showCustomModeSelector() {
 
     const modal = document.createElement('div');
     modal.className = 'modal';
+    modal.id = 'customCourseModal';
     modal.innerHTML = `
         <div class="modal-content">
             <div class="modal-header">
                 <h3>選擇課程</h3>
-                <button class="btn-close" onclick="this.closest('.modal').remove()">&times;</button>
+                <button class="btn-close" onclick="closeCustomCourseModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -161,16 +168,35 @@ function showCustomModeSelector() {
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" onclick="this.closest('.modal').remove()">取消</button>
-                <button class="btn-save" onclick="startCustomCourse()">開始學習</button>
+                <button class="btn-cancel" onclick="closeCustomCourseModal()">取消</button>
+                <button class="btn-save" id="btnStartCustomCourse">開始學習</button>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
+
+    // 使用事件監聽器而不是 onclick 屬性
+    document.getElementById('btnStartCustomCourse').addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        startCustomCourse();
+    });
+}
+
+function closeCustomCourseModal() {
+    const modal = document.getElementById('customCourseModal');
+    if (modal) {
+        modal.remove();
+    }
 }
 
 function startCustomCourse() {
     const select = document.getElementById('customCourseSelect');
+    if (!select) {
+        console.error('Course select element not found');
+        return;
+    }
+
     const courseId = select.value;
 
     if (!courseId) {
@@ -178,11 +204,13 @@ function startCustomCourse() {
         return;
     }
 
-    // 關閉模態框
-    document.querySelector('.modal').remove();
+    // 先關閉模態框（立即執行）
+    closeCustomCourseModal();
 
-    // 啟動測驗
-    initQuiz('custom', courseId);
+    // 使用 setTimeout 確保 DOM 更新完成後再啟動測驗
+    setTimeout(() => {
+        initQuiz('custom', courseId);
+    }, 50);
 }
 
 // ============ 測驗邏輯 ============

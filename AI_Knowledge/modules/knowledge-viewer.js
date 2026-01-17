@@ -121,12 +121,9 @@ const KnowledgeViewer = {
                         </div>
                         <div class="note-question">${this.escapeHtml(item.question)}</div>
                         <div class="note-answer">
-                            <strong>✅ 正確答案：</strong>
-                            <ul>
-                                ${item.correctOptions.map(opt => `<li>${this.escapeHtml(opt)}</li>`).join('')}
-                            </ul>
+                            <ul class="note-answer-list">${item.correctOptions.map(opt => `<li>${this.escapeHtml(opt)}</li>`).join('')}</ul>
                         </div>
-                        ${item.explanation ? `<div class="note-explanation">💡 ${this.escapeHtml(item.explanation)}</div>` : ''}
+                        ${item.explanation ? `<div class="note-explanation">${this.escapeHtml(item.explanation)}</div>` : ''}
                     </div>
                 `;
             });
