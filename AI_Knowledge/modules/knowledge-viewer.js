@@ -89,34 +89,53 @@ const KnowledgeViewer = {
     },
 
     // 渲染系統性筆記
-    renderSystemNotes() {
-        const notes = this.generateNotesFromQuestions();
+    renderSystemNotes(notesData = null) {
+        // 如果傳入數據，則使用傳入的（搜索結果）；否則重新生成
+        const notes = notesData || this.generateNotesFromQuestions();
+
+        // 首次渲染時初始化 Fuse（如果還沒初始化）
+        if (!this.fuse && window.Fuse) {
+            this.initSearchIndex();
+        }
 
         let html = `
             <div class="knowledge-header">
-                <button class="btn-back" onclick="KnowledgeViewer.close()">← 返回</button>
-                <h2>📓 系統性筆記</h2>
+                <div class="header-left">
+                    <button class="btn-back" onclick="KnowledgeViewer.close()">← 返回</button>
+                    <h2>📓 系統性筆記</h2>
+                </div>
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="notesSearch" class="search-input" placeholder="搜尋 AI 知識..." oninput="KnowledgeViewer.handleSearch(this.value)">
+                </div>
             </div>
             <p class="knowledge-subtitle">整理自所有題目的知識點，包含正確答案與解釋</p>
-            <div class="notes-container">
+            <div class="notes-container" id="notesContainer">
         `;
 
+        if (Object.keys(notes).length === 0) {
+            html += `<div class="no-results">找不到相關筆記</div>`;
+        }
+
         Object.entries(notes).forEach(([category, items]) => {
+            // 如果是搜索結果，預設展開；否則預設收起
+            const isSearchResult = !!notesData;
+
             html += `
                 <div class="notes-category">
-                    <div class="notes-category-header" onclick="KnowledgeViewer.toggleNotesCategory(this)">
-                        <span class="notes-expand">▶</span>
+                    <div class="notes-category-header ${isSearchResult ? 'expanded' : ''}" onclick="KnowledgeViewer.toggleNotesCategory(this)">
+                        <span class="notes-expand">${isSearchResult ? '▼' : '▶'}</span>
                         <h3>${this.getCategoryIcon(category)} ${category}</h3>
                         <span class="notes-count">${items.length} 條知識點</span>
                     </div>
-                    <div class="notes-items" style="display: none;">
+                    <div class="notes-items" style="display: ${isSearchResult ? 'block' : 'none'};">
             `;
 
             items.forEach((item, idx) => {
                 html += `
                     <div class="note-card">
                         <div class="note-header">
-                            <span class="note-number">${idx + 1}</span>
+                            <span class="note-number">${item.originalIndex !== undefined ? item.originalIndex + 1 : idx + 1}</span>
                             <span class="note-type ${item.type}">${item.type === 'single' ? '單選' : '多選'}</span>
                         </div>
                         <div class="note-question">${this.escapeHtml(item.question)}</div>
@@ -135,6 +154,113 @@ const KnowledgeViewer = {
         });
 
         html += '</div>';
+        return html;
+    },
+
+    // 初始化搜索索引
+    initSearchIndex() {
+        if (!window.Fuse) return;
+
+        const allNotes = [];
+        const rawNotes = this.generateNotesFromQuestions();
+
+        // 展平結構以便搜索
+        Object.entries(rawNotes).forEach(([category, items]) => {
+            items.forEach((item, idx) => {
+                allNotes.push({
+                    ...item,
+                    category,
+                    originalIndex: idx
+                });
+            });
+        });
+
+        // Fuse 配置
+        const options = {
+            keys: [
+                { name: 'question', weight: 0.5 },
+                { name: 'explanation', weight: 0.3 },
+                { name: 'category', weight: 0.2 }
+            ],
+            threshold: 0.3, // 模糊匹配閾值 (0.0 = 完全匹配, 1.0 = 匹配任何)
+            includeScore: true
+        };
+
+        this.fuse = new Fuse(allNotes, options);
+    },
+
+    // 處理搜索
+    handleSearch(query) {
+        const container = document.getElementById('notesContainer');
+
+        if (!query || query.trim() === '') {
+            // 恢復原始視圖
+            container.innerHTML = this.renderSystemNotesOnlyContent();
+            // 重新綁定事件聽眾（如果需要）
+            return;
+        }
+
+        if (!this.fuse) return;
+
+        const results = this.fuse.search(query);
+        const filteredNotes = {};
+
+        results.forEach(result => {
+            const item = result.item;
+            if (!filteredNotes[item.category]) {
+                filteredNotes[item.category] = [];
+            }
+            filteredNotes[item.category].push(item);
+        });
+
+        // 重新渲染內容區域
+        container.innerHTML = this.renderSystemNotesOnlyContent(filteredNotes);
+    },
+
+    // 僅渲染筆記內容部分（用於搜索更新）
+    renderSystemNotesOnlyContent(notesData = null) {
+        const notes = notesData || this.generateNotesFromQuestions();
+        let html = '';
+
+        if (Object.keys(notes).length === 0) {
+            return `<div class="no-results" style="text-align: center; padding: 2rem; color: var(--text-secondary);">找不到相關筆記 🕵️</div>`;
+        }
+
+        Object.entries(notes).forEach(([category, items]) => {
+            const isSearchResult = !!notesData;
+
+            html += `
+                <div class="notes-category">
+                    <div class="notes-category-header ${isSearchResult ? 'expanded' : ''}" onclick="KnowledgeViewer.toggleNotesCategory(this)">
+                        <span class="notes-expand">${isSearchResult ? '▼' : '▶'}</span>
+                        <h3>${this.getCategoryIcon(category)} ${category}</h3>
+                        <span class="notes-count">${items.length} 條知識點</span>
+                    </div>
+                    <div class="notes-items" style="display: ${isSearchResult ? 'block' : 'none'};">
+            `;
+
+            items.forEach((item) => {
+                html += `
+                    <div class="note-card">
+                        <div class="note-header">
+                            <span class="note-number">${item.originalIndex !== undefined ? item.originalIndex + 1 : '#'}</span>
+                            <span class="note-type ${item.type}">${item.type === 'single' ? '單選' : '多選'}</span>
+                        </div>
+                        <div class="note-question">${this.escapeHtml(item.question)}</div>
+                        <div class="note-answer">
+                            <ul class="note-answer-list">${item.correctOptions.map(opt => `<li>${this.escapeHtml(opt)}</li>`).join('')}</ul>
+                        </div>
+                        ${item.explanation ? `<div class="note-explanation">${this.escapeHtml(item.explanation)}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+
         return html;
     },
 
@@ -193,7 +319,11 @@ const KnowledgeViewer = {
         if (view === 'exploration') {
             container.innerHTML = this.renderExplorationQuestions();
         } else if (view === 'notes') {
+            // 重置搜索
+            this.fuse = null;
             container.innerHTML = this.renderSystemNotes();
+            // 在渲染後初始化搜索
+            setTimeout(() => this.initSearchIndex(), 100);
         }
 
         // 切換頁面
