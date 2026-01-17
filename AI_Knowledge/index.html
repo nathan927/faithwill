@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 知識溫故知新 - 監督學習平台</title>
+    <meta name="description" content="一個智能化的AI知識複習與強化學習平台，幫助您鞏固機器學習和人工智能相關知識">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- 頂部導航 -->
+        <header class="header">
+            <a href="#" class="logo" id="logoLink" title="返回首頁">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">AI 知識溫故知新</span>
+            </a>
+            <div class="header-actions">
+                <button class="btn-theme" id="btnTheme" title="切換主題">
+                    <span id="themeIcon">☀️</span>
+                </button>
+                <button class="btn-stats" id="btnStats" title="學習統計">
+                    <span>📊</span>
+                </button>
+                <button class="btn-admin" id="btnAdmin" title="管理員">
+                    <span>⚙️</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主要內容區域 -->
+        <main class="main-content">
+            <!-- 模式選擇頁面 -->
+            <section class="mode-selection" id="modeSelection">
+                <h1 class="page-title">選擇學習模式</h1>
+                <p class="page-subtitle">根據您的需求選擇適合的學習方式</p>
+
+                <div class="home-sections">
+                    <!-- 左側：知識學習模式 -->
+                    <div class="section-card section-knowledge">
+                        <div class="section-header">
+                            <div class="section-icon">📚</div>
+                            <h2 class="section-title">知識學習模式</h2>
+                        </div>
+                        <p class="section-desc">系統化掌握 AI 核心知識，先理解再實踐</p>
+
+                        <div class="knowledge-options">
+                            <div class="knowledge-option" onclick="KnowledgeViewer.show('exploration')">
+                                <div class="option-icon">💡</div>
+                                <div class="option-content">
+                                    <h3>理清核心問題</h3>
+                                    <p>30 條探索型大問題，帶出 AI 核心概念</p>
+                                </div>
+                                <span class="option-arrow">→</span>
+                            </div>
+
+                            <div class="knowledge-option" onclick="KnowledgeViewer.show('notes')">
+                                <div class="option-icon">📓</div>
+                                <div class="option-content">
+                                    <h3>系統性筆記</h3>
+                                    <p>所有題目已整理知識點與正確答案</p>
+                                </div>
+                                <span class="option-arrow">→</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：問答測試模式 -->
+                    <div class="section-card section-quiz">
+                        <div class="section-header">
+                            <div class="section-icon">❓</div>
+                            <h2 class="section-title">問答測試模式</h2>
+                        </div>
+                        <p class="section-desc">透過測驗檢視學習成效，選擇適合難度</p>
+
+                        <div class="quiz-modes">
+                            <div class="quiz-mode-card mode-beginner" data-mode="beginner">
+                                <div class="qm-icon">🌱</div>
+                                <div class="qm-info">
+                                    <h3>入門模式</h3>
+                                    <span>無時間限制 · 詳細解說</span>
+                                </div>
+                            </div>
+
+                            <div class="quiz-mode-card mode-advanced" data-mode="advanced">
+                                <div class="qm-icon">📈</div>
+                                <div class="qm-info">
+                                    <h3>進階模式</h3>
+                                    <span>60秒限時 · 多選題挑戰</span>
+                                </div>
+                            </div>
+
+                            <div class="quiz-mode-card mode-expert" data-mode="expert">
+                                <div class="qm-icon">🎯</div>
+                                <div class="qm-info">
+                                    <h3>專家模式</h3>
+                                    <span>30秒極限 · 綜合題型</span>
+                                </div>
+                            </div>
+
+                            <div class="quiz-mode-card mode-custom" data-mode="custom">
+                                <div class="qm-icon"><img src="assets/teacher-icon.png" alt="教師" class="teacher-icon">
+                                </div>
+                                <div class="qm-info">
+                                    <h3>程曉霞模式</h3>
+                                    <span>自訂課程 · 專題訓練</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 知識展示區域 -->
+            <section class="knowledge-area" id="knowledgeArea" style="display: none;"></section>
+
+            <!-- 測驗區域 -->
+            <section class="quiz-area" id="quizArea" style="display: none;">
+                <div class="quiz-header">
+                    <button class="btn-back" id="btnBack">← 返回</button>
+                    <div class="quiz-info">
+                        <span class="current-mode" id="currentMode"></span>
+                        <span class="question-counter" id="questionCounter">題目 1/10</span>
+                    </div>
+                    <div class="timer-container" id="timerContainer" style="display: none;">
+                        <div class="timer-ring">
+                            <svg viewBox="0 0 36 36">
+                                <path class="timer-bg"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="timer-progress" id="timerProgress"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <span class="timer-text" id="timerText">60</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="question-container" id="questionContainer">
+                    <div class="question-meta">
+                        <div class="question-category" id="questionCategory"></div>
+                        <div class="question-type" id="questionType"></div>
+                    </div>
+                    <h2 class="question-text" id="questionText"></h2>
+                    <div class="options-container" id="optionsContainer"></div>
+                </div>
+
+                <div class="quiz-actions">
+                    <button class="btn-submit" id="btnSubmit" disabled>確認答案</button>
+                    <button class="btn-next" id="btnNext" style="display: none;">下一題</button>
+                </div>
+
+                <div class="explanation-panel" id="explanationPanel" style="display: none;">
+                    <div class="explanation-header">
+                        <span class="result-icon" id="resultIcon"></span>
+                        <span class="result-text" id="resultText"></span>
+                    </div>
+                    <div class="explanation-content" id="explanationContent"></div>
+                </div>
+            </section>
+
+            <!-- 結果頁面 -->
+            <section class="results-area" id="resultsArea" style="display: none;">
+                <div class="results-card">
+                    <div class="results-header">
+                        <h2>測驗完成！</h2>
+                        <div class="score-circle" id="scoreCircle">
+                            <span class="score-value" id="scoreValue">0</span>
+                            <span class="score-label">分</span>
+                        </div>
+                    </div>
+                    <div class="results-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="correctCount">0</span>
+                            <span class="stat-label">答對</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="wrongCount">0</span>
+                            <span class="stat-label">答錯</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="accuracy">0%</span>
+                            <span class="stat-label">正確率</span>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn-retry" id="btnRetry">再試一次</button>
+                        <button class="btn-home" id="btnHome">返回首頁</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 統計頁面 -->
+            <section class="stats-area" id="statsArea" style="display: none;">
+                <div class="stats-header">
+                    <button class="btn-back" id="btnStatsBack">← 返回</button>
+                    <h2>學習統計</h2>
+                </div>
+                <div class="stats-content">
+                    <div class="stats-overview">
+                        <div class="overview-card">
+                            <span class="overview-value" id="totalQuestions">0</span>
+                            <span class="overview-label">總答題數</span>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-value" id="totalCorrect">0</span>
+                            <span class="overview-label">答對題數</span>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-value" id="overallAccuracy">0%</span>
+                            <span class="overview-label">總正確率</span>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-value" id="studyStreak">0</span>
+                            <span class="overview-label">連續學習天數</span>
+                        </div>
+                    </div>
+                    <div class="stats-by-mode">
+                        <h3>各模式表現</h3>
+                        <div class="mode-stats" id="modeStats"></div>
+                    </div>
+                    <div class="weak-areas">
+                        <h3>需加強領域</h3>
+                        <div class="weak-list" id="weakList"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 管理員面板 -->
+            <section class="admin-area" id="adminArea" style="display: none;">
+                <div class="admin-header">
+                    <button class="btn-back" id="btnAdminBack">← 返回</button>
+                    <h2>👩‍🏫 程曉霞模式 - 管理面板</h2>
+                </div>
+
+                <!-- 密碼驗證 -->
+                <div class="admin-login" id="adminLogin">
+                    <div class="login-card">
+                        <h3>管理員驗證</h3>
+                        <p>請輸入管理員密碼以進入</p>
+                        <input type="password" id="adminPassword" placeholder="請輸入密碼" class="password-input">
+                        <button class="btn-login" id="btnLogin">進入</button>
+                        <p class="login-hint">提示：預設密碼為 admin123</p>
+                    </div>
+                </div>
+
+                <!-- 管理內容 -->
+                <div class="admin-content" id="adminContent" style="display: none;">
+                    <div class="admin-tabs">
+                        <button class="tab-btn active" data-tab="courses">課程管理</button>
+                        <button class="tab-btn" data-tab="questions">題目管理</button>
+                        <button class="tab-btn" data-tab="library">題庫選擇</button>
+                        <button class="tab-btn" data-tab="settings">電郵設置</button>
+                        <button class="tab-btn" data-tab="import">導入/導出</button>
+                    </div>
+
+                    <!-- 課程管理 -->
+                    <div class="tab-content active" id="tabCourses">
+                        <div class="course-list" id="courseList"></div>
+                        <button class="btn-add-course" id="btnAddCourse">+ 新增課程</button>
+                    </div>
+
+                    <!-- 題目管理 -->
+                    <div class="tab-content" id="tabQuestions" style="display: none;">
+                        <div class="question-editor">
+                            <select id="selectCourse" class="course-select">
+                                <option value="">-- 選擇課程 --</option>
+                            </select>
+                            <div class="question-list" id="adminQuestionList"></div>
+                            <button class="btn-add-question" id="btnAddQuestion">+ 新增題目</button>
+                        </div>
+                    </div>
+
+                    <!-- 題庫選擇（分類樹狀圖） -->
+                    <div class="tab-content" id="tabLibrary" style="display: none;">
+                        <div class="library-section">
+                            <div class="library-header">
+                                <h4>📚 題庫分類選擇</h4>
+                                <p>選擇要加入課程的題目分類或個別題目</p>
+                                <div class="library-actions">
+                                    <select id="targetCourseSelect" class="course-select">
+                                        <option value="">-- 選擇目標課程 --</option>
+                                    </select>
+                                    <button class="btn-expand-all" id="btnExpandAll">全部展開</button>
+                                    <button class="btn-collapse-all" id="btnCollapseAll">全部摺疊</button>
+                                </div>
+                            </div>
+                            <div class="category-tree" id="categoryTree"></div>
+                            <button class="btn-add-selected" id="btnAddSelected">將選中題目加入課程</button>
+                        </div>
+                    </div>
+
+                    <!-- 電郵設置 -->
+                    <div class="tab-content" id="tabSettings" style="display: none;">
+                        <div class="settings-section">
+                            <h4>📧 管理員電郵設置</h4>
+                            <p>程曉霞模式測試完成後，詳細結果報告將發送至以下電郵地址</p>
+                            <div class="form-group">
+                                <label for="adminEmails">管理員電郵（多個電郵以逗號分隔）</label>
+                                <input type="text" id="adminEmails"
+                                    placeholder="例如：admin1@example.com, admin2@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="enableEmailReport" checked>
+                                    啟用測試完成後自動發送報告
+                                </label>
+                            </div>
+                            <button class="btn-save" id="btnSaveEmailSettings">保存設置</button>
+                            <p class="settings-note">📌 注意：報告將透過您的預設郵件客戶端發送</p>
+                        </div>
+                    </div>
+
+                    <!-- 導入/導出 -->
+                    <div class="tab-content" id="tabImport" style="display: none;">
+                        <div class="import-export">
+                            <div class="export-section">
+                                <h4>導出題庫</h4>
+                                <p>將所有自定義課程和題目導出為 JSON 文件</p>
+                                <button class="btn-export" id="btnExport">導出 JSON</button>
+                            </div>
+                            <div class="import-section">
+                                <h4>導入題庫</h4>
+                                <p>從 JSON 文件導入課程和題目</p>
+                                <input type="file" id="fileImport" accept=".json" class="file-input">
+                                <button class="btn-import" id="btnImport">導入</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 課程編輯模態框 -->
+        <div class="modal" id="courseModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="courseModalTitle">新增課程</h3>
+                    <button class="btn-close" id="btnCloseCourseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="courseName">課程名稱</label>
+                        <input type="text" id="courseName" placeholder="例如：深度學習基礎">
+                    </div>
+                    <div class="form-group">
+                        <label for="courseDesc">課程描述</label>
+                        <textarea id="courseDesc" placeholder="課程簡介..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>題目順序</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="courseOrder" value="sequential" checked> 順序出題</label>
+                            <label><input type="radio" name="courseOrder" value="random"> 隨機出題</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="courseTimeLimit">每題時間限制 (秒，0為無限制)</label>
+                        <input type="number" id="courseTimeLimit" value="0" min="0" max="300">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="btnCancelCourse">取消</button>
+                    <button class="btn-save" id="btnSaveCourse">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 題目編輯模態框 -->
+        <div class="modal" id="questionModal" style="display: none;">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3 id="questionModalTitle">新增題目</h3>
+                    <button class="btn-close" id="btnCloseQuestionModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="questionCategory">題目分類</label>
+                        <input type="text" id="inputQuestionCategory" placeholder="例如：神經網絡">
+                    </div>
+                    <div class="form-group">
+                        <label for="questionText">題目內容</label>
+                        <textarea id="inputQuestionText" placeholder="輸入題目..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>題目類型</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="questionType" value="single" checked> 單選題</label>
+                            <label><input type="radio" name="questionType" value="multiple"> 多選題</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>選項 (請勾選正確答案)</label>
+                        <div class="options-editor" id="optionsEditor">
+                            <div class="option-row">
+                                <input type="checkbox" class="option-correct">
+                                <input type="text" class="option-text" placeholder="選項 A">
+                                <button class="btn-remove-option">&times;</button>
+                            </div>
+                            <div class="option-row">
+                                <input type="checkbox" class="option-correct">
+                                <input type="text" class="option-text" placeholder="選項 B">
+                                <button class="btn-remove-option">&times;</button>
+                            </div>
+                            <div class="option-row">
+                                <input type="checkbox" class="option-correct">
+                                <input type="text" class="option-text" placeholder="選項 C">
+                                <button class="btn-remove-option">&times;</button>
+                            </div>
+                            <div class="option-row">
+                                <input type="checkbox" class="option-correct">
+                                <input type="text" class="option-text" placeholder="選項 D">
+                                <button class="btn-remove-option">&times;</button>
+                            </div>
+                        </div>
+                        <button class="btn-add-option" id="btnAddOption">+ 添加選項</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="questionExplanation">解釋說明</label>
+                        <textarea id="questionExplanation" placeholder="答案解釋..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="btnCancelQuestion">取消</button>
+                    <button class="btn-save" id="btnSaveQuestion">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頁腳 -->
+        <footer class="footer">
+            <p>AI 知識溫故知新 監督學習平台 © 2026</p>
+        </footer>
+    </div>
+
+    <script src="data/questions.js"></script>
+    <script src="data/modern-questions-1.js"></script>
+    <script src="data/modern-questions-2.js"></script>
+    <script src="data/modern-questions-3.js"></script>
+    <script src="data/modern-questions-4.js"></script>
+    <script src="data/modern-questions-5.js"></script>
+    <script src="data/modern-questions-6.js"></script>
+    <script src="data/modern-questions-7.js"></script>
+    <script src="data/modern-questions-8.js"></script>
+    <script src="data/custom-questions.js"></script>
+    <script src="data/exploration-questions.js"></script>
+    <script src="modules/progress-tracker.js"></script>
+    <script src="modules/quiz-engine.js"></script>
+    <script src="modules/admin-panel.js"></script>
+    <script src="modules/knowledge-viewer.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
