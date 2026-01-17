@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
         rel="stylesheet">
+    <!-- EmailJS for automatic email sending -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 
 <body>
@@ -247,7 +249,7 @@
                         <p>請輸入管理員密碼以進入</p>
                         <input type="password" id="adminPassword" placeholder="請輸入密碼" class="password-input">
                         <button class="btn-login" id="btnLogin">進入</button>
-                        <p class="login-hint">提示：預設密碼為 admin123</p>
+                        <p class="login-hint">提示：預設密碼為 admin</p>
                     </div>
                 </div>
 
@@ -300,21 +302,45 @@
                     <!-- 電郵設置 -->
                     <div class="tab-content" id="tabSettings" style="display: none;">
                         <div class="settings-section">
-                            <h4>📧 管理員電郵設置</h4>
-                            <p>程曉霞模式測試完成後，詳細結果報告將發送至以下電郵地址</p>
+                            <h4>📧 自動發送電郵設置</h4>
+                            <p>程曉霞模式測試完成後，詳細結果報告將自動發送至以下電郵地址</p>
+
                             <div class="form-group">
                                 <label for="adminEmails">管理員電郵（多個電郵以逗號分隔）</label>
                                 <input type="text" id="adminEmails"
                                     placeholder="例如：admin1@example.com, admin2@example.com">
                             </div>
+
                             <div class="form-group">
                                 <label>
                                     <input type="checkbox" id="enableEmailReport" checked>
                                     啟用測試完成後自動發送報告
                                 </label>
                             </div>
+
+                            <h5 style="margin-top: 1.5rem; color: var(--text-primary);">🔧 EmailJS 配置（選填）</h5>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                如需自動發送郵件，請到 <a href="https://www.emailjs.com/" target="_blank"
+                                    style="color: var(--color-advanced);">emailjs.com</a> 免費註冊並獲取以下資訊
+                            </p>
+
+                            <div class="form-group">
+                                <label for="emailjsPublicKey">Public Key (公鑰)</label>
+                                <input type="text" id="emailjsPublicKey" placeholder="例如：user_xxxxxxxxxxxx">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emailjsServiceId">Service ID (服務 ID)</label>
+                                <input type="text" id="emailjsServiceId" placeholder="例如：service_xxxx">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emailjsTemplateId">Template ID (模板 ID)</label>
+                                <input type="text" id="emailjsTemplateId" placeholder="例如：template_xxxx">
+                            </div>
+
                             <button class="btn-save" id="btnSaveEmailSettings">保存設置</button>
-                            <p class="settings-note">📌 注意：報告將透過您的預設郵件客戶端發送</p>
+                            <p class="settings-note">📌 未配置 EmailJS 時，將使用您的電郵客戶端發送</p>
                         </div>
                     </div>
 

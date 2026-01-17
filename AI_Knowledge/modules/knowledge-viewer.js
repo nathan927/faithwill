@@ -117,7 +117,7 @@ const KnowledgeViewer = {
             html += `<div class="no-results">找不到相關筆記</div>`;
         }
 
-        Object.entries(notes).forEach(([category, items]) => {
+        this.getSortedCategories(notes).forEach(([category, items]) => {
             // 如果是搜索結果，預設展開；否則預設收起
             const isSearchResult = !!notesData;
 
@@ -136,7 +136,7 @@ const KnowledgeViewer = {
                     <div class="note-card">
                         <div class="note-header">
                             <span class="note-number">${item.originalIndex !== undefined ? item.originalIndex + 1 : idx + 1}</span>
-                            <span class="note-type ${item.type}">${item.type === 'single' ? '單選' : '多選'}</span>
+                            ${item.originalCategory ? `<span class="note-tag">${item.originalCategory}</span>` : ''}
                         </div>
                         <div class="note-question">${this.escapeHtml(item.question)}</div>
                         <div class="note-answer">
@@ -180,7 +180,8 @@ const KnowledgeViewer = {
             keys: [
                 { name: 'question', weight: 0.5 },
                 { name: 'explanation', weight: 0.3 },
-                { name: 'category', weight: 0.2 }
+                { name: 'category', weight: 0.1 }, // Broad category
+                { name: 'originalCategory', weight: 0.2 } // Specific tag
             ],
             threshold: 0.3, // 模糊匹配閾值 (0.0 = 完全匹配, 1.0 = 匹配任何)
             includeScore: true
@@ -226,7 +227,7 @@ const KnowledgeViewer = {
             return `<div class="no-results" style="text-align: center; padding: 2rem; color: var(--text-secondary);">找不到相關筆記 🕵️</div>`;
         }
 
-        Object.entries(notes).forEach(([category, items]) => {
+        this.getSortedCategories(notes).forEach(([category, items]) => {
             const isSearchResult = !!notesData;
 
             html += `
@@ -244,13 +245,13 @@ const KnowledgeViewer = {
                     <div class="note-card">
                         <div class="note-header">
                             <span class="note-number">${item.originalIndex !== undefined ? item.originalIndex + 1 : '#'}</span>
-                            <span class="note-type ${item.type}">${item.type === 'single' ? '單選' : '多選'}</span>
+                            ${item.originalCategory ? `<span class="note-tag">${item.originalCategory}</span>` : ''}
                         </div>
-                        <div class="note-question">${this.escapeHtml(item.question)}</div>
+                        <div class="note-question">${item.question && item.question.includes('<span class="search-highlight">') ? item.question : this.escapeHtml(item.question)}</div>
                         <div class="note-answer">
                             <ul class="note-answer-list">${item.correctOptions.map(opt => `<li>${this.escapeHtml(opt)}</li>`).join('')}</ul>
                         </div>
-                        ${item.explanation ? `<div class="note-explanation">${this.escapeHtml(item.explanation)}</div>` : ''}
+                        ${item.explanation ? `<div class="note-explanation">${item.explanation && item.explanation.includes('<span class="search-highlight">') ? item.explanation : this.escapeHtml(item.explanation)}</div>` : ''}
                     </div>
                 `;
             });
@@ -264,25 +265,134 @@ const KnowledgeViewer = {
         return html;
     },
 
-    // 從題庫生成筆記
+    // 獲取排序後的筆記分類（按大類排序）
+    getSortedCategories(notes) {
+        const order = [
+            'AI 入門必答',
+            'AI 與機器學習原理',
+            '深度學習核心',
+            '自然語言處理 (NLP)',
+            '電腦視覺與生成式 AI',
+            '進階模型與技術',
+            'AI 應用與安全'
+        ];
+
+        return Object.entries(notes).sort((a, b) => {
+            const indexA = order.indexOf(a[0]);
+            const indexB = order.indexOf(b[0]);
+
+            if (indexA === -1 && indexB === -1) return 0;
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+
+            return indexA - indexB;
+        });
+    },
+
+    // 獲取大類圖標
+    getCategoryIcon(category) {
+        const icons = {
+            'AI 入門必答': '🌟',
+            'AI 與機器學習原理': '📐',
+            '深度學習核心': '🧠',
+            '自然語言處理 (NLP)': '🗣️',
+            '電腦視覺與生成式 AI': '🎨',
+            '進階模型與技術': '⚡',
+            'AI 應用與安全': '🛡️'
+        };
+        return icons[category] || '📂';
+    },
+
+    // 定義細分類到大類的映射
+    getBroadCategory(subCategory) {
+        const mapping = {
+            // AI 入門必答
+            'AI 入門必答': 'AI 入門必答',
+
+            // AI 與機器學習原理
+            'AI 基礎': 'AI 與機器學習原理',
+            '機器學習基礎': 'AI 與機器學習原理',
+            '機器學習類型': 'AI 與機器學習原理',
+            '數據處理': 'AI 與機器學習原理',
+            '數據增強': 'AI 與機器學習原理',
+            '模型評估': 'AI 與機器學習原理',
+            '模型訓練': 'AI 與機器學習原理',
+            '交叉驗證': 'AI 與機器學習原理',
+            '因果推理': 'AI 與機器學習原理',
+            '人工智能倫理': 'AI 與機器學習原理',
+            '集成學習': 'AI 與機器學習原理',
+            '超參數調優': 'AI 與機器學習原理',
+
+            // 深度學習核心
+            '深度學習': '深度學習核心',
+            '神經網絡基礎': '深度學習核心',
+            '神經網絡架構': '深度學習核心',
+            '激活函數': '深度學習核心',
+            '損失函數': '深度學習核心',
+            '優化器': '深度學習核心',
+            '正則化': '深度學習核心',
+            '批次標準化': '深度學習核心',
+
+            // 自然語言處理 (NLP)
+            '自然語言處理': '自然語言處理 (NLP)',
+            'NLP 進階': '自然語言處理 (NLP)',
+            '詞嵌入': '自然語言處理 (NLP)',
+            '注意力機制': '自然語言處理 (NLP)',
+            '注意力變體': '自然語言處理 (NLP)',
+            'Transformer': '自然語言處理 (NLP)',
+            'Transformer 進階': '自然語言處理 (NLP)',
+            'BERT': '自然語言處理 (NLP)',
+            '大型語言模型': '自然語言處理 (NLP)',
+            'LLM': '自然語言處理 (NLP)',
+            'Prompt Engineering': '自然語言處理 (NLP)',
+            'RAG': '自然語言處理 (NLP)',
+            '知識蒸餾': '自然語言處理 (NLP)',
+
+            // 電腦視覺與生成式 AI
+            '電腦視覺': '電腦視覺與生成式 AI',
+            'GAN': '電腦視覺與生成式 AI',
+            'Diffusion Models': '電腦視覺與生成式 AI',
+            '多模態': '電腦視覺與生成式 AI',
+            '自編碼器': '電腦視覺與生成式 AI',
+
+            // 進階模型與技術
+            '強化學習': '進階模型與技術',
+            'RL 進階': '進階模型與技術',
+            '遷移學習': '進階模型與技術',
+            '對比學習': '進階模型與技術',
+            '模型壓縮': '進階模型與技術',
+            '模型優化': '進階模型與技術',
+            '模型部署': '進階模型與技術',
+            '可解釋性': '進階模型與技術',
+
+            // AI 應用與安全
+            'AI 應用': 'AI 應用與安全',
+            'AI 安全': 'AI 應用與安全'
+        };
+        return mapping[subCategory] || '其他';
+    },
+
+    // 從題庫生成筆記（按大類分組）
     generateNotesFromQuestions() {
         const notes = {};
 
-        // 收集所有題目
         if (typeof defaultQuestions !== 'undefined') {
             ['beginner', 'advanced', 'expert'].forEach(level => {
                 if (defaultQuestions[level]) {
                     defaultQuestions[level].forEach(q => {
-                        const category = q.category || '未分類';
-                        if (!notes[category]) {
-                            notes[category] = [];
+                        const subCategory = q.category || '未分類';
+                        const broadCategory = this.getBroadCategory(subCategory);
+
+                        if (!notes[broadCategory]) {
+                            notes[broadCategory] = [];
                         }
 
                         // 避免重複
-                        if (!notes[category].find(n => n.question === q.question)) {
-                            notes[category].push({
+                        if (!notes[broadCategory].find(n => n.question === q.question)) {
+                            notes[broadCategory].push({
                                 question: q.question,
                                 type: q.type || 'single',
+                                originalCategory: subCategory, // 保留原始細分類作為 TAG
                                 correctOptions: q.correctAnswers.map(idx => q.options[idx]),
                                 explanation: q.explanation || ''
                             });
@@ -293,22 +403,6 @@ const KnowledgeViewer = {
         }
 
         return notes;
-    },
-
-    // 切換筆記分類展開/收起
-    toggleNotesCategory(header) {
-        const items = header.nextElementSibling;
-        const expand = header.querySelector('.notes-expand');
-
-        if (items.style.display === 'none') {
-            items.style.display = 'block';
-            expand.textContent = '▼';
-            header.classList.add('expanded');
-        } else {
-            items.style.display = 'none';
-            expand.textContent = '▶';
-            header.classList.remove('expanded');
-        }
     },
 
     // 顯示知識頁面
@@ -336,6 +430,22 @@ const KnowledgeViewer = {
         document.getElementById('knowledgeArea').style.display = 'none';
         document.getElementById('modeSelection').style.display = 'block';
         this.currentView = null;
+    },
+
+    // 切換筆記分類展開/收起
+    toggleNotesCategory(header) {
+        const items = header.nextElementSibling;
+        const expand = header.querySelector('.notes-expand');
+
+        if (items.style.display === 'none') {
+            items.style.display = 'block';
+            expand.textContent = '▼';
+            header.classList.add('expanded');
+        } else {
+            items.style.display = 'none';
+            expand.textContent = '▶';
+            header.classList.remove('expanded');
+        }
     },
 
     // HTML 轉義

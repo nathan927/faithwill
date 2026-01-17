@@ -425,25 +425,61 @@ function showResults(results) {
     }
 }
 
-// 發送電郵報告
-function sendEmailReportIfEnabled(results) {
+// 發送電郵報告 - 使用 EmailJS
+async function sendEmailReportIfEnabled(results) {
     const settings = getEmailSettings();
     if (!settings.enabled || !settings.emails || settings.emails.length === 0) {
         return;
     }
 
+    // 檢查 EmailJS 配置
+    if (!settings.serviceId || !settings.templateId || !settings.publicKey) {
+        console.log('EmailJS 尚未配置，使用 mailto 備用方案');
+        sendEmailViaMailto(results, settings);
+        return;
+    }
+
     // 生成報告內容
     const report = generateTestReport(results);
+    const course = selectedCourseId ? CourseManager.get(selectedCourseId) : null;
+    const courseName = course ? course.name : '未知課程';
 
-    // 使用 mailto 打開郵件客戶端
+    try {
+        // 初始化 EmailJS
+        emailjs.init(settings.publicKey);
+
+        // 發送郵件給每個管理員
+        for (const email of settings.emails) {
+            await emailjs.send(settings.serviceId, settings.templateId, {
+                to_email: email,
+                subject: `[程曉霞模式] 測試結果報告 - ${new Date().toLocaleDateString('zh-HK')}`,
+                course_name: courseName,
+                score: results.score,
+                correct: results.correct,
+                wrong: results.wrong,
+                accuracy: results.accuracy,
+                report_content: report,
+                test_date: new Date().toLocaleString('zh-HK')
+            });
+        }
+
+        alert('✅ 測試報告已成功發送至管理員電郵！');
+    } catch (error) {
+        console.error('EmailJS 發送失敗:', error);
+        // 如果 EmailJS 失敗，退回到 mailto
+        if (confirm('自動發送失敗，是否改用電郵客戶端發送？')) {
+            sendEmailViaMailto(results, settings);
+        }
+    }
+}
+
+// 備用：使用 mailto 發送
+function sendEmailViaMailto(results, settings) {
+    const report = generateTestReport(results);
     const subject = encodeURIComponent(`[程曉霞模式] 測試結果報告 - ${new Date().toLocaleDateString('zh-HK')}`);
     const body = encodeURIComponent(report);
     const emailList = settings.emails.join(',');
-
-    // 顯示發送確認
-    if (confirm(`是否發送測試結果報告至管理員電郵？\n\n收件人：${emailList}`)) {
-        window.location.href = `mailto:${emailList}?subject=${subject}&body=${body}`;
-    }
+    window.location.href = `mailto:${emailList}?subject=${subject}&body=${body}`;
 }
 
 // 生成測試報告文字
@@ -505,6 +541,9 @@ function getEmailSettings() {
 function saveEmailSettings() {
     const emailInput = document.getElementById('adminEmails');
     const enableCheck = document.getElementById('enableEmailReport');
+    const publicKeyInput = document.getElementById('emailjsPublicKey');
+    const serviceIdInput = document.getElementById('emailjsServiceId');
+    const templateIdInput = document.getElementById('emailjsTemplateId');
 
     const emails = emailInput.value
         .split(',')
@@ -513,7 +552,10 @@ function saveEmailSettings() {
 
     const settings = {
         enabled: enableCheck.checked,
-        emails: emails
+        emails: emails,
+        publicKey: publicKeyInput ? publicKeyInput.value.trim() : '',
+        serviceId: serviceIdInput ? serviceIdInput.value.trim() : '',
+        templateId: templateIdInput ? templateIdInput.value.trim() : ''
     };
 
     localStorage.setItem('adminEmailSettings', JSON.stringify(settings));
@@ -525,12 +567,24 @@ function loadEmailSettings() {
     const settings = getEmailSettings();
     const emailInput = document.getElementById('adminEmails');
     const enableCheck = document.getElementById('enableEmailReport');
+    const publicKeyInput = document.getElementById('emailjsPublicKey');
+    const serviceIdInput = document.getElementById('emailjsServiceId');
+    const templateIdInput = document.getElementById('emailjsTemplateId');
 
     if (emailInput) {
         emailInput.value = settings.emails.join(', ');
     }
     if (enableCheck) {
         enableCheck.checked = settings.enabled;
+    }
+    if (publicKeyInput) {
+        publicKeyInput.value = settings.publicKey || '';
+    }
+    if (serviceIdInput) {
+        serviceIdInput.value = settings.serviceId || '';
+    }
+    if (templateIdInput) {
+        templateIdInput.value = settings.templateId || '';
     }
 }
 

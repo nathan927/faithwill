@@ -298,7 +298,7 @@ const defaultQuestions = {
                 '統計用戶數量的函數'
             ],
             correctAnswers: [0],
-            explanation: '損失函數（也稱目標函數或成本函數）用於衡量模型預測值與實際值之間的差距。訓練的目標是最小化這個差距。'
+            explanation: '損失函數（也稱目標函數或成本函數）用於衡量模型預測值與實際值之間的差距。訓練的目標是這差距最小化。\n\n█ 核心概念（分數卡）：\n損失函數就像是老師給學生的「扣分標準」：\n• 答錯得越多，Loss 越大（扣分越多）。\n• 答對了，Loss 接近 0。\n• 模型的終極目標：讓 Loss 變成 0。\n\n█ 常見類型：\n\n1. 均方誤差 (MSE) - 用於回歸問題：\n   • 預測房價 500 萬，實際 600 萬 → 差距平方後的數值。\n   • 對大誤差懲罰非常重（因為有平方）。\n\n2. 交叉熵 (Cross-Entropy) - 用於分類問題：\n   • 預測是貓的機率 0.1，實際是貓 (1.0)。\n   • 衡量两个機率分佈的差異。\n\n█ 作用：\n它是「梯度下降」的導航儀。Loss 告訴模型「你錯在哪裡，錯了多少」，模型根據這個反饋去調整參數。'
         },
         {
             id: 'b22',
@@ -782,7 +782,7 @@ const defaultQuestions = {
                 '完全消除歧義'
             ],
             correctAnswers: [0, 1, 2],
-            explanation: 'Subword Tokenization (如 BPE, Byte Pair Encoding) 是現代 NLP 的標準分詞方式，它在「字」和「詞」之間取得了完美的平衡。\n\nBPE 等 Subword 方法將詞語分解為子詞單元，能處理 OOV、控制詞彙表大小、保留詞根詞綴等形態信息。但不能完全消除語義歧義。'
+            explanation: 'Subword Tokenization (如 BPE, Byte Pair Encoding) 是現代 NLP 的標準分詞方式，它在「字」和「詞」之間取得了完美的平衡，既解決了未登錄詞 (OOV) 問題，又保持了語義的完整性。\n\n█ 為什麼需要它？\n\n1. 詞級別 (Word-level) 的問題：\n   字典太大（英文有 30 萬詞），且遇到新詞（如 "iPhone15"）就無法識別 (OOV)。\n\n2. 字級別 (Char-level) 的問題：\n   粒度太細，"a", "p", "p", "l", "e" 單獨看沒有意義，模型很難學。\n\n█ Subword (子詞) 的智慧：\n它把常見的詞保留完整，把罕見的詞拆開。\n\n例子：\n• "playing" → "play" + "ing"（常見詞根 + 後綴）\n• "unhappiness" → "un" + "happy" + "ness"\n\n█ BPE 算法核心：\n1. 從字符開始。\n2. 統計最常相鄰出現的字符對（如 "e" 和 "s" → "es"）。\n3. 合併它們，重複此步驟，直到達到預設詞表大小。\n\n這讓 GPT 等模型能用有限的詞表（約 5 萬個 Token）表達無限的語言。'
         },
         {
             id: 'e11',
