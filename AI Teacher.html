@@ -1188,6 +1188,186 @@
             border-radius: 10px;
             margin-bottom: 20px;
         }
+
+        /* API 設定按鈕樣式 */
+        .api-settings-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .api-settings-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .api-settings-btn i {
+            font-size: 1.3rem;
+        }
+
+        /* API 設定模態框樣式 */
+        .api-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .api-modal-content {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .api-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-modal-title {
+            color: white;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: all 0.2s;
+        }
+
+        .api-close-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .api-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .api-form-group {
+            margin-bottom: 18px;
+        }
+
+        .api-form-group label {
+            display: block;
+            font-weight: 600;
+            color: #0d47a1;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .api-form-group select,
+        .api-form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #bbdefb;
+            background: #f5f9ff;
+            font-size: 1rem;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .api-form-group select:focus,
+        .api-form-group input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .api-form-group .hint {
+            font-size: 0.85rem;
+            color: #78909c;
+            margin-top: 6px;
+        }
+
+        .api-status {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .api-status.connected {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .api-status.disconnected {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .api-modal-footer {
+            padding: 15px 20px;
+            background: #f5f5f5;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .api-modal-footer .btn {
+            width: auto;
+            padding: 10px 25px;
+        }
+
+        .provider-info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #0d47a1;
+        }
+
+        .provider-info a {
+            color: #1e88e5;
+            text-decoration: none;
+        }
+
+        .provider-info a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -1494,9 +1674,207 @@
         </footer>
     </div>
 
+    <!-- API 設定按鈕 -->
+    <button class="api-settings-btn" id="apiSettingsBtn" title="API 設定">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- API 設定模態框 -->
+    <div class="api-modal" id="apiModal">
+        <div class="api-modal-content">
+            <div class="api-modal-header">
+                <h3 class="api-modal-title"><i class="fas fa-key"></i> API 設定</h3>
+                <button class="api-close-btn" id="apiCloseBtn">&times;</button>
+            </div>
+            <div class="api-modal-body">
+                <div class="api-status disconnected" id="apiStatus">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>尚未設定 API Key</span>
+                </div>
+
+                <div class="api-form-group">
+                    <label><i class="fas fa-server"></i> API 提供商</label>
+                    <select id="apiProvider">
+                        <option value="openrouter">OpenRouter (推薦，支援多模型)</option>
+                        <option value="xiaomi">小米 MiMo 官方 (免費公測)</option>
+                        <option value="nvidia">NVIDIA API</option>
+                        <option value="google">Google Gemini</option>
+                        <option value="glm">GLM 智譜 AI</option>
+                        <option value="minimax">MiniMax</option>
+                    </select>
+                </div>
+
+                <div class="provider-info" id="providerInfo">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="providerInfoText">OpenRouter 是一個 API 聚合平台，支援多種 AI 模型，包括免費模型。</span>
+                    <br><a href="https://openrouter.ai/keys" target="_blank">獲取 OpenRouter API Key →</a>
+                </div>
+
+                <div class="api-form-group">
+                    <label><i class="fas fa-key"></i> API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="輸入您的 API Key">
+                    <p class="hint">您的 API Key 將安全地存儲在瀏覽器本地</p>
+                </div>
+
+                <div class="api-form-group">
+                    <label><i class="fas fa-robot"></i> 選擇模型</label>
+                    <select id="modelSelect">
+                        <option value="xiaomi/mimo-v2-flash:free">小米 MiMo v2 Flash (免費)</option>
+                        <option value="google/gemini-2.0-flash-exp:free">Google Gemini 2.0 Flash (免費)</option>
+                        <option value="deepseek/deepseek-chat:free">DeepSeek Chat (免費)</option>
+                        <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B (免費)</option>
+                        <option value="google/gemini-2.0-pro-exp-02-05:free">Google Gemini 2.0 Pro (免費)</option>
+                        <option value="custom">自定義模型...</option>
+                    </select>
+                </div>
+
+                <div class="api-form-group" id="customModelGroup" style="display: none;">
+                    <label><i class="fas fa-edit"></i> 自定義模型名稱</label>
+                    <input type="text" id="customModelInput" placeholder="例如：google/gemini-2.0-flash-exp">
+                    <p class="hint">請輸入完整的模型 ID</p>
+                </div>
+            </div>
+            <div class="api-modal-footer">
+                <button class="btn btn-warning" id="apiResetBtn">
+                    <i class="fas fa-undo"></i> 重置
+                </button>
+                <button class="btn btn-success" id="apiSaveBtn">
+                    <i class="fas fa-save"></i> 保存設定
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // API 提供商配置
+        const API_PROVIDERS = {
+            openrouter: {
+                name: 'OpenRouter',
+                endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+                description: 'OpenRouter 是一個 API 聚合平台，支援多種 AI 模型，包括免費模型。',
+                keyUrl: 'https://openrouter.ai/keys',
+                models: [
+                    { id: 'xiaomi/mimo-v2-flash:free', name: '小米 MiMo v2 Flash (免費)' },
+                    { id: 'google/gemini-2.0-flash-exp:free', name: 'Google Gemini 2.0 Flash (免費)' },
+                    { id: 'deepseek/deepseek-chat:free', name: 'DeepSeek Chat (免費)' },
+                    { id: 'qwen/qwen-2.5-72b-instruct:free', name: 'Qwen 2.5 72B (免費)' },
+                    { id: 'google/gemini-2.0-pro-exp-02-05:free', name: 'Google Gemini 2.0 Pro (免費)' },
+                    { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B (免費)' }
+                ],
+                supportsVision: true
+            },
+            google: {
+                name: 'Google Gemini',
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta/models',
+                description: 'Google Gemini 是 Google 的最新 AI 模型系列。',
+                keyUrl: 'https://aistudio.google.com/apikey',
+                models: [
+                    { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash Exp' },
+                    { id: 'gemini-2.0-pro-exp-02-05', name: 'Gemini 2.0 Pro' },
+                    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }
+                ],
+                supportsVision: true
+            },
+            glm: {
+                name: 'GLM 智譜 AI',
+                endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+                description: '智譜 AI 的 GLM 系列是中國領先的語言模型。',
+                keyUrl: 'https://open.bigmodel.cn/',
+                models: [
+                    { id: 'glm-4-flash', name: 'GLM-4 Flash' },
+                    { id: 'glm-4-plus', name: 'GLM-4 Plus' },
+                    { id: 'glm-4v-flash', name: 'GLM-4V Flash (視覺)' }
+                ],
+                supportsVision: true
+            },
+            minimax: {
+                name: 'MiniMax',
+                endpoint: 'https://api.minimax.chat/v1/text/chatcompletion_v2',
+                description: 'MiniMax 提供高性能的中文 AI 模型。',
+                keyUrl: 'https://platform.minimax.chat/',
+                models: [
+                    { id: 'MiniMax-Text-01', name: 'MiniMax Text 01' },
+                    { id: 'abab6.5s-chat', name: 'ABAB 6.5s Chat' }
+                ],
+                supportsVision: false
+            },
+            nvidia: {
+                name: 'NVIDIA API',
+                endpoint: 'https://integrate.api.nvidia.com/v1/chat/completions',
+                description: 'NVIDIA 提供高性能 AI 模型 API，支援多種先進模型。',
+                keyUrl: 'https://build.nvidia.com/',
+                models: [
+                    { id: 'z-ai/glm4.7', name: 'GLM 4.7 (Z-AI)' },
+                    { id: 'minimaxai/minimax-m2.1', name: 'MiniMax M2.1' }
+                ],
+                supportsVision: true
+            },
+            xiaomi: {
+                name: '小米 MiMo 官方',
+                endpoint: 'https://api.xiaomimimo.com/v1/chat/completions',
+                description: '小米 MiMo 官方 API 平台，目前免費公測至2026年1月20日。',
+                keyUrl: 'https://xiaomimimo.com/',
+                models: [
+                    { id: 'MiMo-V2-Flash', name: 'MiMo V2 Flash' },
+                    { id: 'MiMo-V2-Flash-Thinking', name: 'MiMo V2 Flash Thinking' }
+                ],
+                supportsVision: true
+            }
+        };
+
+        // 預設 API 設定 (使用原本的 OpenRouter key 作為預設)
+        const DEFAULT_API_CONFIG = {
+            provider: 'openrouter',
+            apiKey: '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',
+            model: 'xiaomi/mimo-v2-flash:free',
+            customModel: ''
+        };
+
+        // 當前 API 設定 (從 localStorage 讀取或使用預設值)
+        let currentApiConfig = loadApiConfig();
+
+        // 從 localStorage 讀取 API 設定
+        function loadApiConfig() {
+            try {
+                const saved = localStorage.getItem('aiTeacherApiConfig');
+                if (saved) {
+                    const config = JSON.parse(saved);
+                    console.log('已從本地載入 API 設定');
+                    return config;
+                }
+            } catch (e) {
+                console.error('讀取 API 設定失敗:', e);
+            }
+            return { ...DEFAULT_API_CONFIG };
+        }
+
+        // 保存 API 設定到 localStorage
+        function saveApiConfig(config) {
+            try {
+                localStorage.setItem('aiTeacherApiConfig', JSON.stringify(config));
+                currentApiConfig = config;
+                console.log('API 設定已保存到本地');
+                return true;
+            } catch (e) {
+                console.error('保存 API 設定失敗:', e);
+                return false;
+            }
+        }
+
+        // 獲取當前使用的模型 ID
+        function getCurrentModel() {
+            if (currentApiConfig.model === 'custom' && currentApiConfig.customModel) {
+                return currentApiConfig.customModel;
+            }
+            return currentApiConfig.model;
+        }
+
+        // 獲取當前 API Key
+        function getCurrentApiKey() {
+            return currentApiConfig.apiKey || DEFAULT_API_CONFIG.apiKey;
+        }
+
         // 全局變量
-        const OPENROUTER_API_KEY = "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";
         let uploadedImages = []; // 改為數組支持多圖
         let feedbackText = "";
         let currentSpeech = null;
@@ -1691,11 +2069,192 @@
             // 設置選項卡
             setupTabs();
 
+            // API 設定模態框事件
+            initApiSettings();
+
             // 初始化日志
             log('應用程式已啟動', 'info');
             log('支持多頁作文上傳功能', 'info');
             log('新增寫文思路功能', 'info');
+            log(`當前 API: ${API_PROVIDERS[currentApiConfig.provider].name} - ${getCurrentModel()}`, 'info');
             log('等待用戶操作', 'info');
+        }
+
+        // 初始化 API 設定模態框
+        function initApiSettings() {
+            const apiModal = document.getElementById('apiModal');
+            const apiSettingsBtn = document.getElementById('apiSettingsBtn');
+            const apiCloseBtn = document.getElementById('apiCloseBtn');
+            const apiProvider = document.getElementById('apiProvider');
+            const modelSelect = document.getElementById('modelSelect');
+            const customModelGroup = document.getElementById('customModelGroup');
+            const customModelInput = document.getElementById('customModelInput');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const apiSaveBtn = document.getElementById('apiSaveBtn');
+            const apiResetBtn = document.getElementById('apiResetBtn');
+            const apiStatus = document.getElementById('apiStatus');
+            const providerInfoText = document.getElementById('providerInfoText');
+            const providerInfo = document.getElementById('providerInfo');
+
+            // 開啟 API 設定模態框
+            apiSettingsBtn.addEventListener('click', () => {
+                apiModal.style.display = 'flex';
+                loadApiSettingsUI();
+            });
+
+            // 關閉模態框
+            apiCloseBtn.addEventListener('click', () => {
+                apiModal.style.display = 'none';
+            });
+
+            // 點擊模態框外部關閉
+            apiModal.addEventListener('click', (e) => {
+                if (e.target === apiModal) {
+                    apiModal.style.display = 'none';
+                }
+            });
+
+            // 提供商切換
+            apiProvider.addEventListener('change', () => {
+                updateModelOptions();
+                updateProviderInfo();
+            });
+
+            // 模型選擇變更
+            modelSelect.addEventListener('change', () => {
+                customModelGroup.style.display = modelSelect.value === 'custom' ? 'block' : 'none';
+            });
+
+            // 保存設定
+            apiSaveBtn.addEventListener('click', () => {
+                const config = {
+                    provider: apiProvider.value,
+                    apiKey: apiKeyInput.value.trim(),
+                    model: modelSelect.value,
+                    customModel: customModelInput.value.trim()
+                };
+
+                if (!config.apiKey) {
+                    alert('請輸入 API Key');
+                    return;
+                }
+
+                if (config.model === 'custom' && !config.customModel) {
+                    alert('請輸入自定義模型名稱');
+                    return;
+                }
+
+                if (saveApiConfig(config)) {
+                    updateApiStatus();
+                    alert('API 設定已保存！');
+                    apiModal.style.display = 'none';
+                    log(`API 設定已更新: ${API_PROVIDERS[config.provider].name} - ${getCurrentModel()}`, 'info');
+                } else {
+                    alert('保存失敗，請重試');
+                }
+            });
+
+            // 重置設定
+            apiResetBtn.addEventListener('click', () => {
+                if (confirm('確定要重置為預設設定嗎？')) {
+                    saveApiConfig({ ...DEFAULT_API_CONFIG });
+                    loadApiSettingsUI();
+                    log('API 設定已重置為預設值', 'info');
+                }
+            });
+
+            // 初始化 API 狀態顯示
+            updateApiStatus();
+        }
+
+        // 載入 API 設定到 UI
+        function loadApiSettingsUI() {
+            const apiProvider = document.getElementById('apiProvider');
+            const modelSelect = document.getElementById('modelSelect');
+            const customModelGroup = document.getElementById('customModelGroup');
+            const customModelInput = document.getElementById('customModelInput');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+
+            apiProvider.value = currentApiConfig.provider;
+            apiKeyInput.value = currentApiConfig.apiKey || '';
+
+            updateModelOptions();
+            updateProviderInfo();
+
+            // 設置當前模型
+            if (currentApiConfig.model === 'custom') {
+                modelSelect.value = 'custom';
+                customModelGroup.style.display = 'block';
+                customModelInput.value = currentApiConfig.customModel || '';
+            } else {
+                // 嘗試選擇已保存的模型
+                const modelExists = Array.from(modelSelect.options).some(opt => opt.value === currentApiConfig.model);
+                if (modelExists) {
+                    modelSelect.value = currentApiConfig.model;
+                } else {
+                    // 如果模型不在列表中，使用自定義模型
+                    modelSelect.value = 'custom';
+                    customModelGroup.style.display = 'block';
+                    customModelInput.value = currentApiConfig.model;
+                }
+            }
+        }
+
+        // 更新模型選項
+        function updateModelOptions() {
+            const apiProvider = document.getElementById('apiProvider');
+            const modelSelect = document.getElementById('modelSelect');
+            const provider = API_PROVIDERS[apiProvider.value];
+
+            // 清空現有選項
+            modelSelect.innerHTML = '';
+
+            // 添加提供商的模型
+            provider.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = model.name;
+                modelSelect.appendChild(option);
+            });
+
+            // 添加自定義選項
+            const customOption = document.createElement('option');
+            customOption.value = 'custom';
+            customOption.textContent = '自定義模型...';
+            modelSelect.appendChild(customOption);
+        }
+
+        // 更新提供商信息
+        function updateProviderInfo() {
+            const apiProvider = document.getElementById('apiProvider');
+            const providerInfoText = document.getElementById('providerInfoText');
+            const providerInfo = document.getElementById('providerInfo');
+            const provider = API_PROVIDERS[apiProvider.value];
+
+            providerInfoText.textContent = provider.description;
+            providerInfo.querySelector('a').href = provider.keyUrl;
+            providerInfo.querySelector('a').textContent = `獲取 ${provider.name} API Key →`;
+        }
+
+        // 更新 API 狀態顯示
+        function updateApiStatus() {
+            const apiStatus = document.getElementById('apiStatus');
+            const hasApiKey = currentApiConfig.apiKey && currentApiConfig.apiKey.length > 0;
+
+            if (hasApiKey) {
+                const provider = API_PROVIDERS[currentApiConfig.provider];
+                apiStatus.className = 'api-status connected';
+                apiStatus.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>已連接: ${provider.name} - ${getCurrentModel()}</span>
+                `;
+            } else {
+                apiStatus.className = 'api-status disconnected';
+                apiStatus.innerHTML = `
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>尚未設定 API Key</span>
+                `;
+            }
         }
 
         // 導出評語（純文字）
@@ -2151,10 +2710,50 @@
             `;
         }
 
-        // 調用Gemini Pro 2.0 Flash API (OpenRouter)
-        async function callGeminiFlash(prompt, base64Image = null) {
+        // 通用 AI API 調用函數 (支援多種提供商)
+        async function callAI(prompt, base64Image = null) {
+            const provider = currentApiConfig.provider;
+            const apiKey = getCurrentApiKey();
+            const model = getCurrentModel();
+            const providerConfig = API_PROVIDERS[provider];
+
+            log(`使用 ${providerConfig.name} - ${model}`, 'info');
+            log(`發送API請求: ${prompt.substring(0, 100)}...`, 'info');
+            const startTime = Date.now();
+
+            let response;
+
+            try {
+                if (provider === 'openrouter') {
+                    response = await callOpenRouter(prompt, base64Image, apiKey, model);
+                } else if (provider === 'xiaomi') {
+                    response = await callXiaomi(prompt, base64Image, apiKey, model);
+                } else if (provider === 'nvidia') {
+                    response = await callNvidia(prompt, base64Image, apiKey, model);
+                } else if (provider === 'google') {
+                    response = await callGoogleGemini(prompt, base64Image, apiKey, model);
+                } else if (provider === 'glm') {
+                    response = await callGLM(prompt, base64Image, apiKey, model);
+                } else if (provider === 'minimax') {
+                    response = await callMiniMax(prompt, apiKey, model);
+                } else {
+                    // 預設使用 OpenRouter 格式
+                    response = await callOpenRouter(prompt, base64Image, apiKey, model);
+                }
+
+                const duration = Date.now() - startTime;
+                log(`API響應成功 (${duration}ms): ${response.substring(0, 100)}...`, 'info');
+                return response;
+            } catch (error) {
+                log(`API調用失敗: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // OpenRouter API 調用
+        async function callOpenRouter(prompt, base64Image, apiKey, model) {
             const payload = {
-                model: "xiaomi/mimo-v2-flash:free",
+                model: model,
                 messages: [
                     {
                         role: "user",
@@ -2176,13 +2775,10 @@
                 });
             }
 
-            log(`發送API請求: ${prompt.substring(0, 100)}...`, 'info');
-            const startTime = Date.now();
-
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                    "Authorization": `Bearer ${apiKey}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(payload)
@@ -2191,19 +2787,209 @@
             if (!response.ok) {
                 const errorData = await response.json();
                 let errorMsg = errorData.error?.message || `API請求失敗 (${response.status})`;
-
-                // 添加更詳細的錯誤信息
                 if (errorData.error?.type === "insufficient_credits") {
                     errorMsg += ` | 可用額度: ${errorData.error.available}`;
                 }
-
                 throw new Error(errorMsg);
             }
 
             const data = await response.json();
-            const duration = Date.now() - startTime;
-            log(`API響應成功 (${duration}ms): ${data.choices[0].message.content.substring(0, 100)}...`, 'info');
             return data.choices[0].message.content;
+        }
+
+        // Google Gemini API 調用
+        async function callGoogleGemini(prompt, base64Image, apiKey, model) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+            const contents = [{
+                parts: [{ text: prompt }]
+            }];
+
+            if (base64Image) {
+                contents[0].parts.push({
+                    inline_data: {
+                        mime_type: "image/jpeg",
+                        data: base64Image
+                    }
+                });
+            }
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ contents })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || `API請求失敗 (${response.status})`);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        // GLM 智譜 API 調用
+        async function callGLM(prompt, base64Image, apiKey, model) {
+            const payload = {
+                model: model,
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ]
+            };
+
+            // GLM-4V 支援圖片
+            if (base64Image && model.includes('4v')) {
+                payload.messages[0].content = [
+                    { type: "text", text: prompt },
+                    { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
+                ];
+            }
+
+            const response = await fetch("https://open.bigmodel.cn/api/paas/v4/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || `API請求失敗 (${response.status})`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        // MiniMax API 調用
+        async function callMiniMax(prompt, apiKey, model) {
+            const payload = {
+                model: model,
+                messages: [
+                    {
+                        sender_type: "USER",
+                        text: prompt
+                    }
+                ]
+            };
+
+            const response = await fetch("https://api.minimax.chat/v1/text/chatcompletion_v2", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.base_resp?.status_msg || `API請求失敗 (${response.status})`);
+            }
+
+            const data = await response.json();
+            return data.reply;
+        }
+
+        // 小米 MiMo 官方 API 調用 (使用 OpenAI 兼容格式)
+        async function callXiaomi(prompt, base64Image, apiKey, model) {
+            const payload = {
+                model: model,
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "text", text: prompt }
+                        ]
+                    }
+                ],
+                max_tokens: 16384
+            };
+
+            // 添加圖片數據 (多模態輸入)
+            if (base64Image) {
+                payload.messages[0].content.push({
+                    type: "image_url",
+                    image_url: {
+                        url: `data:image/jpeg;base64,${base64Image}`
+                    }
+                });
+            }
+
+            const response = await fetch("https://api.xiaomimimo.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                let errorMsg = errorData.error?.message || `API請求失敗 (${response.status})`;
+                throw new Error(errorMsg);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        // NVIDIA API 調用 (使用 OpenAI 兼容格式)
+        async function callNvidia(prompt, base64Image, apiKey, model) {
+            const payload = {
+                model: model,
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "text", text: prompt }
+                        ]
+                    }
+                ],
+                max_tokens: 16384
+            };
+
+            // 添加圖片數據 (多模態輸入)
+            if (base64Image) {
+                payload.messages[0].content.push({
+                    type: "image_url",
+                    image_url: {
+                        url: `data:image/jpeg;base64,${base64Image}`
+                    }
+                });
+            }
+
+            const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                let errorMsg = errorData.error?.message || `API請求失敗 (${response.status})`;
+                throw new Error(errorMsg);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        // 保持向後兼容的別名
+        async function callGeminiFlash(prompt, base64Image = null) {
+            return callAI(prompt, base64Image);
         }
 
         // 有題目的評價生成（香港繁體中文）
