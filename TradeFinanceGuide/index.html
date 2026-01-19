@@ -5103,8 +5103,13 @@ $\text{账面亏损} = \text{买回价格} - \text{卖出价格} &gt; 0$
           return;
         }
 
-        const id = 'h-' + index;
-        h.id = id;
+        // PRESERVE existing IDs, only create new if missing
+        const existingId = h.getAttribute('id');
+        const id = existingId || ('h-' + index);
+        if (!existingId) {
+          h.id = id;
+        }
+
         const isH1 = h.tagName === 'H1';
         tocHTML += `<a href="#${id}" class="toc-link ${isH1 ? '' : 'toc-sub'}">${h.innerText}</a>`;
       });
