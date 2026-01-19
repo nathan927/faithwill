@@ -242,7 +242,47 @@
             .main-content { padding: 2rem 1rem; }
             h1 { font-size: 2rem; }
         }
-    </style>
+    
+    /* Flow Diagram Styling - Blue gradient box for ASCII diagrams */
+    pre code:has([class*="flow"]),
+    .flow-diagram-box {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+        border: 2px solid #3b82f6 !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        display: block;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        color: #1e3a8a;
+        line-height: 1.8;
+    }
+    
+    /* Make arrows stand out */
+    .arrow { color: #2563eb; font-weight: bold; }
+    .amount { color: #dc2626; font-weight: bold; }
+    .company { color: #059669; font-weight: bold; }
+
+
+    /* Case Study Box Styling */
+    .case-box {
+        background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+        border: 1px solid #facc15;
+        border-left: 4px solid #eab308;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin: 15px 0;
+    }
+    
+    .case-box p {
+        margin: 8px 0;
+    }
+    
+    .case-box strong {
+        color: #92400e;
+    }
+
+</style>
 </head>
 <body>
     <aside class="sidebar">
@@ -1461,22 +1501,22 @@ A公司的盈亏：
 </tr>
 </tbody></table>
 <p><strong>异常案例识别</strong>：</p>
-<pre><code>案例：企业A的异常交易
+<div class="flow-diagram">案例：企业A的异常交易
 
 采购记录：
-2025年1月10日，从B公司采购钢材100吨，成本500万元
+<span class="flow-amount">2025</span>年<span class="flow-amount">1</span>月<span class="flow-amount">10</span>日，从<span class="flow-company">B公司</span>采购钢材<span class="flow-amount">100</span>吨，成本<span class="flow-amount">500万</span>元
 
 销售记录：
-2025年1月15日，向C公司销售钢材80吨，收入400万元
+<span class="flow-amount">2025</span>年<span class="flow-amount">1</span>月<span class="flow-amount">15</span>日，向<span class="flow-company">C公司</span>销售钢材<span class="flow-amount">80</span>吨，收入<span class="flow-amount">400万</span>元
 
 异常分析：
-1. 采购100吨，销售80吨，差额20吨去向不明
-   → 可能被挪作他用（如质押给其他金融机构）
-   → 或为虚构交易，实际并无100吨库存
+<span class="flow-amount">1</span>. 采购<span class="flow-amount">100</span>吨，销售<span class="flow-amount">80</span>吨，差额<span class="flow-amount">20</span>吨去向不明
+   <span class="flow-arrow">→</span> 可能被挪作他用（如质押给其他金融机构）
+   <span class="flow-arrow">→</span> 或为虚构交易，实际并无<span class="flow-amount">100</span>吨库存
 
-2. 采购成本500万（5000元/吨），销售收入400万（5000元/吨）
-   → 毛利率为0，不符合商业
-</code></pre>
+<span class="flow-amount">2</span>. 采购成本<span class="flow-amount">500万</span>（<span class="flow-amount">5000</span>元/吨），销售收入<span class="flow-amount">400万</span>（<span class="flow-amount">5000</span>元/吨）
+   <span class="flow-arrow">→</span> 毛利率为<span class="flow-amount">0</span>，不符合商业
+</div>
 <hr>
 <pre><code class="language-markdown">逻辑
    → 可能涉及融资性贸易或虚假交易
@@ -2211,15 +2251,15 @@ A公司（回流，形成闭环）
 <h4 id="特征四-资金流动呈闭环结构且定向停留">特征四：资金流动呈闭环结构且定向停留</h4>
 <p><strong>资金闭环的四个层次识别</strong>：</p>
 <p><strong>层次1：直接闭环（最明显）</strong></p>
-<pre><code>时间轴：
-Day 1: A公司 → 1000万 → B公司
-Day 90: B公司 → 1060万 → A公司
+<div class="flow-diagram">时间轴：
+Day <span class="flow-amount">1</span>: <span class="flow-company">A公司</span> <span class="flow-arrow">→</span> <span class="flow-amount">1000万</span> <span class="flow-arrow">→</span> <span class="flow-company">B公司</span>
+Day <span class="flow-amount">90</span>: <span class="flow-company">B公司</span> <span class="flow-arrow">→</span> <span class="flow-amount">1060万</span> <span class="flow-arrow">→</span> <span class="flow-company">A公司</span>
 
 特点：
 • 资金直接在两方之间循环
-• 停留期为融资期（通常3-6个月）
+• 停留期为融资期（通常<span class="flow-amount">3</span>-<span class="flow-amount">6</span>个月）
 • 回流金额 &gt; 原始支付金额（差额为利息）
-</code></pre>
+</div>
 <p><strong>层次2：单向传递闭环（常见）</strong></p>
 <pre><code>资金流转路径：
 A → 1000万 → B → 1005万 → C → 1010万 → D（停留3个月）
@@ -2408,7 +2448,7 @@ D公司
 <li>第三方代付主体频繁变换，无固定模式</li>
 <li>代付方与交易标的物无任何关联</li>
 </ul>
-<p>实质：通过第三方代付掩盖资金闭环路径</p>
+<div class="info-box case-study"><p class="case-content"><strong>實質：</strong>通过第三方代付掩盖资金闭环路径</p>
 <hr>
 <h3 id="三-空转贸易与走单业务的识别特征">三、空转贸易与走单业务的识别特征</h3>
 <h4 id="一-quot-走单走票不走货-quot-的本质">（一）&quot;走单走票不走货&quot;的本质</h4>
@@ -2693,18 +2733,18 @@ $\text{销售回款率} = \frac{\text{销售商品收到现金}}{\text{营业收
 • 要么销售额为虚构
 </code></pre>
 <p><strong>异常信号6：应收应付账款的镜像关系</strong></p>
-<pre><code>正常情况：
-企业对A公司：应收账款 1000万（销售形成）
-企业对A公司：应付账款 0万
-→ 说明A是客户
+<div class="flow-diagram">正常情况：
+企业对<span class="flow-company">A公司</span>：应收账款 <span class="flow-amount">1000万</span>（销售形成）
+企业对<span class="flow-company">A公司</span>：应付账款 <span class="flow-amount">0万</span>
+<span class="flow-arrow">→</span> 说明A是客户
 
 空转贸易异常情况：
-企业对B公司：应收账款 1000万（销售形成）
-企业对B公司：应付账款 980万（采购形成）
-→ B既是客户又是供应商
-→ 净额仅20万
-→ 高度疑似循环贸易或空转贸易
-</code></pre>
+企业对<span class="flow-company">B公司</span>：应收账款 <span class="flow-amount">1000万</span>（销售形成）
+企业对<span class="flow-company">B公司</span>：应付账款 <span class="flow-amount">980万</span>（采购形成）
+<span class="flow-arrow">→</span> B既是客户又是供应商
+<span class="flow-arrow">→</span> 净额仅<span class="flow-amount">20万</span>
+<span class="flow-arrow">→</span> 高度疑似循环贸易或空转贸易
+</div>
 <hr>
 <h3 id="四-国资委-quot-十不准-quot-与监管打击">四、国资委&quot;十不准&quot;与监管打击</h3>
 <h4 id="一-quot-十不准-quot-核心内容">（一）&quot;十不准&quot;核心内容</h4>
@@ -2835,16 +2875,16 @@ $\text{销售回款率} = \frac{\text{销售商品收到现金}}{\text{营业收
 <li>标记实际控制人重叠的主体</li>
 </ol>
 <p>案例：</p>
-<pre><code>交易链条：A公司 → B公司 → C公司 → D公司
+<div class="flow-diagram">交易链条：<span class="flow-company">A公司</span> <span class="flow-arrow">→</span> <span class="flow-company">B公司</span> <span class="flow-arrow">→</span> <span class="flow-company">C公司</span> <span class="flow-arrow">→</span> <span class="flow-company">D公司</span>
 
 股权穿透发现：
-A公司：张某持股100%
-B公司：李某持股60%，但李某为张某配偶
-C公司：张某通过X公司间接控制70%
-D公司：张某兄弟张某某持股100%
+<span class="flow-company">A公司</span>：张某持股<span class="flow-amount">100</span>%
+<span class="flow-company">B公司</span>：李某持股<span class="flow-amount">60</span>%，但李某为张某配偶
+<span class="flow-company">C公司</span>：张某通过<span class="flow-company">X公司</span>间接控制<span class="flow-amount">70</span>%
+<span class="flow-company">D公司</span>：张某兄弟张某某持股<span class="flow-amount">100</span>%
 
 结论：四家公司实质由张某家族控制
-</code></pre>
+</div>
 <p><strong>同一办公地址</strong>：</p>
 <table>
 <thead>
@@ -2879,18 +2919,7 @@ D公司：张某兄弟张某某持股100%
 </tbody></table>
 <hr>
 <div class="converted-block">
-<table>
-<thead>
-  <tr>
-    <th>办公室号</th>
-    <th>不同房间</th>
-    <th>同一办公室</th>
-    <th>极高风险</th>
-  </tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+<!-- Removed duplicate table (simplified) -->
 <p>现场验证方法：</p>
 <p><li>实地走访各交易主体的办公地址</li></p>
 <p><li>拍照记录办公场所外观、门牌号</li></p>
@@ -2898,7 +2927,7 @@ D公司：张某兄弟张某某持股100%
 <p><li>核实是否有独立的员工工作区</li></p>
 <p><strong>同期注册成立</strong>：</p>
 <p>异常模式：</p>
-</div>
+
 <p>正常情况：
 交易对手成立时间分散，如2015年、2018年、2020年</p>
 <p>异常情况：
@@ -3017,7 +3046,7 @@ F的收益 = 1060 - 1055 = 5万（0.5%通道费）</p>
 <p><li>如无监控录像或拒绝提供，则风险较高</li></p>
 <p><strong>维度2：权属凭证的&quot;虚假流转&quot;</strong></p>
 <p>正常贸易流程 vs 融资性贸易流程对比：</p>
-</div>
+
 <p>正常贸易流程：</p>
 <ol>
 <li>卖方A交货 → 2. 买方B验收 → 3. B取得提单原件
@@ -3175,15 +3204,12 @@ A公司付款1000万给B公司（货款）
 
 案例：
 </code></pre>
-<p>表面：
-A公司向B公司销售，应收1000万
+<p class="case-content"><strong>表面：</strong>A公司向B公司销售，应收1000万
 实际收款：C公司代B公司付款1000万</p>
-<p>深度追踪：
-C公司的资金来源 ← D公司汇款1000万
+<p class="case-content"><strong>深度追蹤：</strong>C公司的资金来源 ← D公司汇款1000万
 D公司的资金来源 ← A公司之前汇款1000万（采购款）</p>
-<p>实质：
-A公司的资金绕了一圈又回到A公司
-形成完整的资金闭环</p>
+<p class="case-content"><strong>實質：</strong>A公司的资金绕了一圈又回到A公司
+形成完整的资金闭环</p></div>
 <pre><code>
 <h4 id="特征5-合同条款的-quot-形式化-quot">特征5：合同条款的&quot;形式化&quot;</h4>
 
