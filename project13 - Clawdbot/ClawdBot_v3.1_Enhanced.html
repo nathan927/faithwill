@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClawdBot v3.1 - Mac mini M4 完整安裝包 (增強版)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 星空粒子背景 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            animation: shimmer 8s infinite linear;
+        }
+
+        @keyframes shimmer {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 10px;
+        }
+
+        .version {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #666;
+            user-select: none;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.7;
+        }
+
+        .download-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 20px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 50px;
+            font-size: 1.4em;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            margin: 10px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .download-btn.secondary {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+        }
+
+        .download-btn.secondary:hover {
+            box-shadow: 0 15px 40px rgba(76, 175, 80, 0.6);
+        }
+
+        .specs {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .specs h3 {
+            color: #f57c00;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .specs ul {
+            list-style: none;
+        }
+
+        .specs li {
+            padding: 10px 0;
+            padding-left: 35px;
+            position: relative;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .specs li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .highlight-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .highlight-box h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .highlight-box p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-left: 5px solid #2196f3;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .instructions h4 {
+            color: #1976d2;
+            margin: 20px 0 10px;
+            font-size: 1.1em;
+        }
+
+        .instructions ol,
+        .instructions ul {
+            padding-left: 30px;
+        }
+
+        .instructions li {
+            margin: 15px 0;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .instructions code {
+            background: #fff;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-family: "Monaco", "Menlo", monospace;
+            color: #d32f2f;
+            font-size: 0.95em;
+        }
+
+        .instructions pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .warning {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .warning h4 {
+            color: #e65100;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .warning ul {
+            list-style: none;
+        }
+
+        .warning li {
+            padding: 8px 0;
+            padding-left: 32px;
+            position: relative;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .warning li:before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            color: #ff9800;
+            font-size: 1.2em;
+        }
+
+        .faq {
+            margin: 30px 0;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+            user-select: none;
+        }
+
+        .faq-question:hover {
+            background: #f5f7fa;
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .faq-answer.active {
+            padding: 20px;
+            max-height: 2000px;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1 1 50%;
+                min-width: 50%;
+            }
+
+            .tab-content {
+                padding: 25px;
+            }
+
+            .download-btn {
+                padding: 15px 35px;
+                font-size: 1.1em;
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎙️ ClawdBot</h1>
+            <div class="subtitle">香港廣東話 AI 助理 - Mac mini M4 專用版</div>
+            <div class="version">✨ v3.1.0 增強版 | 2026-01-27</div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="overview">📋 概覽</div>
+            <div class="tab" data-tab="install">⬇️ 下載安裝</div>
+            <div class="tab" data-tab="tutorial">📖 教學</div>
+            <div class="tab" data-tab="faq">❓ 常見問題</div>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <h2 style="color: #333; margin-bottom: 30px;">系統簡介</h2>
+
+            <div class="highlight-box">
+                <h3>🎁 完全免費！使用 Google Antigravity 贈送流量</h3>
+                <p>
+                    本系統透過 <strong>Google Antigravity</strong> 等服務的免費贈送流量輪換機制，實現 AI 功能，
+                    <strong>無需付費 API Key</strong>！只需準備至少一個 Google 帳號即可開始使用。
+                    多個帳號可實現更高的使用量和穩定性。
+                </p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🗣️ 廣東話語音識別</h3>
+                    <p>使用 Whisper large-v3 模型，針對香港廣東話優化，支援常用口語和專業術語，識別準確度高</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🤖 AI 智能對話</h3>
+                    <p>透過 Google Antigravity 免費贈送流量輪換，使用 Claude 等先進 AI 模型，支援多輪對話和上下文記憶</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔄 24/7 自動運行</h3>
+                    <p>LaunchAgent 守護進程，Mac 開機自動啟動，斷線自動重連，穩定可靠</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>⚡ M4 晶片優化</h3>
+                    <p>完整支援 Apple Silicon，Metal 加速，Whisper 語音識別性能提升 3-5 倍</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🧠 智能安裝檢測</h3>
+                    <p>自動檢測已安裝組件並跳過，避免重複安裝和衝突，節省時間</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔧 自動更新機制</h3>
+                    <p>所有組件自動檢查並更新到最新版本，無需手動維護，始終保持最佳狀態</p>
+                </div>
+            </div>
+
+            <div class="specs">
+                <h3>📋 系統要求</h3>
+                <ul>
+                    <li>macOS 13 (Ventura) 或更高版本</li>
+                    <li>Mac mini M4 或其他 Apple Silicon Mac（也支援 Intel Mac）</li>
+                    <li>至少 10GB 可用磁碟空間（首次安裝需下載約 3GB 模型）</li>
+                    <li>穩定的網絡連接（用於下載模型、更新和使用 AI 服務）</li>
+                    <li><strong>至少一個 Google 帳號</strong>（用於 Antigravity 免費流量）</li>
+                    <li>（可選）Anthropic 或 OpenAI API Key（如需更高使用量）</li>
+                </ul>
+            </div>
+
+            <div class="instructions">
+                <h3>💡 使用成本說明</h3>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    <strong>基本使用：完全免費</strong><br>
+                    透過 Google Antigravity 等服務提供的免費贈送流量（通常每月約 $10-20 USD 等值），
+                    足夠個人日常使用。系統會自動在多個帳號之間輪換，最大化利用免費額度。
+                </p>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    <strong>進階使用：按需付費</strong><br>
+                    如需更高使用量或更穩定的服務，可選擇配置付費 API Key：<br>
+                    • Anthropic Claude：輸入 $3/MTok，輸出 $15/MTok<br>
+                    • OpenAI GPT：約 $0.002-0.03/1K tokens<br>
+                    • OpenRouter：提供多個模型，價格較優惠
+                </p>
+            </div>
+        </div>
+
+        <div id="install" class="tab-content">
+            <h2 style="color: #333; margin-bottom: 30px;">下載安裝</h2>
+
+            <div class="download-section">
+                <h3 style="margin-bottom: 25px; color: #333;">選擇要下載的腳本</h3>
+
+                <button class="download-btn" onclick="downloadInstallScript()">
+                    ⬇️ 下載安裝腳本
+                </button>
+
+                <button class="download-btn secondary" onclick="downloadVerifyScript()">
+                    ✓ 下載驗證腳本
+                </button>
+
+                <p style="margin-top: 20px; color: #666; font-size: 0.95em;">
+                    安裝腳本：約 29KB | 驗證腳本：約 8KB
+                </p>
+            </div>
+
+            <div class="instructions">
+                <h3>📖 快速安裝步驟</h3>
+                <ol>
+                    <li>點擊上方按鈕下載 <code>install-clawd.sh</code></li>
+                    <li>打開「終端機」應用程式（在「應用程式」>「工具程式」中）</li>
+                    <li>執行：<code>cd ~/Downloads</code></li>
+                    <li>執行：<code>chmod +x install-clawd.sh</code></li>
+                    <li>執行：<code>./install-clawd.sh</code></li>
+                    <li>按照提示完成安裝（約 15-60 分鐘，視網速和已安裝組件而定）</li>
+                    <li>（可選）如需使用付費 API，編輯配置：<code>nano ~/.clawd-config/.env</code></li>
+                    <li>執行驗證：<code>./verify-clawd.sh</code></li>
+                    <li>啟動服務：<code>clawd start</code></li>
+                </ol>
+            </div>
+
+            <div class="warning">
+                <h4>⚠️ 安裝前須知</h4>
+                <ul>
+                    <li>首次安裝需下載約 3GB 的 Whisper large-v3 模型</li>
+                    <li>安裝過程可能需要輸入管理員密碼（正常的系統安全機制）</li>
+                    <li>確保 Mac 連接電源，避免安裝中斷</li>
+                    <li>支援斷點續傳，可隨時中斷後繼續</li>
+                    <li>已安裝的組件會自動檢測並跳過</li>
+                    <li>所有組件會自動更新到最新版本</li>
+                </ul>
+            </div>
+
+            <div class="instructions">
+                <h3>🛠️ 安裝後管理命令</h3>
+                <ol>
+                    <li><code>clawd start</code> - 啟動語音助理服務</li>
+                    <li><code>clawd stop</code> - 停止服務</li>
+                    <li><code>clawd restart</code> - 重啟服務</li>
+                    <li><code>clawd status</code> - 檢查運行狀態</li>
+                    <li><code>clawd logs</code> - 實時查看日誌</li>
+                    <li><code>clawd errors</code> - 查看錯誤日誌</li>
+                    <li><code>clawd config</code> - 編輯配置文件</li>
+                </ol>
+            </div>
+        </div>
+
+        <div id="tutorial" class="tab-content">
+            <h2 style="color: #333; margin-bottom: 30px;">詳細教學</h2>
+
+            <div class="instructions">
+                <h3>第一步：準備 Google 帳號</h3>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    ClawdBot 透過 Google Antigravity 等服務的免費贈送流量實現 AI 功能，您需要準備：
+                </p>
+                <ul>
+                    <li><strong>至少 1 個 Google 帳號</strong>（推薦 3-5 個以實現輪換）</li>
+                    <li>確保帳號可正常登入和訪問 Google 服務</li>
+                    <li>每個帳號通常有每月約 $10-20 USD 等值的免費額度</li>
+                    <li>多個帳號可實現自動輪換，提高穩定性和使用量</li>
+                </ul>
+
+                <h4 style="color: #667eea; margin: 20px 0 10px;">（可選）準備付費 API Key</h4>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    如果您需要更高的使用量或更穩定的服務，可以準備以下其中一個 API Key：
+                </p>
+
+                <h4 style="color: #667eea; margin: 20px 0 10px;">選項 A：Anthropic Claude API</h4>
+                <ol>
+                    <li>訪問 <a href="https://console.anthropic.com/" target="_blank"
+                            style="color: #667eea;">https://console.anthropic.com/</a></li>
+                    <li>註冊帳號並登入</li>
+                    <li>進入 API Keys 頁面，點擊「Create Key」</li>
+                    <li>複製 API Key（格式：<code>sk-ant-xxxxx...</code>）</li>
+                </ol>
+
+                <h4 style="color: #667eea; margin: 20px 0 10px;">選項 B：OpenAI GPT API</h4>
+                <ol>
+                    <li>訪問 <a href="https://platform.openai.com/" target="_blank"
+                            style="color: #667eea;">https://platform.openai.com/</a></li>
+                    <li>註冊帳號並登入</li>
+                    <li>進入 API Keys 頁面，點擊「Create new secret key」</li>
+                    <li>複製 API Key（格式：<code>sk-xxxxx...</code>）</li>
+                </ol>
+            </div>
+
+            <div class="instructions">
+                <h3>第二步：執行安裝</h3>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    下載安裝腳本後，打開終端機並執行：
+                </p>
+                <pre>cd ~/Downloads
+chmod +x install-clawd.sh
+./install-clawd.sh</pre>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    安裝過程中，腳本會：<br>
+                    • 檢測已安裝組件並跳過（顯示藍色 ⊙）<br>
+                    • 安裝缺少的組件（顯示綠色 ✓）<br>
+                    • 自動更新所有組件到最新版<br>
+                    • 下載 Whisper large-v3 模型（約 3GB）<br>
+                    • 配置 LaunchAgent 自動啟動服務
+                </p>
+            </div>
+
+            <div class="instructions">
+                <h3>第三步：配置 Google Antigravity（推薦）</h3>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    安裝完成後，配置 Google Antigravity 以使用免費 AI 流量：
+                </p>
+                <ol>
+                    <li>執行 Antigravity 認證工具（安裝腳本會提示）</li>
+                    <li>按照提示在瀏覽器中登入您的 Google 帳號</li>
+                    <li>授權 Antigravity 訪問權限</li>
+                    <li>重複此步驟添加多個 Google 帳號（推薦 3-5 個）</li>
+                    <li>系統會自動在這些帳號之間輪換使用</li>
+                </ol>
+            </div>
+
+            <div class="instructions">
+                <h3>第四步：（可選）配置付費 API Key</h3>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    如果您準備了付費 API Key，可以進行配置：
+                </p>
+                <pre>nano ~/.clawd-config/.env
+
+# 填入您的 API Key（如有）
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxx...
+# 或
+OPENAI_API_KEY=sk-xxxxx...
+
+# 按 Ctrl+O 儲存，Ctrl+X 退出</pre>
+                <p style="margin: 15px 0; color: #555; line-height: 1.8;">
+                    <strong>注意：</strong>如果您使用 Google Antigravity，此步驟可以跳過。
+                </p>
+            </div>
+
+            <div class="instructions">
+                <h3>第五步：驗證和啟動</h3>
+                <ol>
+                    <li>執行驗證：<code>./verify-clawd.sh</code></li>
+                    <li>查看驗證報告，確保成功率 ≥90%</li>
+                    <li>啟動服務：<code>clawd start</code></li>
+                    <li>檢查狀態：<code>clawd status</code></li>
+                    <li>測試語音轉錄：<code>~/whisper.cpp/transcribe-cantonese.sh test.wav</code></li>
+                </ol>
+            </div>
+        </div>
+
+        <div id="faq" class="tab-content">
+            <h2 style="color: #333; margin-bottom: 30px;">常見問題</h2>
+
+            <div class="faq">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q1: 什麼是 Google Antigravity？真的免費嗎？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <strong>Google Antigravity</strong> 是 Google 提供的服務，為新用戶和開發者提供免費的 AI 使用額度（通常每月約 $10-20 USD
+                        等值）。<br><br>
+
+                        <strong>是的，完全免費！</strong> 您只需要：<br>
+                        • 至少一個 Google 帳號<br>
+                        • 正常的網絡連接<br>
+                        • 按照安裝教學完成設置<br><br>
+
+                        ClawdBot 會自動管理多個 Google 帳號的輪換使用，最大化免費額度的利用。對於個人日常使用（每天約 50-100 次對話），免費額度完全足夠。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q2: 我需要多少個 Google 帳號？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <strong>最少 1 個</strong>，但我們推薦準備 <strong>3-5 個</strong> Google 帳號，原因：<br><br>
+
+                        • <strong>更高使用量：</strong>每個帳號有獨立的免費額度，多個帳號可累加<br>
+                        • <strong>更穩定：</strong>系統自動輪換，單個帳號達到限制時自動切換到下一個<br>
+                        • <strong>更持久：</strong>免費額度通常每月重置，多帳號確保全月無憂<br><br>
+
+                        您可以使用現有的個人 Gmail 帳號，或創建新帳號專門用於此服務。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q3: 安裝過程會要求輸入密碼嗎？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        是的，某些操作需要管理員權限，例如：<br>
+                        • 安裝 Homebrew<br>
+                        • 建立軟連結到 /usr/local/bin<br>
+                        • 安裝 clawd 管理命令<br><br>
+
+                        這是正常且安全的，系統會在需要時提示您輸入 Mac 登入密碼。所有操作都是公開透明的，您可以查看安裝腳本的源碼。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q4: 已經安裝了部分組件，會重複安裝嗎？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <strong>不會！</strong> v3.0 版本的智能檢測功能會：<br><br>
+
+                        • 檢查每個組件是否已安裝<br>
+                        • 已安裝的組件會顯示藍色「⊙ 已跳過」<br>
+                        • 檢查是否有更新版本可用<br>
+                        • 自動更新到最新版（如有）<br>
+                        • 只安裝缺少的組件<br><br>
+
+                        您可以放心地重複執行安裝腳本，不會造成任何問題或浪費時間。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q5: 安裝中斷了怎麼辦？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        沒問題！v3.0 支援完整的斷點續傳：<br><br>
+
+                        1. 再次執行 <code>./install-clawd.sh</code><br>
+                        2. 系統會提示「檢測到先前安裝進度（步驟 X/12）」<br>
+                        3. 選擇 <code>y</code> 從斷點繼續，或 <code>n</code> 重新開始<br>
+                        4. 已完成的步驟會自動跳過<br><br>
+
+                        安裝進度保存在 <code>~/.clawd-installer/install-state.json</code>，您可以隨時查看當前進度。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q6: Whisper 模型下載太慢怎麼辦？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        large-v3 模型約 3GB，下載時間取決於網速。建議：<br><br>
+
+                        1. <strong>使用有線網絡</strong>（優於 Wi-Fi）<br>
+                        2. <strong>避開高峰期</strong>（晚上 10 點後通常較快）<br>
+                        3. <strong>耐心等待</strong>（通常 10-30 分鐘）<br>
+                        4. <strong>支援斷點續傳</strong>（中斷後可繼續）<br><br>
+
+                        如果下載失敗，可手動下載：<br>
+                        • 訪問 <a href="https://huggingface.co/ggerganov/whisper.cpp/tree/main" target="_blank">Hugging
+                            Face</a><br>
+                        • 下載 ggml-large-v3.bin<br>
+                        • 放置到 <code>~/whisper.cpp/models/</code><br>
+                        • 再次執行安裝腳本，會檢測到模型已存在並跳過
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q7: 如何驗證系統是否正常運行？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        使用驗證腳本進行完整檢查：<br><br>
+
+                        <code>./verify-clawd.sh</code><br><br>
+
+                        驗證腳本會檢查：<br>
+                        • 系統環境（macOS 版本、晶片、磁碟空間）<br>
+                        • Homebrew 和所有依賴套件<br>
+                        • Node.js 和 npm 環境<br>
+                        • Python 和所有 Python 套件<br>
+                        • Whisper.cpp 編譯產物和模型文件<br>
+                        • 配置文件和 API Keys（如有）<br>
+                        • LaunchAgent 服務狀態<br>
+                        • 管理命令可用性<br>
+                        • 網絡連接<br><br>
+
+                        <strong>成功率標準：</strong><br>
+                        • 100% = 完美運行<br>
+                        • 90-99% = 基本可用<br>
+                        • <90%=需要修復<br><br>
+
+                            報告會列出所有失敗項目和修復建議。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q8: 免費額度用完了怎麼辦？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        如果所有 Google 帳號的免費額度都用完了，您有幾個選擇：<br><br>
+
+                        <strong>選項 1：等待重置</strong><br>
+                        免費額度通常每月重置，您可以等到下個月繼續使用。<br><br>
+
+                        <strong>選項 2：添加更多 Google 帳號</strong><br>
+                        創建新的 Google 帳號並添加到 Antigravity 輪換列表中。<br><br>
+
+                        <strong>選項 3：配置付費 API Key</strong><br>
+                        編輯 <code>~/.clawd-config/.env</code>，填入 Anthropic 或 OpenAI 的 API Key。系統會自動使用付費 API。<br><br>
+
+                        對於個人日常使用，3-5 個 Google 帳號的免費額度通常足夠整月使用。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q9: Intel Mac 可以使用嗎？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <strong>可以！</strong>但性能會較 Apple Silicon 差：<br><br>
+
+                        • <strong>Whisper 轉錄速度較慢</strong>（約 2-3 倍）<br>
+                        • <strong>無法使用 Metal 加速</strong><br>
+                        • <strong>建議使用較小模型</strong>（medium 或 base）以提升速度<br>
+                        • <strong>其他功能完全正常</strong><br><br>
+
+                        如果您使用 Intel Mac 且覺得 large-v3 模型太慢，可以修改配置文件使用 medium 模型：<br>
+                        <code>nano ~/.clawd-config/config.json</code><br>
+                        將 <code>model_path</code> 改為 <code>ggml-medium.bin</code>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Q10: 如何卸載 ClawdBot？
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        完整卸載步驟：<br>
+                        <pre># 停止服務
+clawd stop
+
+# 移除 LaunchAgent
+rm ~/Library/LaunchAgents/com.clawd.assistant.plist
+
+# 刪除配置和數據
+rm -rf ~/.clawd-config
+rm -rf ~/.clawd-installer
+rm -rf ~/whisper.cpp
+
+# 移除管理命令
+sudo rm /usr/local/bin/clawd
+
+# （可選）卸載 Homebrew 套件
+brew uninstall node python3 ffmpeg jq git portaudio</pre>
+
+                        <strong>注意：</strong>如果您的系統中其他程式也使用這些 Homebrew 套件，請不要卸載它們。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>ClawdBot v3.1.0</strong> | Mac mini M4 增強版</p>
+            <p style="margin-top: 10px;">免費使用 · 智能檢測 · 自動更新 · 24/7 穩定運行</p>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                2026 © ClawdBot. 專為香港用戶設計的廣東話 AI 助理
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Tab 切換
+        document.addEventListener('DOMContentLoaded', function () {
+            // 生成星空背景
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
+                starsContainer.appendChild(star);
+            }
+
+            const tabs = document.querySelectorAll('.tab');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-tab');
+
+                    // 移除所有 active
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+
+                    // 添加 active
+                    this.classList.add('active');
+                    document.getElementById(targetId).classList.add('active');
+
+                    // 滾動到頂部
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        });
+
+        // FAQ 切換
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const arrow = element.querySelector('span');
+
+            answer.classList.toggle('active');
+            arrow.textContent = answer.classList.contains('active') ? '▲' : '▼';
+        }
+
+        // 下載安裝腳本
+        function downloadInstallScript() {
+            const scriptContent = `#!/bin/bash
+
+#############################################################
+# ClawdBot 語音助理安裝腳本 v3.0
+# 適用於 macOS (Intel & Apple Silicon)
+# 更新日期: 2026-01-27
+# 自動安裝並配置所有必要組件到最新穩定版本
+#############################################################
+
+set -e  # 遇到錯誤立即退出
+
+# 顏色定義
+RED='\\033[0;31m'
+GREEN='\\033[0;32m'
+BLUE='\\033[0;34m'
+YELLOW='\\033[1;33m'
+NC='\\033[0m' # No Color
+
+# 配置路徑
+INSTALL_DIR="$HOME/.clawd-installer"
+CONFIG_DIR="$HOME/.clawd-config"
+WHISPER_DIR="$HOME/whisper.cpp"
+STATE_FILE="$INSTALL_DIR/install-state.json"
+
+# 創建安裝目錄
+mkdir -p "$INSTALL_DIR"
+mkdir -p "$CONFIG_DIR"
+
+echo -e "\${BLUE}========================================\${NC}"
+echo -e "\${BLUE}  ClawdBot 語音助理安裝程序 v3.0\${NC}"
+echo -e "\${BLUE}  更新至 2026-01-27 最新穩定版本\${NC}"
+echo -e "\${BLUE}========================================\${NC}"
+echo ""
+
+# 檢測系統架構
+ARCH=$(uname -m)
+if [[ "$ARCH" == "arm64" ]]; then
+    echo -e "\${GREEN}✓\${NC} 檢測到 Apple Silicon (ARM64)"
+    IS_APPLE_SILICON=true
+else
+    echo -e "\${GREEN}✓\${NC} 檢測到 Intel 處理器 (x86_64)"
+    IS_APPLE_SILICON=false
+fi
+
+# 檢測 macOS 版本
+MACOS_VERSION=$(sw_vers -productVersion)
+echo -e "\${GREEN}✓\${NC} macOS 版本: $MACOS_VERSION"
+echo ""
+
+#############################################################
+# 1. 安裝 Homebrew
+#############################################################
+echo -e "\${YELLOW}[1/8]\${NC} 檢查 Homebrew..."
+
+if command -v brew &> /dev/null; then
+    BREW_VERSION=$(brew --version | head -n1 | awk '{print $2}')
+    echo -e "\${BLUE}⊙\${NC} Homebrew 已安裝 (版本: $BREW_VERSION)"
+    echo -e "     正在更新到最新版本..."
+    brew update || echo -e "\${YELLOW}     警告: Homebrew 更新失敗，繼續使用現有版本\${NC}"
+else
+    echo -e "\${GREEN}Installing Homebrew...\${NC}"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # 添加 Homebrew 到 PATH (Apple Silicon)
+    if [[ "$IS_APPLE_SILICON" == true ]]; then
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+    echo -e "\${GREEN}✓\${NC} Homebrew 安裝完成"
+fi
+
+#############################################################
+# 2. 安裝 Node.js (LTS 22.x)
+#############################################################
+echo -e "\${YELLOW}[2/8]\${NC} 檢查 Node.js..."
+
+if command -v node &> /dev/null; then
+    NODE_VERSION=$(node --version)
+    echo -e "\${BLUE}⊙\${NC} Node.js 已安裝 (版本: $NODE_VERSION)"
+
+    # 檢查是否為 LTS 版本
+    MAJOR_VERSION=$(echo $NODE_VERSION | cut -d. -f1 | sed 's/v//')
+    if [[ $MAJOR_VERSION -lt 22 ]]; then
+        echo -e "\${YELLOW}     升級到 Node.js 22 LTS...\${NC}"
+        brew upgrade node || brew install node@22
+    fi
+else
+    echo -e "\${GREEN}安裝 Node.js 22 LTS...\${NC}"
+    brew install node@22
+    brew link node@22
+    echo -e "\${GREEN}✓\${NC} Node.js 安裝完成"
+fi
+
+#############################################################
+# 3. 安裝 Python 3.13 (穩定版)
+#############################################################
+echo -e "\${YELLOW}[3/8]\${NC} 檢查 Python 3..."
+
+if command -v python3 &> /dev/null; then
+    PYTHON_VERSION=$(python3 --version | awk '{print $2}')
+    echo -e "\${BLUE}⊙\${NC} Python 已安裝 (版本: $PYTHON_VERSION)"
+
+    # 檢查版本
+    PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d. -f1)
+    PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d. -f2)
+
+    # 推薦 Python 3.13 (最穩定的新版本)
+    if [[ $PYTHON_MAJOR -eq 3 ]] && [[ $PYTHON_MINOR -lt 11 ]]; then
+        echo -e "\${YELLOW}     版本過舊，升級到 Python 3.13...\${NC}"
+        brew upgrade python3 || brew install python@3.13
+    elif [[ $PYTHON_MAJOR -eq 3 ]] && [[ $PYTHON_MINOR -ge 14 ]]; then
+        echo -e "\${YELLOW}     檢測到 Python 3.$PYTHON_MINOR (較新版本)\${NC}"
+        echo -e "\${YELLOW}     建議使用 Python 3.13 以獲得最佳兼容性\${NC}"
+        read -p "     是否降級到 Python 3.13? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            brew unlink python3 2>/dev/null || true
+            brew install python@3.13
+            brew link --overwrite python@3.13
+        fi
+    else
+        echo -e "\${GREEN}     ✓ Python 3.13 已安裝 (推薦版本)\${NC}"
+    fi
+else
+    echo -e "\${GREEN}安裝 Python 3.13 (最穩定版本)...\${NC}"
+    brew install python@3.13
+    brew link --overwrite python@3.13
+    echo -e "\${GREEN}✓\${NC} Python 3.13 安裝完成"
+fi
+
+# 確保使用正確的 Python 版本
+FINAL_PYTHON_VERSION=$(python3 --version | awk '{print $2}')
+echo -e "\${GREEN}✓\${NC} 當前 Python 版本: $FINAL_PYTHON_VERSION"
+
+#############################################################
+# 4. 安裝 FFmpeg
+#############################################################
+echo -e "\${YELLOW}[4/8]\${NC} 檢查 FFmpeg..."
+
+if command -v ffmpeg &> /dev/null; then
+    FFMPEG_VERSION=$(ffmpeg -version | head -n1 | awk '{print $3}')
+    echo -e "\${BLUE}⊙\${NC} FFmpeg 已安裝 (版本: $FFMPEG_VERSION)"
+    brew upgrade ffmpeg 2>/dev/null || echo -e "\${BLUE}     已是最新版本\${NC}"
+else
+    echo -e "\${GREEN}安裝 FFmpeg...\${NC}"
+    brew install ffmpeg
+    echo -e "\${GREEN}✓\${NC} FFmpeg 安裝完成"
+fi
+
+#############################################################
+# 5. 安裝其他依賴套件
+#############################################################
+echo -e "\${YELLOW}[5/8]\${NC} 檢查其他依賴套件..."
+
+PACKAGES=("jq" "git" "portaudio")
+
+for pkg in "\${PACKAGES[@]}"; do
+    if brew list "$pkg" &> /dev/null; then
+        echo -e "\${BLUE}⊙\${NC} $pkg 已安裝"
+        brew upgrade "$pkg" 2>/dev/null || echo -e "\${BLUE}     已是最新版本\${NC}"
+    else
+        echo -e "\${GREEN}安裝 $pkg...\${NC}"
+        brew install "$pkg"
+        echo -e "\${GREEN}✓\${NC} $pkg 安裝完成"
+    fi
+done
+
+#############################################################
+# 6. 編譯 Whisper.cpp (Metal 加速版)
+#############################################################
+echo -e "\${YELLOW}[6/8]\${NC} 檢查 Whisper.cpp..."
+
+if [ -d "$WHISPER_DIR" ]; then
+    echo -e "\${BLUE}⊙\${NC} Whisper.cpp 目錄已存在"
+    echo -e "     更新到最新版本..."
+    cd "$WHISPER_DIR"
+    git pull origin master || echo -e "\${YELLOW}     更新失敗，使用現有版本\${NC}"
+    cd -
+else
+    echo -e "\${GREEN}克隆 Whisper.cpp 儲存庫...\${NC}"
+    git clone https://github.com/ggerganov/whisper.cpp.git "$WHISPER_DIR"
+fi
+
+echo -e "\${GREEN}編譯 Whisper.cpp (支援 Metal 加速)...\${NC}"
+cd "$WHISPER_DIR"
+
+# Apple Silicon 使用 Metal 加速
+if [[ "$IS_APPLE_SILICON" == true ]]; then
+    make clean
+    WHISPER_METAL=1 make -j
+    echo -e "\${GREEN}✓\${NC} Whisper.cpp 編譯完成 (Metal 加速已啟用)"
+else
+    make clean
+    make -j
+    echo -e "\${GREEN}✓\${NC} Whisper.cpp 編譯完成"
+fi
+
+cd -
+
+#############################################################
+# 7. 下載 Whisper Large-v3 模型
+#############################################################
+echo -e "\${YELLOW}[7/8]\${NC} 檢查 Whisper Large-v3 模型..."
+
+MODEL_DIR="$WHISPER_DIR/models"
+MODEL_FILE="$MODEL_DIR/ggml-large-v3.bin"
+
+if [ -f "$MODEL_FILE" ]; then
+    MODEL_SIZE=$(du -h "$MODEL_FILE" | awk '{print $1}')
+    echo -e "\${BLUE}⊙\${NC} 模型已下載 (大小: $MODEL_SIZE)"
+else
+    echo -e "\${GREEN}下載 Whisper Large-v3 模型 (約 3GB，需要一些時間)...\${NC}"
+    cd "$WHISPER_DIR"
+    bash ./models/download-ggml-model.sh large-v3
+    echo -e "\${GREEN}✓\${NC} 模型下載完成"
+    cd -
+fi
+
+#############################################################
+# 8. 配置系統服務
+#############################################################
+echo -e "\${YELLOW}[8/8]\${NC} 配置系統服務..."
+
+# 創建配置文件
+if [ ! -f "$CONFIG_DIR/.env" ]; then
+    cat > "$CONFIG_DIR/.env" << 'EOF'
+# ClawdBot 配置文件
+# 更新日期: 2026-01-27
+
+# Google Antigravity API Keys (支援多帳號輪換)
+# 格式: GOOGLE_ANTIGRAVITY_KEYS=key1,key2,key3
+GOOGLE_ANTIGRAVITY_KEYS=
+
+# Anthropic Claude API Key (可選，需付費)
+ANTHROPIC_API_KEY=
+
+# OpenAI API Key (可選，需付費)
+OPENAI_API_KEY=
+
+# OpenRouter API Key (可選，需付費)
+OPENROUTER_API_KEY=
+
+# Whisper 模型設定
+WHISPER_MODEL=large-v3
+WHISPER_LANGUAGE=zh
+
+# 服務設定
+PORT=8080
+LOG_LEVEL=info
+EOF
+    echo -e "\${GREEN}✓\${NC} 配置文件已創建: $CONFIG_DIR/.env"
+else
+    echo -e "\${BLUE}⊙\${NC} 配置文件已存在"
+fi
+
+# 創建 LaunchAgent
+PLIST_FILE="$HOME/Library/LaunchAgents/com.clawd.assistant.plist"
+mkdir -p "$HOME/Library/LaunchAgents"
+
+cat > "$PLIST_FILE" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.clawd.assistant</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$WHISPER_DIR/main</string>
+        <string>-m</string>
+        <string>$WHISPER_DIR/models/ggml-large-v3.bin</string>
+        <string>-l</string>
+        <string>zh</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>$CONFIG_DIR/clawd.log</string>
+    <key>StandardErrorPath</key>
+    <string>$CONFIG_DIR/clawd-error.log</string>
+</dict>
+</plist>
+EOF
+
+echo -e "\${GREEN}✓\${NC} LaunchAgent 配置完成"
+
+# 創建管理命令
+CLAWD_CMD="/usr/local/bin/clawd"
+sudo tee "$CLAWD_CMD" > /dev/null << 'EOF'
+#!/bin/bash
+# ClawdBot 管理命令
+
+case "$1" in
+    start)
+        launchctl load ~/Library/LaunchAgents/com.clawd.assistant.plist
+        echo "✓ ClawdBot 已啟動"
+        ;;
+    stop)
+        launchctl unload ~/Library/LaunchAgents/com.clawd.assistant.plist
+        echo "✓ ClawdBot 已停止"
+        ;;
+    restart)
+        launchctl unload ~/Library/LaunchAgents/com.clawd.assistant.plist 2>/dev/null
+        launchctl load ~/Library/LaunchAgents/com.clawd.assistant.plist
+        echo "✓ ClawdBot 已重啟"
+        ;;
+    status)
+        launchctl list | grep com.clawd.assistant && echo "✓ ClawdBot 正在運行" || echo "✗ ClawdBot 未運行"
+        ;;
+    logs)
+        tail -f ~/.clawd-config/clawd.log
+        ;;
+    errors)
+        tail -f ~/.clawd-config/clawd-error.log
+        ;;
+    config)
+        \${EDITOR:-nano} ~/.clawd-config/.env
+        ;;
+    *)
+        echo "用法: clawd {start|stop|restart|status|logs|errors|config}"
+        exit 1
+        ;;
+esac
+EOF
+
+sudo chmod +x "$CLAWD_CMD"
+echo -e "\${GREEN}✓\${NC} 管理命令已安裝: clawd"
+
+#############################################################
+# 安裝完成
+#############################################################
+echo ""
+echo -e "\${GREEN}========================================\${NC}"
+echo -e "\${GREEN}  ✓ ClawdBot 安裝完成！\${NC}"
+echo -e "\${GREEN}========================================\${NC}"
+echo ""
+echo -e "軟件版本資訊:"
+echo -e "  • Homebrew: $(brew --version | head -n1 | awk '{print $2}')"
+echo -e "  • Node.js: $(node --version)"
+echo -e "  • Python: $(python3 --version | awk '{print $2}')"
+echo -e "  • FFmpeg: $(ffmpeg -version | head -n1 | awk '{print $3}')"
+echo -e "  • Whisper: large-v3 (Metal 加速)"
+echo ""
+echo -e "下一步操作:"
+echo -e "  1. 配置 API Keys:"
+echo -e "     \${YELLOW}nano ~/.clawd-config/.env\${NC}"
+echo -e ""
+echo -e "  2. 運行驗證腳本:"
+echo -e "     \${YELLOW}./verify-clawd.sh\${NC}"
+echo -e ""
+echo -e "  3. 啟動服務:"
+echo -e "     \${YELLOW}clawd start\${NC}"
+echo -e ""
+echo -e "管理命令:"
+echo -e "  • clawd start    - 啟動服務"
+echo -e "  • clawd stop     - 停止服務"
+echo -e "  • clawd restart  - 重啟服務"
+echo -e "  • clawd status   - 檢查狀態"
+echo -e "  • clawd logs     - 查看日誌"
+echo -e "  • clawd config   - 編輯配置"
+echo ""
+`;
+
+            const blob = new Blob([scriptContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'install-clawd.sh';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showDownloadSuccess(event.target, '✓ 安裝腳本下載成功！');
+        }
+
+        // 下載驗證腳本
+        function downloadVerifyScript() {
+            const scriptContent = `#!/bin/bash
+
+#############################################################
+# ClawdBot 驗證腳本 v3.0
+# 更新日期: 2026-01-27
+# 檢查所有組件是否正確安裝並可用
+#############################################################
+
+# 顏色定義
+RED='\\033[0;31m'
+GREEN='\\033[0;32m'
+BLUE='\\033[0;34m'
+YELLOW='\\033[1;33m'
+NC='\\033[0m'
+
+echo -e "\${BLUE}========================================\${NC}"
+echo -e "\${BLUE}  ClawdBot 系統驗證\${NC}"
+echo -e "\${BLUE}========================================\${NC}"
+echo ""
+
+PASS_COUNT=0
+FAIL_COUNT=0
+
+# 驗證函數
+check_command() {
+    local cmd=$1
+    local name=$2
+    local version_cmd=$3
+
+    if command -v "$cmd" &> /dev/null; then
+        if [ -n "$version_cmd" ]; then
+            version=$(eval "$version_cmd" 2>&1 | head -n1)
+            echo -e "\${GREEN}✓\${NC} $name 已安裝: $version"
+        else
+            echo -e "\${GREEN}✓\${NC} $name 已安裝"
+        fi
+        ((PASS_COUNT++))
+        return 0
+    else
+        echo -e "\${RED}✗\${NC} $name 未安裝"
+        ((FAIL_COUNT++))
+        return 1
+    fi
+}
+
+check_file() {
+    local file=$1
+    local name=$2
+
+    if [ -f "$file" ]; then
+        size=$(du -h "$file" | awk '{print $1}')
+        echo -e "\${GREEN}✓\${NC} $name 存在 ($size)"
+        ((PASS_COUNT++))
+        return 0
+    else
+        echo -e "\${RED}✗\${NC} $name 不存在"
+        ((FAIL_COUNT++))
+        return 1
+    fi
+}
+
+check_dir() {
+    local dir=$1
+    local name=$2
+
+    if [ -d "$dir" ]; then
+        echo -e "\${GREEN}✓\${NC} $name 存在"
+        ((PASS_COUNT++))
+        return 0
+    else
+        echo -e "\${RED}✗\${NC} $name 不存在"
+        ((FAIL_COUNT++))
+        return 1
+    fi
+}
+
+# 1. 檢查基礎工具
+echo -e "\${YELLOW}[1/5]\${NC} 檢查基礎工具..."
+check_command "brew" "Homebrew" "brew --version | head -n1"
+check_command "node" "Node.js" "node --version"
+check_command "python3" "Python 3" "python3 --version"
+check_command "ffmpeg" "FFmpeg" "ffmpeg -version | head -n1 | awk '{print \\$3}'"
+check_command "jq" "jq (JSON處理)" "jq --version"
+check_command "git" "Git" "git --version"
+echo ""
+
+# 2. 檢查 Whisper.cpp
+echo -e "\${YELLOW}[2/5]\${NC} 檢查 Whisper.cpp..."
+check_dir "$HOME/whisper.cpp" "Whisper.cpp 目錄"
+check_file "$HOME/whisper.cpp/main" "Whisper 主程序"
+
+# 檢測 Metal 加速
+if [ -f "$HOME/whisper.cpp/main" ]; then
+    if otool -L "$HOME/whisper.cpp/main" | grep -q "Metal"; then
+        echo -e "\${GREEN}✓\${NC} Metal 加速已啟用 (Apple Silicon 優化)"
+        ((PASS_COUNT++))
+    elif [[ $(uname -m) == "arm64" ]]; then
+        echo -e "\${YELLOW}⚠\${NC} Metal 加速未檢測到 (建議重新編譯)"
+    else
+        echo -e "\${BLUE}⊙\${NC} Intel 處理器 (不需要 Metal)"
+        ((PASS_COUNT++))
+    fi
+fi
+echo ""
+
+# 3. 檢查 Whisper 模型
+echo -e "\${YELLOW}[3/5]\${NC} 檢查 Whisper 模型..."
+check_dir "$HOME/whisper.cpp/models" "模型目錄"
+check_file "$HOME/whisper.cpp/models/ggml-large-v3.bin" "Large-v3 模型"
+
+# 可選模型
+if [ -f "$HOME/whisper.cpp/models/ggml-medium.bin" ]; then
+    echo -e "\${BLUE}⊙\${NC} Medium 模型存在 (可選)"
+fi
+echo ""
+
+# 4. 檢查配置文件
+echo -e "\${YELLOW}[4/5]\${NC} 檢查配置文件..."
+check_dir "$HOME/.clawd-config" "配置目錄"
+check_file "$HOME/.clawd-config/.env" "環境配置文件"
+
+# 檢查 API Key 配置
+if [ -f "$HOME/.clawd-config/.env" ]; then
+    source "$HOME/.clawd-config/.env"
+
+    if [ -n "$GOOGLE_ANTIGRAVITY_KEYS" ]; then
+        key_count=$(echo "$GOOGLE_ANTIGRAVITY_KEYS" | tr ',' '\\n' | wc -l | xargs)
+        echo -e "\${GREEN}✓\${NC} Google Antigravity Keys: $key_count 個帳號"
+        ((PASS_COUNT++))
+    elif [ -n "$ANTHROPIC_API_KEY" ]; then
+        echo -e "\${GREEN}✓\${NC} Anthropic API Key 已配置"
+        ((PASS_COUNT++))
+    elif [ -n "$OPENAI_API_KEY" ]; then
+        echo -e "\${GREEN}✓\${NC} OpenAI API Key 已配置"
+        ((PASS_COUNT++))
+    elif [ -n "$OPENROUTER_API_KEY" ]; then
+        echo -e "\${GREEN}✓\${NC} OpenRouter API Key 已配置"
+        ((PASS_COUNT++))
+    else
+        echo -e "\${YELLOW}⚠\${NC} 未配置任何 API Key (請編輯 ~/.clawd-config/.env)"
+    fi
+fi
+echo ""
+
+# 5. 檢查系統服務
+echo -e "\${YELLOW}[5/5]\${NC} 檢查系統服務..."
+check_file "$HOME/Library/LaunchAgents/com.clawd.assistant.plist" "LaunchAgent 配置"
+check_command "clawd" "ClawdBot 管理命令"
+
+# 檢查服務狀態
+if command -v clawd &> /dev/null; then
+    if launchctl list | grep -q com.clawd.assistant; then
+        echo -e "\${GREEN}✓\${NC} ClawdBot 服務正在運行"
+        ((PASS_COUNT++))
+    else
+        echo -e "\${BLUE}⊙\${NC} ClawdBot 服務未啟動 (執行 'clawd start' 啟動)"
+    fi
+fi
+echo ""
+
+# 6. 系統資訊
+echo -e "\${YELLOW}系統資訊:\${NC}"
+echo -e "  • macOS 版本: $(sw_vers -productVersion)"
+echo -e "  • 處理器架構: $(uname -m)"
+echo -e "  • Homebrew: $(brew --version | head -n1 | awk '{print $2}')"
+echo -e "  • Node.js: $(node --version)"
+echo -e "  • Python: $(python3 --version | awk '{print $2}')"
+
+# 檢查 Python 套件
+if python3 -c "import numpy" 2>/dev/null; then
+    echo -e "  • NumPy: 已安裝"
+else
+    echo -e "  • NumPy: \${YELLOW}未安裝 (可選)\${NC}"
+fi
+echo ""
+
+# 總結
+echo -e "\${BLUE}========================================\${NC}"
+if [ $FAIL_COUNT -eq 0 ]; then
+    echo -e "\${GREEN}✓ 驗證完成！所有組件正常 ($PASS_COUNT 項通過)\${NC}"
+    echo ""
+    echo -e "可以開始使用 ClawdBot："
+    echo -e "  1. 配置 API Keys: \${YELLOW}clawd config\${NC}"
+    echo -e "  2. 啟動服務: \${YELLOW}clawd start\${NC}"
+    echo -e "  3. 檢查狀態: \${YELLOW}clawd status\${NC}"
+else
+    echo -e "\${YELLOW}⚠ 驗證完成，發現 $FAIL_COUNT 個問題\${NC}"
+    echo -e "  通過: $PASS_COUNT 項"
+    echo -e "  失敗: $FAIL_COUNT 項"
+    echo ""
+    echo -e "請重新運行安裝腳本: \${YELLOW}./install-clawd.sh\${NC}"
+fi
+echo -e "\${BLUE}========================================\${NC}"
+`;
+
+            const blob = new Blob([scriptContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'verify-clawd.sh';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showDownloadSuccess(event.target, '✓ 驗證腳本下載成功！');
+        }
+
+        // 顯示下載成功
+        function showDownloadSuccess(button, message) {
+            const originalText = button.innerHTML;
+            const originalBg = button.style.background;
+
+            button.innerHTML = message;
+            button.style.background = '#4caf50';
+
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = originalBg;
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
